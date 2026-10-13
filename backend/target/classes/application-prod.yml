@@ -1,0 +1,16 @@
+# 生产 / 联调：连接 MySQL 与 Redis。密码按实际环境修改。
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/argument_annotation?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: changeit
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+management:
+  health:
+    redis:
+      enabled: true

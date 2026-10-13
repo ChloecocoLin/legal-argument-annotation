@@ -1,0 +1,170 @@
+/* ============================================================================
+   法律论证标注系统 · 设计令牌 (tokens.css)
+   方向：深蓝 + 灰白 + 少量暖色强调 · 中文字体 · 学术 / 专业 / 可信赖
+   所有原始色值只出现在本文件的 :root 中；其余样式一律使用 var() 与 color-mix()。
+   ========================================================================== */
+
+:root {
+  /* ── 基础界面色（深蓝 / 灰白） ───────────────────────────────── */
+  --bg:            #edf1f7;   /* 应用画布 */
+  --surface:       #ffffff;   /* 卡片、面板 */
+  --surface-2:     #f6f8fc;   /* 次级面板、条纹 */
+  --surface-3:     #eef2f8;   /* 三级填充 */
+  --fg:            #0e1a2b;   /* 主文字：墨蓝 */
+  --fg-2:          #33445c;   /* 次级文字 */
+  --muted:         #5c6b80;   /* 说明 / 元信息 */
+  --faint:         #8a97a8;   /* 更弱的文字 */
+  --border:        #dde3ec;   /* 细分隔线 */
+  --border-strong: #c6d0dd;   /* 强边界 */
+
+  /* ── 品牌色：深蓝 ─────────────────────────────────────────── */
+  --accent:        #1d3f7a;   /* 主色（按钮 / 链接 / 激活） */
+  --accent-hover:  #16325f;
+  --accent-ink:    #12294e;   /* 侧栏底色附近的深蓝 */
+  --accent-soft:   #e7eefb;   /* 主色浅底 */
+  --accent-line:   #b9c9ea;
+
+  /* ── 暖色强调（克制使用） ─────────────────────────────────── */
+  --warm:          #b06a2c;   /* 暖色强调：激活指示、品牌点 */
+  --warm-strong:   #8a4f1c;
+  --warm-soft:     #f7ecdf;
+
+  /* ── 侧栏（深蓝） ─────────────────────────────────────────── */
+  --nav-bg:        #0d1a2c;
+  --nav-bg-2:      #12233a;
+  --nav-fg:        #c6d2e2;
+  --nav-fg-dim:    #7f90a6;
+  --nav-active:    rgba(255,255,255,0.07);
+  --nav-line:      rgba(255,255,255,0.09);
+
+  /* ── 状态色 ───────────────────────────────────────────────── */
+  --info:    #2563eb;  --info-soft:   #e6efff;
+  --success: #0f8a5f;  --success-soft:#e0f4ec;
+  --warn:    #b7791f;  --warn-soft:   #fbf0da;
+  --danger:  #c0392b;  --danger-soft: #fbe7e4;
+
+  /* ── 命题 / 非命题语义标签色（数据编码色板） ──────────────── */
+  --nl:      #64748b;  --nl-soft: #eef1f5;  --nl-line: #cfd7e2;   /* 非命题：灰 */
+  --gm:      #2563eb;  --gm-soft: #e6efff;  --gm-line: #bcd3fb;   /* GM：蓝 */
+  --sm:      #0f8a5f;  --sm-soft: #e0f4ec;  --sm-line: #b5e2cf;   /* SM：绿 */
+  --gf:      #d9761b;  --gf-soft: #fdeddc;  --gf-line: #f6d0a3;   /* GF：橙 */
+  --sf:      #7c3aed;  --sf-soft: #f1e9fe;  --sf-line: #d9c6fb;   /* SF：紫 */
+
+  /* ── 关系色（图元） ───────────────────────────────────────── */
+  --rel-s:   #1f7a4d;   /* S 支持（实心圆 ●） */
+  --rel-a:   #c0392b;   /* A 反对（空心圆 ○） */
+  --rel-j:   #b7791f;   /* J 组合（带 + 圆） */
+  --rel-m:   #0e7490;   /* M 匹配（带 + 圆，有向） */
+  --rel-i:   #6b7280;   /* I 同一（框内 /） */
+
+  /* ── 字体 ─────────────────────────────────────────────────── */
+  --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
+               "Source Han Sans SC", "Hiragino Sans GB", system-ui,
+               -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, "Cascadia Code",
+               "Roboto Mono", Menlo, Consolas, monospace;
+  --font-serif-cn: "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
+
+  /* ── 字号 ─────────────────────────────────────────────────── */
+  --fs-display: 30px;
+  --fs-h1: 23px;
+  --fs-h2: 18px;
+  --fs-h3: 15px;
+  --fs-body: 14px;
+  --fs-sm: 13px;
+  --fs-xs: 12px;
+  --fs-mono: 12px;
+
+  /* ── 间距（8pt 网格） ─────────────────────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 40px; --sp-9: 56px;
+
+  /* ── 形状 ─────────────────────────────────────────────────── */
+  --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(13,26,44,0.06), 0 1px 3px rgba(13,26,44,0.05);
+  --shadow-2: 0 2px 8px rgba(13,26,44,0.08), 0 8px 24px rgba(13,26,44,0.08);
+  --shadow-3: 0 12px 40px rgba(13,26,44,0.18);
+
+  --sidebar-w: 236px;
+  --topbar-h: 56px;
+}
+
+/* ── reset & base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; color: inherit; }
+p { margin: 0; text-wrap: pretty; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; font-weight: 600; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 0; }
+input, select, textarea { font: inherit; }
+::selection { background: color-mix(in oklch, var(--accent) 24%, transparent); }
+
+/* 滚动条 —— 与灰白画布协调 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--faint); background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ── 排版工具类 ──────────────────────────────────────────────────── */
+.t-display { font-size: var(--fs-display); line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; }
+.t-h1 { font-size: var(--fs-h1); line-height: 1.28; letter-spacing: -0.015em; font-weight: 600; }
+.t-h2 { font-size: var(--fs-h2); line-height: 1.35; font-weight: 600; }
+.t-h3 { font-size: var(--fs-h3); line-height: 1.4; font-weight: 600; }
+.t-lead { font-size: 15px; line-height: 1.65; color: var(--muted); }
+.t-sm { font-size: var(--fs-sm); }
+.t-xs { font-size: var(--fs-xs); }
+.muted { color: var(--muted); }
+.faint { color: var(--faint); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.serif { font-family: var(--font-serif-cn); }
+.strong { font-weight: 600; color: var(--fg); }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent);
+}
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowrap { white-space: nowrap; }
+
+/* ── 布局原语 ─────────────────────────────────────────────────────── */
+.stack { display: flex; flex-direction: column; }
+.stack-2 > * + * { margin-top: var(--sp-2); }
+.stack-3 > * + * { margin-top: var(--sp-3); }
+.stack-4 > * + * { margin-top: var(--sp-4); }
+.stack-5 > * + * { margin-top: var(--sp-5); }
+.stack-6 > * + * { margin-top: var(--sp-6); }
+.row { display: flex; align-items: center; gap: var(--sp-3); }
+.row-tight { display: flex; align-items: center; gap: var(--sp-2); }
+.row-4 { display: flex; align-items: center; gap: var(--sp-4); }
+.between { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.spacer { flex: 1 1 auto; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-5); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); }
+@media (max-width: 1080px) {
+  .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .row-4 { flex-wrap: wrap; }
+}

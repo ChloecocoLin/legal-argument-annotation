@@ -1,0 +1,38 @@
+package com.argument.common.exception;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+/**
+ * 业务错误码。code 字符串与 openapi-ready.yaml 对齐。
+ */
+@Getter
+@RequiredArgsConstructor
+public enum ErrorCode {
+
+    VALIDATION_ERROR("VALIDATION_ERROR", HttpStatus.BAD_REQUEST),
+    UNAUTHENTICATED("UNAUTHENTICATED", HttpStatus.UNAUTHORIZED),
+    FORBIDDEN("FORBIDDEN", HttpStatus.FORBIDDEN),
+    NOT_FOUND("NOT_FOUND", HttpStatus.NOT_FOUND),
+    CONFLICT("CONFLICT", HttpStatus.CONFLICT),
+    LOCKED_RESOURCE("LOCKED_RESOURCE", HttpStatus.LOCKED),
+
+    INSUFFICIENT_VERSIONS("INSUFFICIENT_VERSIONS", HttpStatus.BAD_REQUEST),
+    LABEL_IN_USE("LABEL_IN_USE", HttpStatus.CONFLICT),
+    GUIDE_VERSION_LOCKED("GUIDE_VERSION_LOCKED", HttpStatus.CONFLICT),
+    OFFSET_INVALID("OFFSET_INVALID", HttpStatus.BAD_REQUEST),
+    GUIDE_NOT_READY("GUIDE_NOT_READY", HttpStatus.CONFLICT),
+
+    INVALID_CUSTOM_GRAPH("INVALID_CUSTOM_GRAPH", HttpStatus.BAD_REQUEST),
+    EXPERT_NOT_ASSIGNED("EXPERT_NOT_ASSIGNED", HttpStatus.BAD_REQUEST),
+    OPEN_EXPERT_ISSUES("OPEN_EXPERT_ISSUES", HttpStatus.CONFLICT),
+    UNDECIDED_PROPOSITIONS("UNDECIDED_PROPOSITIONS", HttpStatus.CONFLICT),
+    INVALID_REVIEW_STATE("INVALID_REVIEW_STATE", HttpStatus.CONFLICT),
+    GUIDE_BASIS_REQUIRED("GUIDE_BASIS_REQUIRED", HttpStatus.BAD_REQUEST),
+
+    INTERNAL_ERROR("INTERNAL_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    private final String code;
+    private final HttpStatus status;
+}
