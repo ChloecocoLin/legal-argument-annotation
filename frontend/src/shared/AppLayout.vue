@@ -5,8 +5,10 @@ import Icon from './Icon.vue'
 import Toasts from './Toasts.vue'
 import { NAV } from './nav.config'
 import { toast } from './toast'
+import { DEV_IDENTITIES, useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const auth = useAuthStore()
 
 const titleMap: Record<string, string> = {
   '/': '系统总览',
@@ -14,10 +16,17 @@ const titleMap: Record<string, string> = {
   '/adjudication/conflict': '冲突解决',
   '/adjudication/annotate': '标注工作台',
   '/expert': '专家工作台',
-  '/expert/issues': '疑难问题说明文档'
+  '/expert/issues': '疑难问题说明文档',
+  '/documents': '文书总库',
+  '/tasks': '任务列表',
+  '/tasks/create': '创建任务'
 }
 const here = computed(() => {
   if (route.path.startsWith('/guide/')) return '版本详情'
+  if (route.path.startsWith('/documents/')) return '文书详情'
+  if (route.path.startsWith('/annotate/')) return '标注工作台'
+  if (route.path.endsWith('/assign')) return '任务分配'
+  if (route.path.startsWith('/tasks/') && route.path !== '/tasks/create') return '任务详情'
   return titleMap[route.path] || '系统总览'
 })
 
@@ -29,6 +38,12 @@ function isActive(path?: string): boolean {
 
 function notReady(label: string) {
   toast(`「${label}」模块由其他成员负责，当前未接入`, 'err')
+}
+
+function onRoleChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value
+  auth.setToken(value)
+  window.location.reload()
 }
 
 function openMobileNav() {
@@ -70,8 +85,8 @@ function openMobileNav() {
       <div class="sidebar-foot">
         <span class="avatar">WH</span>
         <span>
-          <b style="color: #fff; font-size: 12.5px">王慧</b><br />
-          <span>管理员</span>
+          <b style="color: #fff; font-size: 12.5px">{{ auth.current.label.split(' · ')[0] }}</b><br />
+          <span>{{ auth.current.role }}</span>
         </span>
       </div>
     </aside>
@@ -91,9 +106,11 @@ function openMobileNav() {
         </div>
         <div class="role-switch">
           <Icon name="user" />
-          <span class="muted t-xs">角色</span>
-          <select aria-label="切换角色" disabled>
-            <option>管理员</option>
+          <span class="muted t-xs">开发身份</span>
+          <select aria-label="切换开发 Token" :value="auth.token" @change="onRoleChange">
+            <option v-for="item in DEV_IDENTITIES" :key="item.token" :value="item.token">
+              {{ item.label }}
+            </option>
           </select>
         </div>
         <button class="btn btn-icon btn-ghost" title="帮助" @click="notReady('帮助')"><Icon name="help" /></button>

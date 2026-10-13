@@ -1,0 +1,23 @@
+[
+  {
+    "id": "bfd699c7-e225-4263-b077-c247e4d59fbc",
+    "title": "余某、徐某劳务合同纠纷民事一审民事判决书",
+    "sourceType": "ORDINARY_JUDGMENT",
+    "caseType": "CIVIL",
+    "caseNumber": "(2023)苏0106民初18909号",
+    "currentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "courtName": "江苏省南京市鼓楼区人民法院",
+    "courtLevel": "BASIC",
+    "causeOfAction": "劳务合同纠纷",
+    "trialInstance": "FIRST_INSTANCE",
+    "judgmentDate": "2023-12-28",
+    "sourceReference": "中国裁判文书网：(2023)苏0106民初18909号",
+    "originalFileId": "826a54dd-c644-4e1d-a460-66b9586b1cb7"
+  }
+]

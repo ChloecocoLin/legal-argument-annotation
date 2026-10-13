@@ -1,0 +1,28 @@
+[
+  {
+    "id": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "name": "劳务合同纠纷裁判理由标注",
+    "taskType": "FORMAL_RESEARCH",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "defaultRequiredAnnotators": 2,
+    "annotatorPoolUserIds": [
+      "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+      "17e46666-aec6-4ed2-8e48-c044014f94a1"
+    ],
+    "assignmentMode": "MANUAL",
+    "dueAt": "2026-10-30T15:59:00Z",
+    "status": "IN_PROGRESS",
+    "sourceTaskId": null,
+    "sourceFinalVersionId": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1,
+    "description": "按指南 v1.2 完成双人独立科研标注。",
+    "ownerUserId": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "autoPreannotationEnabled": true,
+    "expertConfirmationRequired": false,
+    "adjudicationReasonRequired": true
+  }
+]

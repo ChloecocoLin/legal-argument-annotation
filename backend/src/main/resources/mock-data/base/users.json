@@ -1,0 +1,114 @@
+[
+  {
+    "id": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "username": "admin.wang",
+    "displayName": "王慧",
+    "roleIds": [
+      "76233b76-9e9f-45e0-bb15-458821815a9a"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "username": "creator.li",
+    "displayName": "李承志",
+    "roleIds": [
+      "0db02658-691f-4b3d-86db-4c5e069f85e1"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+    "username": "annotator.chen",
+    "displayName": "陈晓",
+    "roleIds": [
+      "2c1969cb-de58-4e3a-be24-298ee128897c"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+    "username": "annotator.liu",
+    "displayName": "刘一鸣",
+    "roleIds": [
+      "2c1969cb-de58-4e3a-be24-298ee128897c"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "username": "arbiter.zhao",
+    "displayName": "赵明远",
+    "roleIds": [
+      "950e4a39-5f25-48c4-bf24-9478f3cb9335"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "2901c453-e8c4-4cfa-948c-7dedb4f2ab8a",
+    "username": "teacher.sun",
+    "displayName": "孙立",
+    "roleIds": [
+      "b36ccbb6-b3c1-4b8e-b5cf-3cdee283a120"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "52b8374c-4ad4-4aca-bed8-1b7bc6687577",
+    "username": "student.zhou",
+    "displayName": "周雨桐",
+    "roleIds": [
+      "508550e3-f67f-4c8d-847d-5afbd186a685"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "4809fe74-569e-4906-a453-423c290b0525",
+    "username": "expert.qian",
+    "displayName": "钱学礼",
+    "roleIds": [
+      "d9d073f0-da96-442f-826d-a1a689cada11"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  }
+]

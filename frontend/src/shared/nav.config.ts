@@ -21,15 +21,15 @@ export const NAV: NavGroup[] = [
     items: [
       { id: 'admin-home', label: '管理工作台', icon: 'dash' },
       { id: 'guide-management', label: '指南管理', icon: 'book', path: '/guide' },
-      { id: 'document-library', label: '文书总库', icon: 'doc' }
+      { id: 'document-library', label: '文书总库', icon: 'doc', path: '/documents' }
     ]
   },
   {
     group: '标注任务',
     items: [
-      { id: 'task-list', label: '任务列表', icon: 'list' },
-      { id: 'task-create', label: '创建任务', icon: 'plus' },
-      { id: 'task-assign', label: '任务分配', icon: 'share' }
+      { id: 'task-list', label: '任务列表', icon: 'list', path: '/tasks' },
+      { id: 'task-create', label: '创建任务', icon: 'plus', path: '/tasks/create' },
+      { id: 'task-assign', label: '任务分配', icon: 'share', path: '/tasks' }
     ]
   },
   {

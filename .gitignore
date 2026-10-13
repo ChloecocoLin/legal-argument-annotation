@@ -20,3 +20,6 @@ backend/target/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Accidental nested unzip leftover
+/legal-argument-annotation-main/

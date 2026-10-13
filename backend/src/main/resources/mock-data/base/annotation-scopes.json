@@ -1,0 +1,17 @@
+[
+  {
+    "id": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+    "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+    "scopeType": "REASONING",
+    "startOffset": 5,
+    "endOffset": 39,
+    "selectionMethod": "MANUAL",
+    "status": "CONFIRMED",
+    "confirmedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1
+  }
+]
