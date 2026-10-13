@@ -1,4 +1,5 @@
-// 要素类型元数据，与原型 assets/data.js 的 TYPE_META 一致。
+// 要素类型的视觉元数据。
+// 业务字典必须以 G06 返回的 LabelDefinition 为准；这里不负责决定标签是否存在或如何分组。
 export interface TypeMetaItem {
   name: string
   group: string
@@ -13,7 +14,6 @@ export const TYPE_META: Record<string, TypeMetaItem> = {
   'Non-O': { name: '其它非论证成分', group: 'nl', short: '其它非论证' },
   'GM-L': { name: '法律条文', group: 'gm', short: '法律条文' },
   'GM-I': { name: '法律解释', group: 'gm', short: '法律解释' },
-  'GM-C': { name: '合同及合同解释', group: 'gm', short: '合同及合同解释' },
   'GM-U': { name: '习惯与行业惯例', group: 'gm', short: '习惯与行业惯例' },
   'GM-M': { name: '道德与价值观念', group: 'gm', short: '道德与价值观念' },
   'GM-O': { name: '其他规范判断', group: 'gm', short: '其他规范判断' },
@@ -31,7 +31,3 @@ export function typeGroup(code?: string): string {
   if (code === 'SF') return 'sf'
   return 'nl'
 }
-
-export const NON_PROP_TYPES = ['IS', 'AS', 'SS', 'JG', 'JD', 'Non-O']
-export const GM_SUBTYPES = ['GM-L', 'GM-I', 'GM-C', 'GM-U', 'GM-M', 'GM-O']
-export const SM_SUBTYPES = ['SM', 'SM-C']

@@ -6,7 +6,6 @@ import StatusBadge from '@/shared/StatusBadge.vue'
 import BaseModal from '@/shared/BaseModal.vue'
 import { toast } from '@/shared/toast'
 import { getGuide, listLabels } from '@/api/guide'
-import { NON_PROP_TYPES, GM_SUBTYPES, SM_SUBTYPES } from '@/shared/elementMeta'
 import type { Guide, GuideVersion, LabelDefinition } from '@/types/guide'
 
 const route = useRoute()
@@ -26,14 +25,41 @@ onMounted(async () => {
   }
 })
 
-const labelSet = computed(() => new Set(labels.value.map((l) => l.code)))
-function has(code: string): boolean {
-  return labelSet.value.has(code)
+function bySortOrder(a: LabelDefinition, b: LabelDefinition): number {
+  return a.sortOrder - b.sortOrder || a.code.localeCompare(b.code)
 }
 
-const tagNl = computed(() => NON_PROP_TYPES.filter(has))
-const tagGm = computed(() => GM_SUBTYPES.filter(has))
-const tagSm = computed(() => SM_SUBTYPES.filter(has))
+// 标签是否存在、属于哪一类，完全以当前指南版本的 G06 字典为准。
+const tagNl = computed(() =>
+  labels.value
+    .filter((label) => label.category === 'NON_PROPOSITION')
+    .slice()
+    .sort(bySortOrder)
+)
+const tagGm = computed(() =>
+  labels.value
+    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'GM')
+    .slice()
+    .sort(bySortOrder)
+)
+const tagSm = computed(() =>
+  labels.value
+    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'SM')
+    .slice()
+    .sort(bySortOrder)
+)
+const tagGf = computed(() =>
+  labels.value
+    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'GF')
+    .slice()
+    .sort(bySortOrder)
+)
+const tagSf = computed(() =>
+  labels.value
+    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'SF')
+    .slice()
+    .sort(bySortOrder)
+)
 
 function fmtSize(bytes?: number | null): string {
   if (bytes == null) return '—'
@@ -153,32 +179,32 @@ const NEST_FIGS: [string, string][] = [
           <div class="card-body">
             <div class="section-label" style="margin-bottom: 10px">一、非命题要素</div>
             <div class="row wrap" style="gap: 6px">
-              <Chip v-for="c in tagNl" :key="c" :code="c" long />
+              <Chip v-for="label in tagNl" :key="label.id" :code="label.code" long />
             </div>
             <div class="section-label" style="margin: 18px 0 10px">二、命题要素</div>
             <div class="grid-2" style="gap: 16px">
               <div>
                 <div class="t-xs muted" style="margin-bottom: 8px">一般规范判断 GM（子类型）</div>
                 <div class="row wrap" style="gap: 6px">
-                  <Chip v-for="c in tagGm" :key="c" :code="c" />
+                  <Chip v-for="label in tagGm" :key="label.id" :code="label.code" />
                 </div>
               </div>
               <div>
                 <div class="t-xs muted" style="margin-bottom: 8px">个别规范判断 SM</div>
                 <div class="row wrap" style="gap: 6px">
-                  <Chip v-for="c in tagSm" :key="c" :code="c" />
+                  <Chip v-for="label in tagSm" :key="label.id" :code="label.code" />
                 </div>
               </div>
               <div>
                 <div class="t-xs muted" style="margin-bottom: 8px">一般事实判断 GF</div>
                 <div class="row wrap" style="gap: 6px">
-                  <Chip v-if="has('GF')" code="GF" long />
+                  <Chip v-for="label in tagGf" :key="label.id" :code="label.code" long />
                 </div>
               </div>
               <div>
                 <div class="t-xs muted" style="margin-bottom: 8px">个别事实判断 SF</div>
                 <div class="row wrap" style="gap: 6px">
-                  <Chip v-if="has('SF')" code="SF" long />
+                  <Chip v-for="label in tagSf" :key="label.id" :code="label.code" long />
                 </div>
               </div>
             </div>

@@ -1,85 +1,200 @@
-# 法律论证标注系统 · 正式工程
+# 法律论证结构标注系统
 
-中文裁判文书说理部分法律论证结构标注系统。本仓库为正式开发工程。
+面向中文裁判文书说理部分的法律论证结构标注平台。系统围绕“标注指南管理—要素标注—命题裁定—专家复核—论证图展示”组织业务流程，为法律论证语料建设、冲突裁定和质量复核提供统一的前后端工程。
+
+> 当前版本：`0.1.0`　|　开发分支：`main`　|　当前阶段：M1 已完成，M2 待开发
+
+## 项目功能
+
+| 模块 | 主要能力 | 当前状态 |
+| --- | --- | --- |
+| 标注指南管理 | 指南列表、版本详情、标签字典、版本创建/归档/审核/对比 | 已完成 |
+| 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 待开发 |
+| 要素标注 | 文书片段选择、要素类型标注、自定义标注 | 待开发 |
+| 命题裁定 | 查看标注分歧、处理冲突、升级专家复核 | 页面与接口骨架 |
+| 专家复核 | 专家问题列表、复核详情、最终裁定 | 页面与接口骨架 |
+| 论证图展示 | 支持、反对、组合等关系的图形化展示 | 资源与基础依赖已接入 |
 
 ## 技术栈
 
-- 前端：Vue 3 + Vite + TypeScript + Pinia + Vue Router + Element Plus + Axios；论证图使用 AntV X6。
-- 后端：Spring Boot 3.2.5 + Java 17 + MyBatis-Plus + MySQL 8 + Redis；接口文档 Knife4j。
+### 前端
 
-## 目录结构
+- Vue 3、TypeScript、Vite
+- Vue Router、Pinia、Axios
+- Element Plus
+- AntV X6
 
-```
-标注系统正式工程/
-├── frontend/                 前端工程
+### 后端
+
+- Java 17、Spring Boot 3.2.5
+- MyBatis-Plus
+- H2（本地开发）/ MySQL 8（联调与生产）
+- Redis
+- Knife4j / OpenAPI 3
+- Maven
+
+## 项目结构
+
+```text
+legal-argument-annotation/
+├── frontend/                         # Vue 前端工程
+│   ├── public/figures/               # 指南和论证关系示意图
 │   └── src/
-│       ├── api/              接口函数：guide / adjudication / expert / request
-│       ├── types/            TS 类型：common / guide / element / adjudication / expert
-│       ├── shared/           共享组件（类型选择组件等）
-│       └── features/         页面：guide / adjudication / expert
-└── backend/                  后端工程
-    └── src/main/java/com/argument/
-        ├── common/           统一信封、异常、配置
-        ├── guide/            指南模块 G
-        ├── adjudication/     裁定模块 J
-        └── expert/           专家模块 X
+│       ├── api/                      # 前端接口封装
+│       ├── features/                 # guide / adjudication / expert 页面
+│       ├── router/                   # 路由配置
+│       ├── shared/                   # 公共组件与视觉元数据
+│       ├── stores/                   # Pinia 状态管理
+│       ├── styles/                   # 全局样式与设计变量
+│       └── types/                    # TypeScript 接口类型
+├── backend/                          # Spring Boot 后端工程
+│   └── src/main/
+│       ├── java/com/argument/
+│       │   ├── common/               # 响应信封、异常、公共配置
+│       │   ├── guide/                # 标注指南模块
+│       │   ├── adjudication/         # 命题裁定模块
+│       │   └── expert/               # 专家复核模块
+│       └── resources/
+│           ├── application.yml       # 公共配置
+│           ├── application-local.yml # H2 本地环境
+│           ├── application-prod.yml  # MySQL/Redis 联调环境
+│           ├── schema.sql            # H2 初始化表结构
+│           └── data.sql              # H2 演示数据
+└── README.md
 ```
 
-## 启动前端
+## 环境要求
+
+| 工具 | 建议版本 |
+| --- | --- |
+| Node.js | 18 或更高版本 |
+| npm | 9 或更高版本 |
+| JDK | 17 |
+| Maven | 3.9 或更高版本 |
+| MySQL / Redis | 仅 `prod` 环境需要 |
+
+可先检查本机环境：
 
 ```bash
-cd frontend
-npm install
-npm run dev        # 访问 http://localhost:5173
-npm run build      # 类型检查 + 生产构建
+node -v
+npm -v
+java -version
+mvn -v
 ```
 
-开发服务器已配置代理：`/api` 转发到 `http://localhost:8080`。
+## 本地运行
 
-## 启动后端
+### 1. 获取代码
 
-本机 JDK 17 路径：`C:\Users\CHENLIN\.jdks\ms-17.0.20.1`。
+```bash
+git clone https://github.com/ChloecocoLin/legal-argument-annotation.git
+cd legal-argument-annotation
+```
 
-默认使用 `local` profile，数据源为 H2 内存库，**无需安装 MySQL**：
+### 2. 启动后端
 
-```powersShell
+默认启用 `local` profile，使用 H2 内存数据库，不需要提前安装 MySQL 或 Redis。
+
+```powershell
 cd backend
-$env:JAVA_HOME="C:\Users\CHENLIN\.jdks\ms-17.0.20.1"
 mvn -DskipTests package
 java -jar target/argument-annotation-backend-0.1.0.jar
 ```
 
-启动后验证：
+后端默认运行在 `http://localhost:8080`：
 
-- 健康检查：http://localhost:8080/actuator/health 返回 `{"status":"UP"}`
-- 接口文档：http://localhost:8080/doc.html
+- 健康检查：`http://localhost:8080/actuator/health`
+- Knife4j 接口文档：`http://localhost:8080/doc.html`
 
-连接真实 MySQL 与 Redis，使用 `prod` profile（参数放在 jar 后面）：
+> Windows 下如果项目路径包含中文，`mvn spring-boot:run` 的 fork 进程可能出现主类路径编码问题。建议使用上面的 `package` 和 `java -jar` 方式启动。
 
+### 3. 启动前端
+
+另开一个终端：
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-java -jar target/argument-annotation-backend-0.1.0.jar --spring.profiles.active=prod
+
+浏览器访问 `http://localhost:5173`。开发服务器会把 `/api` 请求代理到 `http://localhost:8080`。
+
+### 4. 构建检查
+
+```bash
+# 前端：类型检查与生产构建
+cd frontend
+npm run build
+
+# 后端：编译
+cd ../backend
+mvn -DskipTests compile
 ```
 
-> 注意：项目路径含中文。`mvn spring-boot:run` 的 fork 进程可能因路径编码找不到主类。请使用上面的 `package` + `java -jar` 方式启动。
+## 生产或联调环境
 
-## 接口口径
+`prod` profile 使用 MySQL 与 Redis。使用前请修改 `backend/src/main/resources/application-prod.yml` 中的数据源和 Redis 配置，并避免把真实密码提交到仓库。
 
-- 以 `接口与数据格式约定/接口契约/openapi-ready.yaml` 为最终依据。
-- 统一信封：成功 `{ success:true, data, meta, error:null }`；失败 `{ success:false, error:{ code, message, details } }`。
-- POST 请求由前端自动补充 `Idempotency-Key`。
+```bash
+java -jar backend/target/argument-annotation-backend-0.1.0.jar --spring.profiles.active=prod
+```
 
-## 当前进度
+## 接口约定
 
-- M0 工程骨架与契约层：已完成（前端构建通过，后端可打包启动，健康检查 UP）。
-- M1 标注指南管理：已完成。
-  - 后端：G01–G06、G08–G11、G13/G14/G17 全部实现；H2 建表与演示数据；curl 验证通过。
-  - 前端：指南管理页、指南版本详情页，严格还原可运行原型；`npm run build` 通过。
-  - 已注册 MyBatis-Plus 分页与乐观锁拦截器；H2 初始化使用 UTF-8。
-- 待办：M2 共享类型组件 → M3 命题裁定 → M4 专家复核 → M5 联调。
+- 前后端接口统一使用 `/api` 前缀。
+- 成功响应：`{ "success": true, "data": ..., "meta": ..., "error": null }`。
+- 失败响应：`{ "success": false, "error": { "code": "...", "message": "...", "details": ... } }`。
+- 前端请求层会为 POST 请求补充 `Idempotency-Key`。
+- 标签的存在性和分组以指南标签字典接口返回的 `category`、`baseType`、`sortOrder` 为准。
 
-## M1 已知差异（需团队确认）
+## 标签口径
 
-- GM 子类型：原型 data.js 为 6 个（含 GM-C）；指南 v1.2 正文为 5 个（合同解释放在 SM-C）。前端按原型渲染 6 个。
-- 「设为启用」：契约无重新启用旧版本接口，按钮保留，点击只提示接口未就绪。
-- 文件附件上传接口未就绪，上传功能目前只保存版本元数据（DRAFT）。
-- G11 版本对比接口已实现，前端对比弹窗当前为原型静态两栏，暂未动态调用。
+正式 v1.2 使用 15 个标签：
+
+- 非命题要素：`IS`、`AS`、`SS`、`JG`、`JD`、`Non-O`
+- 一般规范判断：`GM-L`、`GM-I`、`GM-U`、`GM-M`、`GM-O`
+- 个别规范判断：`SM`、`SM-C`
+- 事实判断：`GF`、`SF`
+
+合同及合同解释属于 `SM-C`，不启用早期原型中的 `GM-C`。
+
+## 开发进度
+
+- [x] M0：前后端工程骨架与接口契约层
+- [x] M1：标注指南管理
+- [ ] M2：共享要素类型组件
+- [ ] M2.5：要素标注
+- [ ] M3：命题裁定
+- [ ] M4：专家复核
+- [ ] M5：前后端联调与验收
+
+M1 当前保留事项：
+
+- “设为启用”暂缺重新启用旧版本的后端接口。
+- 附件上传接口未完成，新增版本目前只保存元数据。
+- G11 版本对比接口已实现，对比弹窗尚未改为动态数据。
+
+## Git 协作建议
+
+开发前同步远程分支：
+
+```bash
+git switch main
+git pull --rebase origin main
+```
+
+建议按功能创建分支，完成验证后再合并到 `main`：
+
+```bash
+git switch -c feature/your-feature
+git add frontend backend README.md
+git commit -m "feat: describe your change"
+git push -u origin feature/your-feature
+```
+
+提交前至少执行前端构建和后端编译，且不要提交密码、IDE 配置、`node_modules` 或新的构建产物。
+
+## 说明
+
+本项目用于课程设计与团队协作开发。业务规则、标签定义及接口字段发生冲突时，以团队确认的最新指南和接口契约为准。

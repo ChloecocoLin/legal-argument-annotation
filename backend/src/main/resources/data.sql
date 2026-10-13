@@ -12,7 +12,8 @@ INSERT INTO guide_version (id, guide_id, version_code, status, attachment_file_i
 ('v-g-11', 'g-11', '1.1', 'ARCHIVED', 'f-v11', '中文裁判文书说理部分法律论证结构标注与图示指南_v1.1.docx', 319488, 37, '王慧', TIMESTAMP '2026-03-02 10:00:00', 0, TIMESTAMP '2026-03-02 10:00:00', TIMESTAMP '2026-03-02 10:00:00', 0),
 ('v-g-10', 'g-10', '1.0', 'ARCHIVED', 'f-v10', '裁判理由法律论证标注规范（试行）_v1.0.docx', 253952, 29, '王慧', TIMESTAMP '2025-11-20 10:00:00', 0, TIMESTAMP '2025-11-20 10:00:00', TIMESTAMP '2025-11-20 10:00:00', 0);
 
--- v1.2 标签定义（非命题6 + GM6 + SM2 + GF/SF = 16）
+-- v1.2 标签定义（非命题6 + GM5 + SM2 + GF/SF = 15）。
+-- 合同及合同解释属于 SM-C；正式 v1.2 不启用原型中的 GM-C。
 INSERT INTO label_definition (id, guide_version_id, code, name, category, base_type, sort_order, definition, recognition_rules, signal_phrases, examples, notes, record_version, created_at, updated_at, deleted) VALUES
 ('l12-is',    'v-g-12', 'IS',    '争议焦点',         'NON_PROPOSITION', NULL, 1,  NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-as',    'v-g-12', 'AS',    '态度声明',         'NON_PROPOSITION', NULL, 2,  NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
@@ -22,7 +23,6 @@ INSERT INTO label_definition (id, guide_version_id, code, name, category, base_t
 ('l12-nono',  'v-g-12', 'Non-O', '其它非论证成分',   'NON_PROPOSITION', NULL, 6,  NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-gml',   'v-g-12', 'GM-L',  '法律条文',         'PROPOSITION', 'GM', 10, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-gmi',   'v-g-12', 'GM-I',  '法律解释',         'PROPOSITION', 'GM', 11, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
-('l12-gmc',   'v-g-12', 'GM-C',  '合同及合同解释',   'PROPOSITION', 'GM', 12, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-gmu',   'v-g-12', 'GM-U',  '习惯与行业惯例',   'PROPOSITION', 'GM', 13, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-gmm',   'v-g-12', 'GM-M',  '道德与价值观念',   'PROPOSITION', 'GM', 14, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('l12-gmo',   'v-g-12', 'GM-O',  '其他规范判断',     'PROPOSITION', 'GM', 15, NULL, '[]', '[]', '[]', NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
