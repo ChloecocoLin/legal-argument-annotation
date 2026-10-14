@@ -23,11 +23,27 @@ PASS = 0
 FAIL = 0
 
 
+# ── 登录（分工.md §六，成员 C）──────────────────────────────────────────
+# C 启用 Spring Security 后，未带令牌的请求一律 401。这里走的就是浏览器那条路：
+# 先登录换令牌、再带 Authorization 头——**没有**任何「跳过鉴权」的开关。
+# 令牌拿不到就立刻退出：否则后面每条断言都会以 401 的形式红一片，
+# 真正的原因（后端没起 / 种子没进 / 口令不对）反而被埋在中间。
+import pathlib
+
+_p = pathlib.Path(__file__).resolve().parent
+while not (_p / ".git").exists():
+    _p = _p.parent
+sys.path.insert(0, str(_p / "scripts"))
+from verify_auth import login_token  # noqa: E402
+
+TOKEN = login_token(base=BASE)
+
 def call(method, path, body=None, idem="workbench-flow"):
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(
         BASE + path, data=data, method=method,
-        headers={"Content-Type": "application/json", "Idempotency-Key": idem})
+        headers={"Content-Type": "application/json", "Idempotency-Key": idem,
+                 "Authorization": "Bearer " + TOKEN})
     try:
         with urllib.request.urlopen(req) as resp:
             return resp.status, json.loads(resp.read().decode())

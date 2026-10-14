@@ -33,6 +33,34 @@ const instance: AxiosInstance = axios.create({
   }
 })
 
+// ── 登录失效的出口（分工.md §六，成员C） ────────────────────────────────────
+// 这一层**不知道路由、也不知道 pinia**：在这里 import router 会绕成
+// request → router → stores/user → api/auth → request 的循环依赖。
+// 所以改成由 main.ts 注册一个回调。默认值只在 main.ts 跑起来之前生效
+// （那时也不可能有请求）。
+let onUnauthenticated: (() => void) | null = null
+
+/** 由 main.ts 调用，注册「需要重新登录」时要做的事（清本地登录态 + 跳登录页）。 */
+export function setUnauthenticatedHandler(handler: () => void): void {
+  onUnauthenticated = handler
+}
+
+/**
+ * 通知登录失效：清掉本地令牌，再让注册方去跳登录页。
+ *
+ * 一个页面常常并发好几个请求，令牌过期时它们会**同时** 401，于是这里会被连着调用几次。
+ * 重复调用是安全的、也是**故意**的：清令牌是幂等的，跳转由注册方自己判断「已经在登录页就什么都不做」。
+ * 这里不额外记一个「已经通知过」的标志位——那种标志位要么漏掉「重新登录后再过期」的情形，
+ * 要么就得再维护一套失效时间戳，为了省几次无副作用的函数调用不值得。
+ *
+ * 顺带把令牌清掉：已经在飞的请求赶不上了，但**之后再发起的**请求不会继续带着这个作废令牌
+ * 去打后端（否则每转一页都白挨一次 401）。清掉它同时让 `stores/user.ts` 的 isLoggedIn 在刷新后也是 false。
+ */
+function notifyUnauthenticated(): void {
+  localStorage.removeItem('token')
+  onUnauthenticated?.()
+}
+
 // 请求拦截：附带 token
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -81,8 +109,11 @@ instance.interceptors.response.use(
       const code = body.error?.code
       if (code === 'UNAUTHENTICATED' || error.response.status === 401) {
         ElMessage.error('登录已过期，请重新登录')
+        notifyUnauthenticated()
       } else if (code === 'FORBIDDEN' || error.response.status === 403) {
-        ElMessage.error('没有操作权限')
+        // 403 不跳登录页：身份是有效的，只是这个角色不能做这件事。
+        // 跳走反而让人以为「我又没登录了」，还得重新登一遍。
+        ElMessage.error(body.error?.message || '没有操作权限')
       } else {
         ElMessage.error(body.error?.message || '请求失败')
       }

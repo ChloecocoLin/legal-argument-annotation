@@ -1,12 +1,49 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Icon from './Icon.vue'
 import Toasts from './Toasts.vue'
 import { NAV } from './nav.config'
 import { toast } from './toast'
+import { useUserStore } from '@/stores/user'
+import { ROLE_LABEL } from '@/types/auth'
 
 const route = useRoute()
+const router = useRouter()
+const user = useUserStore()
+
+// 顶栏与侧栏底部的身份区。原来写死「王慧 / WH / 管理员」——那是原型的固定值，
+// 现在真的有登录了，写死就会让人以为「我用别人的账号登进来还是王慧」。
+const displayName = computed(() => user.name || user.username || '未登录')
+const initials = computed(() => {
+  const n = user.name || user.username
+  if (!n) return '?'
+  // 中文名取姓 + 名首字（王慧 → 王慧，欧阳锋 → 欧阳）；英文名/账号取首字母。
+  if (/^[一-龥]+$/.test(n)) return n.length <= 2 ? n : n.slice(0, 2)
+  return n.slice(0, 2).toUpperCase()
+})
+const roleText = computed(() =>
+  user.roles.length ? user.roles.map((r) => ROLE_LABEL[r] || r).join(' / ') : '未分配角色'
+)
+
+async function signOut() {
+  await user.logout()
+  toast('已退出登录')
+  // 不带 redirect：退出是主动行为，用户要的是回到登录页，不是回来接着看刚才那一页。
+  await router.replace({ name: 'login' })
+}
+
+/**
+ * 导航按角色过滤。**只过滤填了 roles 的项**，其余原样显示——
+ * B/D 的模块还没声明各自的角色矩阵，凭空猜一个只会把他们的入口藏掉。
+ * 一个分组里的项全被滤掉时，整个分组也不显示（免得留一个孤零零的标题）。
+ */
+const navGroups = computed(() =>
+  NAV.map((g) => ({
+    ...g,
+    items: g.items.filter((it) => !it.roles || it.roles.some((r) => user.roles.includes(r)))
+  })).filter((g) => g.items.length > 0)
+)
 
 const titleMap: Record<string, string> = {
   '/': '系统总览',
@@ -55,7 +92,7 @@ function openMobileNav() {
         </span>
       </div>
       <nav class="nav">
-        <div v-for="g in NAV" :key="g.group" class="nav-group">
+        <div v-for="g in navGroups" :key="g.group" class="nav-group">
           <div class="nav-group-title">{{ g.group }}</div>
           <router-link
             v-for="item in g.items"
@@ -76,11 +113,14 @@ function openMobileNav() {
         </div>
       </nav>
       <div class="sidebar-foot">
-        <span class="avatar">WH</span>
+        <span class="avatar">{{ initials }}</span>
         <span>
-          <b style="color: #fff; font-size: 12.5px">王慧</b><br />
-          <span>管理员</span>
+          <b style="color: #fff; font-size: 12.5px">{{ displayName }}</b><br />
+          <span>{{ roleText }}</span>
         </span>
+        <button class="btn btn-icon btn-ghost sidebar-foot-out" title="退出登录" @click="signOut">
+          <Icon name="logout" />
+        </button>
       </div>
     </aside>
 
@@ -97,16 +137,18 @@ function openMobileNav() {
           <Icon name="search" />
           <input type="search" placeholder="检索文书 / 任务 / 案号" aria-label="全局检索" />
         </div>
-        <div class="role-switch">
+        <!-- 角色下拉保留但**不可切换**：角色是账号的属性，由后端按令牌判定。
+             做成可切换等于把 RBAC 变成摆设（前端选了也没用，后端不认）。 -->
+        <div class="role-switch" :title="`当前角色：${roleText}（由账号决定，不可切换）`">
           <Icon name="user" />
           <span class="muted t-xs">角色</span>
-          <select aria-label="切换角色" disabled>
-            <option>管理员</option>
+          <select aria-label="当前角色" disabled>
+            <option>{{ roleText }}</option>
           </select>
         </div>
         <button class="btn btn-icon btn-ghost" title="帮助" @click="notReady('帮助')"><Icon name="help" /></button>
         <button class="btn btn-icon btn-ghost" title="通知" @click="notReady('通知')"><Icon name="bell" /></button>
-        <span class="avatar" title="平台管理员">WH</span>
+        <span class="avatar" :title="`${displayName} · ${roleText}`">{{ initials }}</span>
       </header>
 
       <main class="content">
