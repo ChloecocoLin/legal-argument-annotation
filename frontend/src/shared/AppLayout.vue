@@ -15,6 +15,8 @@ const titleMap: Record<string, string> = {
   '/annotation/workbench': '标注工作台',
   // 成员C的图示审查页（分工.md §四.6）
   '/annotation/graph-audit': '图示审查',
+  // 成员C的教学练习页（分工.md §四-7）
+  '/teaching/exercises': '关系练习',
   '/adjudication/conflict': '冲突解决',
   // 成员C的关系裁定页（冲突解决第二阶段）
   '/adjudication/relation': '关系裁定',

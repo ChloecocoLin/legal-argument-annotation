@@ -1,6 +1,9 @@
 -- H2(local) 初始化表结构。每次启动随内存库重建。
 -- 顺序：先删子表再删父表（本文件不声明外键，靠约定维护顺序）。
 
+-- 成员 C：教学评分（分工.md §四-7）
+DROP TABLE IF EXISTS teaching_exercise;
+
 -- 成员 C：关系差异与裁定（J06）
 DROP TABLE IF EXISTS relation_adjudication_item;
 DROP TABLE IF EXISTS adjudication_session;
@@ -271,4 +274,35 @@ CREATE TABLE relation_adjudication_item (
     created_at             TIMESTAMP,
     updated_at             TIMESTAMP,
     deleted                INT         DEFAULT 0
+);
+
+-- ─────────────────────────────────────────────────────────────────────
+-- 成员 C：教学评分题库（分工.md §四-7 五类练习）
+--
+-- 只存**题目与标准答案**，不存学生数据：作答留档、成绩册、班级统计、进步趋势归 D（§五-6），
+-- 由 D 调用 C 的 POST /teaching/exercises/{id}/score 得到同一份评分结果后自行汇总。
+--
+-- scope_ids / standard_relations 是 JSON（MyBatis-Plus JacksonTypeHandler）：
+--   · scope_ids      本题允许使用的命题 ID 列表——评分时两侧在同一范围上建图，
+--                    「独立论证图个数」才可比，否则学生少用一个命题会被误判成结构错；
+--   · standard_relations 标准答案的**模板**（ref/code/participants），不是渲染后的表达式。
+--                    模板经 RelationTemplateCodec 解析，与学生的作答走同一个解析器、同一个
+--                    校验器、同一套等价判据；把标准答案存成字符串会让「标准」与「作答」
+--                    走在两条代码路径上，评分口径必然漂移。
+-- ─────────────────────────────────────────────────────────────────────
+CREATE TABLE teaching_exercise (
+    id                 VARCHAR(36)  PRIMARY KEY,
+    exercise_code      VARCHAR(30)  NOT NULL,
+    exercise_type      VARCHAR(30)  NOT NULL,
+    title              VARCHAR(200) NOT NULL,
+    prompt_text        CLOB,
+    snapshot_id        VARCHAR(36)  NOT NULL,
+    scope_ids          CLOB,
+    standard_relations CLOB,
+    explanation        CLOB,
+    sort_order         INT          DEFAULT 0,
+    record_version     INT          DEFAULT 0,
+    created_at         TIMESTAMP,
+    updated_at         TIMESTAMP,
+    deleted            INT          DEFAULT 0
 );

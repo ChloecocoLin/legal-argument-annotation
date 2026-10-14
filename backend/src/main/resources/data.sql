@@ -288,3 +288,50 @@ INSERT INTO relation_participant (id, relation_id, ordinal, role, target_kind, t
 -- ses-3：命题阶段已完成，源版本 av-3/av-4，用于验证悬空端点
 INSERT INTO adjudication_session (id, task_document_id, arbiter_assignment_id, source_version_ids, unified_snapshot_id, status, current_phase, proposition_completed_at, relation_completed_at, record_version, created_at, updated_at, deleted) VALUES
 ('ses-3', 'td-1', 'ta-3', '["av-3","av-4"]', 'us-1', 'RELATION_REVIEW', 'RELATION_REVIEW', TIMESTAMP '2026-08-16 11:00:00', NULL, 0, TIMESTAMP '2026-08-16 10:30:00', TIMESTAMP '2026-08-16 11:00:00', 0);
+
+-- ─────────────────────────────────────────────────────────────────────
+-- 成员 C：教学题库种子（分工.md §四-7 五类练习，一类一题）
+--
+-- 五题都建在 md-1 的命题上，学生看到的原文与标注工作台是同一份文书。
+-- 每题的 standard_relations 都必须**自身合法**：TeachingScorer 在评分前先解析标准答案，
+-- 不合法直接抛 EXERCISE_KEY_INVALID（题库/种子错误必须显式失败，不能拿坏答案去给学生打分）。
+--
+-- 五题的题型差别只在维度权重（TeachingExerciseType），判据全部共用
+-- RelationCanonicalizer + RelationMatcher + RelationValidator——因此「学生图与标准图比较」
+-- 与「关系裁定」不会算出两套口径。
+-- ─────────────────────────────────────────────────────────────────────
+INSERT INTO teaching_exercise (id, exercise_code, exercise_type, title, prompt_text, snapshot_id, scope_ids, standard_relations, explanation, sort_order, record_version, created_at, updated_at, deleted) VALUES
+('ex-s-01', 'EX-S-01', 'SUPPORT', '找出支持结论的理由（S 专项）',
+ '本案的结论命题是 P5「被告应当支付剩余600元报酬」。请在下列要素中找出直接支持该结论的理由，建立支持关系 S。注意其中有一个要素并不是命题——它能被"支持"，但不能作为理由去支持别人。',
+ 'md-1', '["mp-1","mp-2","mp-3","mp-4","mp-5","mp-9"]',
+ '[{"ref":"r1","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-1"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}],"note":"合同生效"},{"ref":"r2","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-3"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}],"note":"原告已履约"},{"ref":"r3","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-4"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}],"note":"被告仅部分付款"}]',
+ '三条直接支持都指向 P5。P1 说明合同生效，P3 说明原告已履约，P4 说明被告仅支付了部分报酬——它们各自独立支持结论，因此是三条 S，而不是一个组合。另外注意两点：有向关系只有 SOURCE 指向 TARGET 一个方向，写反即为方向错误；本题要素里还列了本案的争议焦点（IS），它只是争议本身，不是命题，不能参与任何关系——被结论的措辞带着把争议焦点当成支持理由，是这道题最常见的误判。',
+ 1, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+
+('ex-jm-01', 'EX-JM-01', 'JOIN_VS_MATCH', '组合还是匹配（J / M 区分）',
+ '下面三个判断各该用 J 还是 M？P2 与 P3 是一组支持同一结论的事实；P7 是一条具体主张；P8 是对该主张的具体评价。请建立两个匹配关系，并把 P2、P3 组合起来。',
+ 'md-1', '["mp-2","mp-3","mp-6","mp-7","mp-8"]',
+ '[{"ref":"r1","code":"J","participants":[{"ordinal":1,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-2"},{"ordinal":2,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-3"}],"note":"一组共同理由"},{"ref":"r2","code":"M","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-7"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-6"}],"note":"具体主张匹配一般规则"},{"ref":"r3","code":"M","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-8"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-6"}],"note":"对证据的具体评价匹配举证规则"}]',
+ 'J 与 M 都是把命题连起来，区别在方向与角色：J 是无向组合，成员之间没有箭头，表示这几个命题合起来构成同一个理由；M 是有向匹配，SOURCE 必须是个别判断（SF/SM/SM-C），TARGET 必须是一般判断（GF/GM-*），表示这个具体判断落在哪条一般规则之下。把 M 写成 J 会同时丢掉类型分与方向分——这也正是本练习要练的地方。',
+ 2, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+
+('ex-ai-01', 'EX-AI-01', 'ATTACK_VS_IDENTIFY', '反对还是同一（A / I 区分）',
+ 'P8 是对 P7 所主张内容的具体反驳；P5 与 P7 则指向同一个争议焦点（600 元报酬）。请分别建立反对关系与同一关系。',
+ 'md-1', '["mp-3","mp-5","mp-7","mp-8"]',
+ '[{"ref":"r1","code":"A","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-8"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-7"}],"note":"反驳者指向被反驳命题"},{"ref":"r2","code":"I","participants":[{"ordinal":1,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-5"},{"ordinal":2,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-7"}],"note":"指向同一争议焦点"}]',
+ 'A 与 I 的区别在是否反对、以及有没有方向：A 是**有向**的反对，SOURCE 是提出反对的那个命题，TARGET 是被反对的命题，写反即为方向错误；I 是无向的同一，只表示这几个命题指向同一个争议焦点，成员之间没有箭头。特别注意 I 的成员只能是命题——不能把一条关系整体塞进 I，后续关系请改用该组最大展示编号的命题作代表。',
+ 3, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+
+('ex-nest-01', 'EX-NEST-01', 'NESTING', '共同理由要作为整体（嵌套关系）',
+ 'P2 与 P3 是共同支持结论 P5 的一组事实，P4 是另一条独立支持。请把共同理由合成一个整体，再让这个整体去支持 P5。',
+ 'md-1', '["mp-2","mp-3","mp-4","mp-5"]',
+ '[{"ref":"r1","code":"J","participants":[{"ordinal":1,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-2"},{"ordinal":2,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-3"}],"note":"共同理由"},{"ref":"r2","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"RELATION","targetRef":"r1"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}],"note":"以组合整体为端点"},{"ref":"r3","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-4"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}],"note":"独立的一条支持"}]',
+ 'P2 与 P3 是支持同一个结论的一组事实，必须先合成组合 J(P2,P3)，再让这个组合作为**整体**去支持 P5，表达式写作 S(J(P2,P3),P5)。最常见的错误是把内层压平，写成 S(P2,P5) 与 S(P3,P5) 两条直接支持：那样既多标了一条关系，也丢掉了「这两条事实属于同一个共同理由」这层结构。P4 是独立支持，不需要放进组合。',
+ 4, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+
+('ex-graph-01', 'EX-GRAPH-01', 'GRAPH_COMPARE', '画出完整的理由图（与标准图比较）',
+ '请为 P1–P8 建立完整的关系结构：把支持、反对、组合、匹配都用上，再对照标准图检查独立论证图的个数与孤立命题。',
+ 'md-1', '["mp-1","mp-2","mp-3","mp-4","mp-5","mp-6","mp-7","mp-8"]',
+ '[{"ref":"r1","code":"J","participants":[{"ordinal":1,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-2"},{"ordinal":2,"role":"MEMBER","targetKind":"ELEMENT","targetId":"mp-3"}]},{"ref":"r2","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"RELATION","targetRef":"r1"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}]},{"ref":"r3","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-1"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}]},{"ref":"r4","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-4"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-5"}]},{"ref":"r5","code":"A","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-8"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-7"}]},{"ref":"r6","code":"S","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-6"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-8"}]},{"ref":"r7","code":"M","participants":[{"ordinal":1,"role":"SOURCE","targetKind":"ELEMENT","targetId":"mp-7"},{"ordinal":2,"role":"TARGET","targetKind":"ELEMENT","targetId":"mp-6"}]}]',
+ '标准答案由两组互不相连的论证构成，因此是**两个**独立论证图。第一组围绕 P5「被告应当支付剩余600元报酬」：J(P2,P3) 作为共同理由整体支持 P5，P1 与 P4 各自独立支持 P5。第二组围绕 P8：P8 反对 P7，P6 支持 P8，并由 M(P7,P6) 把 P7 这条具体主张匹配到 P6 这条一般规则上。两组的差别不在关系的多少，而在**连通性**：只要在两组之间多连一条本不该有的关系，独立论证图个数就会从 2 变成 1；反过来，漏掉某条关系则可能让某个命题变成孤立命题。',
+ 5, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0);

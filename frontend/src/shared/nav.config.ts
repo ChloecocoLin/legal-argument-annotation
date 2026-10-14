@@ -43,6 +43,15 @@ export const NAV: NavGroup[] = [
     ]
   },
   {
+    // 成员C：教学练习（分工.md §四-7）。
+    // 五类练习（S 专项 / J-M 区分 / A-I 区分 / 嵌套 / 学生图与标准图比较）共用一个页面，
+    // 因此这里只有一项；未来若拆成多页再按类型展开。
+    group: '教学与练习',
+    items: [
+      { id: 'teaching-exercises', label: '关系练习', icon: 'list', path: '/teaching/exercises' }
+    ]
+  },
+  {
     group: '专家复核',
     items: [
       { id: 'expert-review', label: '专家工作台', icon: 'scale', path: '/expert' },

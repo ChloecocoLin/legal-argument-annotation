@@ -34,6 +34,13 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '图示审查' }
   },
   {
+    // 成员C：教学练习（分工.md §四-7 的五类练习，共用一个页面）
+    path: '/teaching/exercises',
+    name: 'teaching-exercises',
+    component: () => import('@/features/teaching/ExercisePractice.vue'),
+    meta: { title: '关系练习' }
+  },
+  {
     path: '/adjudication/conflict',
     name: 'conflict-resolve',
     component: () => import('@/features/adjudication/ConflictResolve.vue'),

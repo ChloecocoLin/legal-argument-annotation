@@ -44,6 +44,12 @@ public enum ErrorCode {
     PROPOSITIONS_NOT_COMPLETE("PROPOSITIONS_NOT_COMPLETE", HttpStatus.CONFLICT),
     INVALID_RELATION_MAPPING("INVALID_RELATION_MAPPING", HttpStatus.BAD_REQUEST),
 
+    // 成员 C：教学评分（分工.md §四-7）。教学接口不在 openapi-ready.yaml 里（该契约未覆盖教学），
+    // 故这两个码是 C 侧新增、无契约对应项；取值风格与前端既有错误码保持一致。
+    EXERCISE_NOT_FOUND("EXERCISE_NOT_FOUND", HttpStatus.NOT_FOUND),
+    /** 题库里的标准答案自身不合法——属于种子/题库数据错误，必须显式失败而不是拿它去给学生打分。 */
+    EXERCISE_KEY_INVALID("EXERCISE_KEY_INVALID", HttpStatus.INTERNAL_SERVER_ERROR),
+
     INTERNAL_ERROR("INTERNAL_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
