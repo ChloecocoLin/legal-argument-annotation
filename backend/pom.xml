@@ -23,6 +23,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <mybatis-plus.version>3.5.7</mybatis-plus.version>
     <knife4j.version>4.5.0</knife4j.version>
+    <lombok.version>1.18.42</lombok.version>
   </properties>
 
   <dependencies>
@@ -99,6 +100,13 @@
         <configuration>
           <encoding>UTF-8</encoding>
           <useIncrementalCompilation>false</useIncrementalCompilation>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>

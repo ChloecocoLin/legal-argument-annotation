@@ -257,6 +257,13 @@ function initializeFromContext(value: CustomContext): void {
   const accepted: LocalElement[] = []
   let skipped = 0
   for (const element of candidates) {
+    const sameRange = accepted.find(
+      (item) => element.startOffset === item.startOffset && element.endOffset === item.endOffset
+    )
+    if (sameRange) {
+      sameRange.sourceElementIds = [...new Set([...sameRange.sourceElementIds, element.id])]
+      continue
+    }
     if (accepted.some((item) => element.startOffset < item.endOffset && element.endOffset > item.startOffset)) {
       skipped += 1
       continue
@@ -278,7 +285,7 @@ function initializeFromContext(value: CustomContext): void {
   activeKey.value = elements.value[0]?.clientKey ?? null
   selectionDraft.value = null
   loadNotice.value = skipped > 0
-    ? `${skipped} 个相互重叠的候选未自动加入编辑区，可在命题冲突页择一后重试。`
+    ? `${skipped} 个边界不同且相互重叠的候选未自动加入编辑区，请删除冲突区间后重新划选。`
     : ''
 }
 
@@ -319,7 +326,7 @@ async function loadContext(): Promise<void> {
       itemKind: params.itemKind,
       itemId: params.itemId
     })
-    if (!result) throw new Error('J09 当前返回空数据，后端接口尚未实现')
+    if (!result) throw new Error('J09 未返回裁定上下文数据')
     validateContext(result)
     initializeFromContext(result)
     loadState.value = 'ready'
@@ -569,7 +576,7 @@ watch(() => route.fullPath, () => void loadContext(), { immediate: true })
         </button>
       </div>
       <p v-if="loadState === 'error'" class="context-contract-note">
-        当前后端 J09 仍为 TODO 并返回空数据；此状态不会被当作加载成功。
+        请确认后端服务已启动，并检查会话、裁定项和指南版本是否有效。
       </p>
     </section>
 
@@ -833,7 +840,7 @@ watch(() => route.fullPath, () => void loadContext(), { immediate: true })
       </div>
       <div class="submit-contract-note">
         <Icon name="info" />
-        <span>当前后端 J10 仍为 TODO；只有返回有效 annotationId 才会显示保存成功。</span>
+        <span>保存会创建新的自定义裁定快照；重复提交由 Idempotency-Key 安全去重。</span>
       </div>
       <template #footer>
         <button class="btn btn-secondary" :disabled="submitting" @click="submitOpen = false">
