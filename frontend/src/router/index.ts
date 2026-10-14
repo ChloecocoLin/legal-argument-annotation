@@ -21,10 +21,23 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '指南版本详情' }
   },
   {
+    path: '/annotation/workbench',
+    name: 'annotation-workbench',
+    component: () => import('@/features/annotation/AnnotateWorkbench.vue'),
+    meta: { title: '标注工作台' }
+  },
+  {
     path: '/adjudication/conflict',
     name: 'conflict-resolve',
     component: () => import('@/features/adjudication/ConflictResolve.vue'),
     meta: { title: '冲突解决' }
+  },
+  {
+    // 成员C：冲突解决的第二阶段——关系裁定（J06 + 生成关系裁定结果）
+    path: '/adjudication/relation',
+    name: 'relation-adjudication',
+    component: () => import('@/features/adjudication/RelationAdjudication.vue'),
+    meta: { title: '关系裁定' }
   },
   {
     path: '/adjudication/annotate',

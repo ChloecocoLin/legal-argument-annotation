@@ -35,7 +35,9 @@ export const NAV: NavGroup[] = [
   {
     group: '标注与裁定',
     items: [
+      { id: 'annotation-workbench', label: '标注工作台', icon: 'edit', path: '/annotation/workbench' },
       { id: 'conflict-resolve', label: '冲突解决', icon: 'merge', path: '/adjudication/conflict' },
+      { id: 'relation-adjudication', label: '关系裁定', icon: 'merge', path: '/adjudication/relation' },
       { id: 'final-review', label: '最终版本审查', icon: 'checkc' }
     ]
   },
