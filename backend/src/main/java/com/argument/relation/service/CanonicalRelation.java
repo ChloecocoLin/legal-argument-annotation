@@ -1,21 +1,24 @@
-package com.argument.adjudication.service;
+package com.argument.relation.service;
 
 import java.util.List;
 
 /**
- * 规范化后的关系：**端点一律映射到统一命题集合**后的可比较形态。差异比较算法的唯一输入类型。
+ * 规范化后的关系：**端点一律映射到同一个命题集合**后的可比较形态。差异比较与教学评分的唯一输入类型。
  *
- * <p>三个键的分工（都刻意不含关系自身 ID，否则两版永远不相等）：
+ * <p>三个键的分工（都刻意不含关系自身 ID，否则两边永远不相等）：
  * <ul>
  *   <li>{@code structureKey} —— 关系代码 + 按 ordinal 的 (角色, 端点) 序列，含嵌套结构：完全相同即「一致」；</li>
  *   <li>{@code unorderedKey} —— 同上但端点顺序无关：与 structureKey 不等而它相等，即**方向相反**；</li>
  *   <li>{@code shapeKey} —— 去掉关系代码、去掉角色后的端点集合：与另一条相等而代码不同，即**类型不同**。</li>
  * </ul>
  * 嵌套关系的端点键同样是 id-free 的结构键（内层代码 + 内层叶命题），
- * 因此 `S(J(P2,P3),P5)` 在两版用不同关系 ID 建立时仍然可比。
+ * 因此 `S(J(P2,P3),P5)` 在两侧用不同关系 ID 建立时仍然可比。
+ *
+ * <p>本记录原先定义在关系裁定模块内，因教学评分（分工.md §四-7）需要同一套等价判据而上移到关系模块：
+ * 「两条关系算不算同一条」只应有一处定义，否则学生图与标准图的比较会与裁定口径漂移。
  *
  * @param relationId 源关系 ID（统一命题集合上尚未重建，仅作候选标识与落库引用）
- * @param versionId 所属源版本 ID
+ * @param versionId 所属源版本 ID；教学评分传入的是练习/作答的作用域标识
  * @param code S/A/J/M/I
  * @param directed 是否有向
  * @param expression 源版本上的展示表达式，如 {@code S(J(P2,P3),P5)}

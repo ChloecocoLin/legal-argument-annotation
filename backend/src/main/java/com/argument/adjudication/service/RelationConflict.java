@@ -1,5 +1,6 @@
 package com.argument.adjudication.service;
 
+import com.argument.relation.service.CanonicalRelation;
 import java.util.List;
 
 /**

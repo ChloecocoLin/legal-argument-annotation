@@ -1,23 +1,30 @@
-package com.argument.adjudication.service;
+package com.argument.relation.service;
 
 import com.argument.relation.entity.Relation;
 import com.argument.relation.entity.RelationParticipant;
-import com.argument.relation.service.RelationLookup;
 import java.util.*;
 
 /**
- * 关系裁定结果的**内存读取出口**：把合并后的关系集合做成 {@link RelationLookup}，
- * 使同一套 {@code RelationValidator} 能校验尚未落库的裁定结果。
+ * 未落库关系的**内存读取出口**。把一批「还没进数据库的关系」做成 {@link RelationLookup}，
+ * 使同一套 {@code RelationValidator} 能校验它们——校验器因此不依赖持久层。
  *
- * <p>与单测里用 Map 桩替换 DB 的做法同构——校验器不因此改一行代码，
- * 「标注阶段的关系」与「裁定结果的关系」用的是同一个事实来源。
+ * <p>三处调用方共用：
+ * <ul>
+ *   <li>关系裁定（{@code RelationAdjudicationSemantics}）——合并后、尚未落库的裁定结果；</li>
+ *   <li>教学评分（{@code RelationTemplateCodec}）——学生作答与标准答案的答题模板；
+ *       评分是只读试算，绝不写库，所以两侧都只能待在内存里。</li>
+ *   <li>单测里用 Map 桩替换 DB 的做法与之一致。</li>
+ * </ul>
+ *
+ * <p>本类原先叫 {@code MergedLookup}、定义在关系裁定模块内，因教学评分也需要它而下移到关系模块：
+ * 「同一快照下的关系集合怎么按 ID 查」只应有一处实现。
  */
-public final class MergedLookup implements RelationLookup {
+public final class InMemoryRelationLookup implements RelationLookup {
 
     private final Map<String, Relation> relations = new LinkedHashMap<>();
     private final Map<String, List<RelationParticipant>> participants = new LinkedHashMap<>();
 
-    /** 登记一条合并后的关系及其参与项。 */
+    /** 登记一条关系及其参与项（参与项按 ordinal 升序归一）。 */
     public void put(Relation relation, List<RelationParticipant> items) {
         relations.put(relation.getId(), relation);
         participants.put(relation.getId(), items.stream()

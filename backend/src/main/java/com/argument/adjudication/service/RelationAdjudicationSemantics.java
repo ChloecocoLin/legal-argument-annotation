@@ -17,6 +17,8 @@ import com.argument.relation.entity.Relation;
 import com.argument.relation.entity.RelationParticipant;
 import com.argument.relation.rules.AuditCategory;
 import com.argument.relation.rules.RelationRules;
+import com.argument.relation.service.CanonicalRelation;
+import com.argument.relation.service.InMemoryRelationLookup;
 import com.argument.relation.service.RelationLookup;
 import com.argument.relation.service.RelationValidator;
 import java.util.*;
@@ -245,7 +247,7 @@ public class RelationAdjudicationSemantics {
         private final Map<String, Map<String, String>> mappingCache = new HashMap<>();
         private final Map<String, String> mergedIdBySource = new LinkedHashMap<>();
         private final Map<String, RelationView> mergedById = new LinkedHashMap<>();
-        private final MergedLookup lookup = new MergedLookup();
+        private final InMemoryRelationLookup lookup = new InMemoryRelationLookup();
         private final Set<String> deleted = new LinkedHashSet<>();
         private final List<RelationIssue> issues = new ArrayList<>();
         private int seq = 0;
@@ -268,7 +270,7 @@ public class RelationAdjudicationSemantics {
             return new ArrayList<>(mergedById.values());
         }
 
-        MergedLookup lookup() {
+        InMemoryRelationLookup lookup() {
             return lookup;
         }
 

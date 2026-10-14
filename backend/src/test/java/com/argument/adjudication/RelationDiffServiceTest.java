@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.argument.adjudication.service.CanonicalRelation;
+import com.argument.relation.service.CanonicalRelation;
 import com.argument.adjudication.service.RelationConflict;
 import com.argument.adjudication.service.RelationDiffService;
 import com.argument.proposition.PropositionMappingSource;
@@ -12,6 +12,7 @@ import com.argument.proposition.PropositionRef;
 import com.argument.proposition.PropositionSource;
 import com.argument.relation.dto.ParticipantView;
 import com.argument.relation.dto.RelationView;
+import com.argument.relation.service.RelationCanonicalizer;
 import com.argument.relation.service.RelationService;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,7 +61,7 @@ class RelationDiffServiceTest {
             when(relations.listByOwner("ANNOTATION_VERSION", "av-" + i)).thenReturn(version(i));
         }
 
-        diff = new RelationDiffService(relations, propositionSource(), mappingSource());
+        diff = new RelationDiffService(relations, mappingSource(), new RelationCanonicalizer(propositionSource()));
     }
 
     /** 打桩：本用例对 av-N 设置的关系表。 */
