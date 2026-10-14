@@ -132,7 +132,10 @@ INSERT INTO relation_participant (id, relation_id, ordinal, role, target_kind, t
 ('rp-7-2', 'rel-7', 2, 'TARGET', 'ELEMENT', 'mp-6', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0);
 
 -- ─────────────────────────────────────────────────────────────────────
--- 成员 C：登录 / RBAC 种子（本轮不启用鉴权，密码为占位；登录切片改为真实哈希）
+-- 成员 C：登录 / RBAC 种子（鉴权已启用，见 SecurityConfig）
+--
+-- 口令一律 **demo**，用 {noop} 前缀（Spring Security 的 DelegatingPasswordEncoder 认这个前缀）。
+-- 换 bcrypt 只需把前缀与值换掉，不必改代码。演示账号在登录页上也列了，方便 A/D 直接点检。
 -- 角色取值对齐前端 stores/user.ts 的 UserRole。
 -- ─────────────────────────────────────────────────────────────────────
 INSERT INTO app_role (id, code, name) VALUES
@@ -143,15 +146,25 @@ INSERT INTO app_role (id, code, name) VALUES
 ('role-student',   'student',   '学生'),
 ('role-teacher',   'teacher',   '教师');
 
+-- 五个演示账号，覆盖 C 的三个模块所需的全部角色：
+--   legal.researcher 管理员（什么都能做，也是自查脚本用的账号）
+--   ann.li           标注员（关系标注与论证图写）
+--   arb.zhang        裁定员（关系裁定与图示审查）
+--   stu.chen         学生（教学练习）
+--   tea.wu           教师（教学练习，与学生的区别留给后续「教师看班级统计」）
 INSERT INTO app_user (id, username, password_hash, display_name, status, record_version, created_at, updated_at, deleted) VALUES
 ('u-admin', 'legal.researcher', '{noop}demo', '王慧', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('u-ann',   'ann.li',           '{noop}demo', '李铭', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
-('u-arb',   'arb.zhang',        '{noop}demo', '张宁', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0);
+('u-arb',   'arb.zhang',        '{noop}demo', '张宁', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+('u-stu',   'stu.chen',         '{noop}demo', '陈默', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
+('u-tea',   'tea.wu',           '{noop}demo', '吴敏', 'ACTIVE', 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0);
 
 INSERT INTO app_user_role (id, user_id, role_id) VALUES
 ('ur-1', 'u-admin', 'role-admin'),
 ('ur-2', 'u-ann',   'role-annotator'),
-('ur-3', 'u-arb',   'role-arbiter');
+('ur-3', 'u-arb',   'role-arbiter'),
+('ur-4', 'u-stu',   'role-student'),
+('ur-5', 'u-tea',   'role-teacher');
 
 -- ─────────────────────────────────────────────────────────────────────
 -- 成员 C：关系差异与裁定的演示数据（J06）

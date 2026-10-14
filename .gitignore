@@ -12,6 +12,10 @@ backend/target/
 !.env.example
 *.log
 
+# Python bytecode (验证脚本 scripts/*.py 运行时产生)
+__pycache__/
+*.pyc
+
 # IDE settings
 .idea/
 .vscode/

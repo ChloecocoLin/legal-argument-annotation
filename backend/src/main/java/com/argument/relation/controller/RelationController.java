@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
  * <p>R01 返回契约声明的 {@code {id, relationCode, directed}} **追加式超集**（多带
  * 关系定义、状态与参与项）：工作台与校验器都需要参与项，该响应未声明
  * additionalProperties=false，追加字段向后兼容。
+ *
+ * <p>RBAC（分工.md §六）：**写**操作（R02–R04）限 admin / annotator，读（R01）登录即可。
+ * 读放开是有意的：裁定员与专家都要查看他人标注的关系，把读也锁在标注员上会让裁定做不下去。
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -41,6 +45,7 @@ public class RelationController {
 
     // R02 建立关系
     @PostMapping("/annotation-drafts/{draftId}/relations")
+    @PreAuthorize("hasAnyRole('admin','annotator')")
     public ApiResponse<RelationCreateResult> createRelation(
             @PathVariable String draftId,
             @Valid @RequestBody RelationCreateRequest request) {
@@ -49,6 +54,7 @@ public class RelationController {
 
     // R03 整集替换参与项
     @PutMapping("/relations/{relationId}/participants")
+    @PreAuthorize("hasAnyRole('admin','annotator')")
     public ApiResponse<RelationParticipantsResult> replaceParticipants(
             @PathVariable String relationId,
             @Valid @RequestBody RelationParticipantsRequest request) {
@@ -57,6 +63,7 @@ public class RelationController {
 
     // R04 删除关系（软删：status → REMOVED，删除原因入审计）
     @DeleteMapping("/relations/{relationId}")
+    @PreAuthorize("hasAnyRole('admin','annotator')")
     public ApiResponse<Map<String, String>> removeRelation(
             @PathVariable String relationId,
             @Valid @RequestBody RelationDeleteRequest request) {

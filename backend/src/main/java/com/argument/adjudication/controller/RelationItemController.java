@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,10 +29,14 @@ import org.springframework.web.bind.annotation.*;
  *
  * <p>J06 的 items 是契约声明 {@code {id, conflictType}} 的**追加式超集**（契约的 item 标了
  * {@code additionalProperties:false}，属已记录的偏差）：界面必须并排显示两侧候选与中文差异理由。
+ *
+ * <p>RBAC（分工.md §六）：整组限 admin / arbiter。关系裁定是裁定员的职责，
+ * 标注员看到「各自标了什么、差在哪」会直接暴露另一侧标注员的答案（裁定要回避这件事）。
  */
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('admin','arbiter')")
 public class RelationItemController {
 
     private final RelationAdjudicationService adjudicationService;

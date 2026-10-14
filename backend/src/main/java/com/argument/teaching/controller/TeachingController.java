@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,10 +22,14 @@ import org.springframework.web.bind.annotation.*;
  *
  * <p>评分**不落库**：作答留档、成绩册、班级统计与教师反馈归 D（§五-6）。D 汇总时调用
  * 同一个 {@code POST …/score}，因此 C 与 D 不会各算一套分数。
+ *
+ * <p>RBAC（分工.md §六）：整组接口限 admin / student / teacher。做题人与出题人是这两类角色，
+ * 标注员与裁定员没有理由看到题库——尤其题库详情虽不含标准答案，但题目构造本身就是教学资源。
  */
 @RestController
 @RequestMapping("/api/v1/teaching")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('admin','student','teacher')")
 public class TeachingController {
 
     private final TeachingExerciseService exerciseService;
