@@ -13,6 +13,8 @@ const titleMap: Record<string, string> = {
   '/guide': '指南管理',
   // 成员C的标注工作台（关系标注与论证图），与 B 的 /adjudication/annotate 相互独立
   '/annotation/workbench': '标注工作台',
+  // 成员C的图示审查页（分工.md §四.6）
+  '/annotation/graph-audit': '图示审查',
   '/adjudication/conflict': '冲突解决',
   // 成员C的关系裁定页（冲突解决第二阶段）
   '/adjudication/relation': '关系裁定',

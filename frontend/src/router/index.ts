@@ -27,6 +27,13 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '标注工作台' }
   },
   {
+    // 成员C：图示审查（分工.md §四.6 的七类逐条审查）
+    path: '/annotation/graph-audit',
+    name: 'graph-audit',
+    component: () => import('@/features/annotation/GraphAudit.vue'),
+    meta: { title: '图示审查' }
+  },
+  {
     path: '/adjudication/conflict',
     name: 'conflict-resolve',
     component: () => import('@/features/adjudication/ConflictResolve.vue'),

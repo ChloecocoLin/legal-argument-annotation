@@ -15,6 +15,7 @@ import com.argument.relation.dto.RelationIssue;
 import com.argument.relation.dto.RelationView;
 import com.argument.relation.entity.Relation;
 import com.argument.relation.entity.RelationParticipant;
+import com.argument.relation.rules.AuditCategory;
 import com.argument.relation.rules.RelationRules;
 import com.argument.relation.service.RelationLookup;
 import com.argument.relation.service.RelationValidator;
@@ -132,7 +133,8 @@ public class RelationAdjudicationSemantics {
 
         GraphAssembler.Assembled assembled = assembler.assemble(unifiedElements, merged);
         for (String isolated : assembled.isolatedNodeIds()) {
-            issues.add(RelationIssue.warning("GRAPH_ISOLATED_NODE", "孤立命题未参与任何关系：" + isolated));
+            issues.add(RelationIssue.warning("GRAPH_ISOLATED_NODE", "孤立命题未参与任何关系：" + isolated)
+                    .as(AuditCategory.ISOLATED_PROPOSITION));
         }
         GraphView graph = new GraphView(
                 "session:" + sessionId, OWNER_FINAL_VERSION, unifiedSnapshotId,

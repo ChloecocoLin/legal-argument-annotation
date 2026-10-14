@@ -18,6 +18,7 @@ import com.argument.relation.dto.ParticipantView;
 import com.argument.relation.dto.RelationIssue;
 import com.argument.relation.dto.RelationView;
 import com.argument.relation.entity.Relation;
+import com.argument.relation.rules.AuditCategory;
 import com.argument.relation.rules.RelationRules;
 import com.argument.relation.service.RelationLookup;
 import com.argument.relation.service.RelationService;
@@ -248,7 +249,8 @@ public class ArgumentGraphServiceImpl implements ArgumentGraphService {
                 .collect(Collectors.toSet());
         if (!elementIds.containsAll(allElementIds) || !relationIds.containsAll(allRelationIds)) {
             issues.add(RelationIssue.warning("GRAPH_INCOMPLETE",
-                    "该图示未覆盖本快照全部命题与关系，仅作为局部视图"));
+                    "该图示未覆盖本快照全部命题与关系，仅作为局部视图")
+                    .as(AuditCategory.MISSING_RELATION));
         }
 
         // 4. 关系级校验（方向、角色、J/M 混用、非法嵌套、非命题端点、环）
@@ -257,7 +259,8 @@ public class ArgumentGraphServiceImpl implements ArgumentGraphService {
         // 5. 结构：多个独立论证图与孤立命题
         Assembled structure = assembler.assemble(pickedElements, pickedRelations);
         for (String isolated : structure.isolatedNodeIds()) {
-            issues.add(RelationIssue.warning("GRAPH_ISOLATED_NODE", "孤立命题未参与任何关系：" + isolated));
+            issues.add(RelationIssue.warning("GRAPH_ISOLATED_NODE", "孤立命题未参与任何关系：" + isolated)
+                    .as(AuditCategory.ISOLATED_PROPOSITION));
         }
 
         boolean valid = issues.stream().noneMatch(i -> "ERROR".equals(i.level()));

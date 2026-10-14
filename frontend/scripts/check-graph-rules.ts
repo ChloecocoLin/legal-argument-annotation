@@ -17,6 +17,13 @@ import {
   representativeOf,
   type CandidateInfo
 } from '../src/shared/relationRules.ts'
+import {
+  AUDIT_DIMENSIONS,
+  OTHER_CATEGORY,
+  categoryOf,
+  checkGlyphs,
+  groupIssues
+} from '../src/shared/graphAudit.ts'
 
 let pass = 0
 let fail = 0
@@ -249,6 +256,90 @@ check(
   [parseDisplayNo('P10'), parseDisplayNo('P9')]
 )
 check('非命题无编号 → -1', parseDisplayNo(null) === -1)
+
+console.log('== 图示审查：七类与图元自查 ==')
+check(
+  '七类审查类别与后端 AuditCategory 的 id 一一对应',
+  AUDIT_DIMENSIONS.map((d) => d.id).join(',') ===
+    'MISSING_RELATION,WRONG_DIRECTION,JM_CONFUSION,ILLEGAL_NESTING,' +
+      'ISOLATED_PROPOSITION,GLYPH_ERROR,MULTIPLE_STRUCTURES',
+  AUDIT_DIMENSIONS.map((d) => d.id)
+)
+check(
+  '七类各有判定方，且只有「图元错误」归前端',
+  AUDIT_DIMENSIONS.every((d) => ['BACKEND', 'FRONTEND', 'INFO'].includes(d.decision)) &&
+    AUDIT_DIMENSIONS.filter((d) => d.decision === 'FRONTEND').map((d) => d.id).join() ===
+      'GLYPH_ERROR',
+  AUDIT_DIMENSIONS.map((d) => `${d.id}:${d.decision}`)
+)
+
+// 种子图本身应该是干净的——否则审查页的「通过」没有意义
+const healthy = checkGlyphs(nodes, edges)
+check('种子图的图元全部合规（无发现）', healthy.length === 0, healthy)
+
+const badArrow = checkGlyphs(
+  nodes,
+  edges.map((e) => (e.id === 'e15' ? { ...e, arrow: true } : e))
+)
+check(
+  'I 连线画成有箭头 → 报图元错误并指明应为无向',
+  badArrow.length === 1 && badArrow[0].message.includes('无向不带箭头'),
+  badArrow
+)
+const badDash = checkGlyphs(
+  nodes,
+  edges.map((e) => (e.id === 'e3' ? { ...e, dashed: true } : e))
+)
+check(
+  'S 连线画成虚线 → 报图元错误',
+  badDash.length === 1 && badDash[0].message.includes('不应画成虚线'),
+  badDash
+)
+const badJ = checkGlyphs(
+  nodes,
+  edges.map((e) => (e.id === 'e1' ? { ...e, arrow: true } : e))
+)
+check(
+  'J 连线画成有箭头 → 报图元错误（J/M 混用的画法表现）',
+  badJ.length === 1 && badJ[0].message.includes('J'),
+  badJ
+)
+const ghostEdge = checkGlyphs(nodes, [...edges, E('e17', 'rel-3', 'mp-9', 'rel-3', 'S', true, false)])
+check(
+  '连线端点是图里没有的节点 → 报图元错误',
+  ghostEdge.length === 1 && ghostEdge[0].message.includes('画不出来'),
+  ghostEdge
+)
+const noNo = checkGlyphs(nodes.map((n) => (n.id === 'mp-1' ? { ...n, displayNo: null } : n)), edges)
+check(
+  '命题节点缺展示编号 → 报图元错误',
+  noNo.length === 1 && noNo[0].message.includes('展示编号'),
+  noNo
+)
+const unknown = checkGlyphs(nodes, edges.map((e) => (e.id === 'e1' ? { ...e, relationCode: 'X' } : e)))
+check('未知关系类型 → 报图元错误（没有对应图元）', unknown.length === 1, unknown)
+
+// 归组：后端未分类的问题落「其他结构问题」，不丢
+const grouped = groupIssues([
+  { category: 'WRONG_DIRECTION' },
+  { category: 'WRONG_DIRECTION' },
+  { category: 'GLYPH_ERROR' },
+  { category: null },
+  {}
+])
+check('按类别归组，同类别聚合', grouped.get('WRONG_DIRECTION')?.length === 2, grouped.get('WRONG_DIRECTION'))
+check(
+  '未分类的问题全部落「其他结构问题」',
+  grouped.get('STRUCTURE')?.length === 2,
+  grouped.get('STRUCTURE')
+)
+check(
+  '归组结果含全部类别（含空组），界面才能逐条画清单',
+  grouped.size === AUDIT_DIMENSIONS.length + 1,
+  grouped.size
+)
+check('categoryOf(null) 归其他', categoryOf({ category: null }) === OTHER_CATEGORY)
+check('categoryOf(空串) 归其他', categoryOf({ category: '' }) === OTHER_CATEGORY)
 
 console.log()
 console.log(`通过 ${pass}，失败 ${fail}`)

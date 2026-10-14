@@ -81,6 +81,11 @@ export interface RelationIssue {
   message: string
   relationId?: string | null
   participantOrdinal?: number | null
+  /**
+   * 图示审查分类（后端 AuditCategory）。只有「图示审查」需要它，其余出口可能为 null；
+   * 界面把 null 归入「其他结构问题」。取值见 shared/graphAudit.ts 的 AUDIT_CATEGORIES。
+   */
+  category?: string | null
 }
 
 // 【临时】模拟命题。替代 A/B 的正式要素接口（E01…），就绪后本类型与

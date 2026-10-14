@@ -7,6 +7,7 @@ import com.argument.relation.dto.ParticipantRequest;
 import com.argument.relation.dto.RelationIssue;
 import com.argument.relation.entity.Relation;
 import com.argument.relation.entity.RelationParticipant;
+import com.argument.relation.rules.AuditCategory;
 import com.argument.relation.rules.RelationRules;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -132,11 +133,13 @@ public class RelationValidator {
             if (sourceCount != 1 || targetCount != 1) {
                 issues.add(RelationIssue.error(ErrorCode.INVALID_PARTICIPANT.getCode(),
                         relationCode + " 是有向关系，需要且只需要一个 SOURCE 与一个 TARGET，实际 SOURCE="
-                                + sourceCount + "、TARGET=" + targetCount).at(relationId, null));
+                                + sourceCount + "、TARGET=" + targetCount).at(relationId, null)
+                        .as(AuditCategory.WRONG_DIRECTION));
             }
         } else if (memberCount != inputs.size()) {
             issues.add(RelationIssue.error(ErrorCode.INVALID_PARTICIPANT.getCode(),
-                    relationCode + " 是无向关系，参与项角色必须全部为 MEMBER").at(relationId, null));
+                    relationCode + " 是无向关系，参与项角色必须全部为 MEMBER").at(relationId, null)
+                    .as(AuditCategory.JM_CONFUSION));
         }
     }
 
@@ -195,9 +198,27 @@ public class RelationValidator {
             String problem = RelationRules.checkTarget(relationCode, p.role(), kind, referencedCode, labelCode);
             if (problem != null) {
                 issues.add(RelationIssue.error(ErrorCode.INVALID_PARTICIPANT.getCode(), problem)
-                        .at(relationId, p.ordinal()));
+                        .at(relationId, p.ordinal())
+                        .as(categoryOfMatrixProblem(relationCode, kind)));
             }
         }
+    }
+
+    /**
+     * 参与矩阵违反项的分类（分工.md §四.6）。
+     *
+     * <p>矩阵问题按目标种类分成两族：拿**关系整体**当参与项而被拒的，都是嵌套层级的问题；
+     * 拿**命题**当参与项而被拒的，只可能是 J、M 的角色与成员规则（其余关系对命题的要求
+     * 属于端点类型本身的问题，归「其他结构问题」）。
+     */
+    private static String categoryOfMatrixProblem(String relationCode, String targetKind) {
+        if (RelationRules.KIND_RELATION.equals(targetKind)) {
+            return AuditCategory.ILLEGAL_NESTING;
+        }
+        if (RelationRules.J.equals(relationCode) || RelationRules.M.equals(relationCode)) {
+            return AuditCategory.JM_CONFUSION;
+        }
+        return AuditCategory.STRUCTURE;
     }
 
     // ── 规则 5：循环嵌套 ────────────────────────────────────────────────
@@ -220,7 +241,8 @@ public class RelationValidator {
         if (cycle != null) {
             issues.add(RelationIssue.error(ErrorCode.RELATION_CYCLE.getCode(),
                     "关系嵌套不允许成环：" + String.join(" → ", cycle))
-                    .at(relationId, null));
+                    .at(relationId, null)
+                    .as(AuditCategory.ILLEGAL_NESTING));
         }
     }
 
