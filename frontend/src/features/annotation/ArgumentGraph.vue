@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 论证图示（SVG）。画法依据 mock-data/base/relation-definitions.json 的 diagramRule：
 //   S 实心圆 ● 有向、A 空心圆 ○ 有向、J/M 带“+”圆（J 无向、M 有向）、I 用矩形框内“/”不分圆节点。
-// 几何与交互移植原型 assets/graph.js（拖动 / 滚轮缩放 / 平移 / fit / serialize），
+// 几何与交互移植原型 assets/graph.js（拖动 / 滚轮缩放 / 平移 / fit），
 // 样式全部复用 app.css §11 的 .g-*，不新造类名、不加依赖（不使用 AntV X6）。
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { GraphEdge, GraphNode, GraphNodePosition } from '@/types/graph'
@@ -17,6 +17,18 @@ import {
   type RenderEdge,
   type RenderNode
 } from '@/shared/graphGeometry'
+import {
+  EXPORT_PAD,
+  SVG_NS,
+  backgroundAttrs,
+  exportViewBox,
+  inlineComputedStyles,
+  rasterSize,
+  rasterize,
+  stageBackground,
+  stripUiArtifacts,
+  type ExportOptions
+} from '@/shared/graphExport'
 import { hasPlusSign, relClass } from '@/shared/relationMeta'
 
 const MIN_SCALE = 0.35
@@ -231,16 +243,61 @@ function onNodeClick(node: RenderNode): void {
   if (source) emit('node-click', source)
 }
 
-/** 导出 SVG 字符串（下一轮的 PNG 导出与图示审查直接复用；本轮仅留接口）。 */
-function serialize(): string {
+/**
+ * 导出整图为自包含 SVG 字符串（分工.md §八.5）。
+ *
+ * 与屏幕上那张图的三个差别，都是有意的：
+ *   1. 导出整图 —— 用内容包围盒做 viewBox 并把内容组的 transform 归零，
+ *      所以当前缩放到 2.6 倍或平移出屏，导出的仍是完整图示；
+ *   2. 自包含 —— 内联每个图元的计算样式（.g-* 用的是 var(--rel-*)，
+ *      单独一个 SVG 文件没有 app.css，不内联就是一张只有黑线的残图）；
+ *   3. 去掉交互态 —— 选中描边（.halo）与 is-active 是当前会话的状态，不是图的内容。
+ *
+ * 注意顺序：内联样式必须排在去交互态之前，因为它是按 childNodes 并行下走的，
+ * 克隆树一旦删了 .halo 就不再与源树同构。
+ */
+function exportSvg(options: ExportOptions = {}): string {
   const svg = svgEl.value
-  const host = hostEl.value
-  if (!svg) return ''
+  if (!svg || rendered.value.length === 0) return ''
   const clone = svg.cloneNode(true) as SVGSVGElement
-  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-  clone.setAttribute('width', String(host?.clientWidth ?? 0))
-  clone.setAttribute('height', String(host?.clientHeight ?? 0))
+
+  inlineComputedStyles(svg, clone, window)
+  stripUiArtifacts(clone)
+
+  const view = contentView(options.padding)
+  clone.setAttribute('xmlns', SVG_NS)
+  clone.setAttribute('viewBox', view.viewBox)
+  clone.setAttribute('width', String(view.width))
+  clone.setAttribute('height', String(view.height))
+
+  // 内容组的 transform 归零：整图由 viewBox 定位，与当前平移/缩放无关
+  const content = clone.querySelector('g[transform]')
+  content?.setAttribute('transform', 'translate(0 0)')
+
+  const background = backgroundAttrs(view, options.background)
+  if (background) {
+    const rect = document.createElementNS(SVG_NS, 'rect')
+    Object.entries(background).forEach(([name, value]) => rect.setAttribute(name, value))
+    clone.insertBefore(rect, clone.firstChild)
+  }
+
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)
+}
+
+/** PNG：同一份 SVG 交给 canvas 光栅化。底色默认取绘图区底色（透明图在文档里看不清）。 */
+async function exportPng(options: ExportOptions = {}): Promise<Blob> {
+  const svg = exportSvg(options)
+  if (!svg) throw new Error('没有可导出的图示')
+  const view = contentView(options.padding)
+  const background =
+    options.background === undefined ? stageBackground(hostEl.value, window) : options.background
+  const size = rasterSize(view.width, view.height, options.scale ?? 2, options.maxPixels)
+  return rasterize(svg, size, background)
+}
+
+/** 内容包围盒 + 留白。导出与光栅化共用，避免两处各算一遍尺寸。 */
+function contentView(padding?: number): ReturnType<typeof exportViewBox> {
+  return exportViewBox(graphBounds(rendered.value), padding ?? EXPORT_PAD)
 }
 
 watch([() => props.nodes, () => props.edges, () => props.positions], rebuild, {
@@ -259,7 +316,7 @@ onMounted(() => {
   nextTick(fit)
 })
 
-defineExpose({ fit, zoomBy, reset, serialize, currentPositions })
+defineExpose({ fit, zoomBy, reset, exportSvg, exportPng, currentPositions })
 </script>
 
 <template>

@@ -24,6 +24,16 @@ import {
   checkGlyphs,
   groupIssues
 } from '../src/shared/graphAudit.ts'
+import {
+  backgroundAttrs,
+  exportFileName,
+  exportStamp,
+  exportViewBox,
+  pngBlob,
+  rasterScale,
+  rasterSize,
+  svgBlob
+} from '../src/shared/graphExport.ts'
 
 let pass = 0
 let fail = 0
@@ -340,6 +350,86 @@ check(
 )
 check('categoryOf(null) 归其他', categoryOf({ category: null }) === OTHER_CATEGORY)
 check('categoryOf(空串) 归其他', categoryOf({ category: '' }) === OTHER_CATEGORY)
+
+console.log('== 导出：文件名 / 倍率 / 取景 / Blob（SVG-PNG 底层生成）==')
+// 只覆盖不依赖 DOM 的那部分。内联样式与 canvas 光栅化要真浏览器，在页面里点。
+const stampAt = new Date(2026, 9, 14, 10, 30)
+check('文件名时间戳为 YYYYMMDD-HHMM', exportStamp(stampAt) === '20261014-1030', exportStamp(stampAt))
+check(
+  '文件名由主体与时间戳拼成',
+  exportFileName('图示审查-md-1', 'svg', stampAt) === '图示审查-md-1-20261014-1030.svg',
+  exportFileName('图示审查-md-1', 'svg', stampAt)
+)
+check(
+  '主体里的空格与斜杠被换掉，下载名不会出错',
+  exportFileName('formal graph/us-1', 'png', stampAt) === 'formal-graph-us-1-20261014-1030.png',
+  exportFileName('formal graph/us-1', 'png', stampAt)
+)
+check(
+  '空主体兜底为 argument-graph',
+  exportFileName('', 'svg', stampAt) === 'argument-graph-20261014-1030.svg',
+  exportFileName('', 'svg', stampAt)
+)
+
+check('常规尺寸按请求倍率出图', rasterScale(800, 600, 2) === 2, rasterScale(800, 600, 2))
+check(
+  '超大图按像素上限下调倍率（避免 canvas 静默出白图）',
+  rasterScale(8000, 8000, 2) === 0.5,
+  rasterScale(8000, 8000, 2)
+)
+const bigSize = rasterSize(8000, 8000, 2)
+check(
+  '下调后总像素不超过上限',
+  bigSize.width * bigSize.height <= 16_000_000 && bigSize.width === 4000,
+  bigSize
+)
+check(
+  '倍率不为 0（canvas 不接受 0 宽高）',
+  rasterScale(100, 100, 0) >= 0.1 && rasterSize(1, 1, 1).width >= 1,
+  [rasterScale(100, 100, 0), rasterSize(1, 1, 1)]
+)
+
+const boxed = exportViewBox({ minX: 10, minY: 20, maxX: 110, maxY: 70 }, 24)
+check(
+  '取景盒 = 内容包围盒 + 四周留白',
+  boxed.x === -14 && boxed.y === -4 && boxed.width === 148 && boxed.height === 98,
+  boxed
+)
+check('viewBox 与取景盒一致', boxed.viewBox === '-14 -4 148 98', boxed.viewBox)
+const tight = exportViewBox({ minX: 10, minY: 20, maxX: 110, maxY: 70 }, 0)
+check('留白为 0 时就是内容包围盒本身', tight.viewBox === '10 20 100 50', tight.viewBox)
+check(
+  '零尺寸内容也给 1×1（viewBox 宽高不能为 0）',
+  exportViewBox({ minX: 5, minY: 5, maxX: 5, maxY: 5 }, 0).width === 1,
+  exportViewBox({ minX: 5, minY: 5, maxX: 5, maxY: 5 }, 0)
+)
+
+check(
+  '不传底色 → 不加背景矩形（SVG 保持透明）',
+  backgroundAttrs(boxed, null) === null,
+  backgroundAttrs(boxed, null)
+)
+const withBg = backgroundAttrs(boxed, '#ffffff')
+check(
+  '传底色 → 背景矩形铺满取景盒',
+  withBg?.fill === '#ffffff' && withBg?.width === '148' && withBg?.x === '-14',
+  withBg
+)
+
+const blob = svgBlob('<svg/>')
+check(
+  'SVG Blob 带 charset（否则中文标签在部分查看器里乱码）',
+  blob.type === 'image/svg+xml;charset=utf-8',
+  blob.type
+)
+check('SVG Blob 有内容', blob.size > 0, blob.size)
+let threw = ''
+try {
+  pngBlob(null)
+} catch (error) {
+  threw = error instanceof Error ? error.message : String(error)
+}
+check('canvas 没产出数据时报中文错，而不是给出空文件', threw.includes('光栅化失败'), threw)
 
 console.log()
 console.log(`通过 ${pass}，失败 ${fail}`)

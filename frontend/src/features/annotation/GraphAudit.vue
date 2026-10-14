@@ -11,6 +11,7 @@
 //   信息 —— 「多个论证结构识别」取自 componentCount，是提示不是缺陷。
 import { computed, onMounted, ref, watch } from 'vue'
 import ArgumentGraph from './ArgumentGraph.vue'
+import GraphExportButtons from './GraphExportButtons.vue'
 import Icon from '@/shared/Icon.vue'
 import { toast } from '@/shared/toast'
 import { errorMessageOf } from '@/shared/apiError'
@@ -503,6 +504,7 @@ onMounted(load)
         <button class="btn btn-icon btn-ghost" title="缩小" @click="zoom(0.87)">
           <Icon name="zout" />
         </button>
+        <GraphExportButtons :target="graphRef" :name="`图示审查-${owner.ownerId}`" />
       </div>
 
       <ArgumentGraph

@@ -10,6 +10,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ArgumentGraph from '../annotation/ArgumentGraph.vue'
+import GraphExportButtons from '../annotation/GraphExportButtons.vue'
 import BaseModal from '@/shared/BaseModal.vue'
 import Chip from '@/shared/Chip.vue'
 import Icon from '@/shared/Icon.vue'
@@ -722,6 +723,7 @@ function fitGraph(): void {
         <button class="btn btn-icon btn-ghost" title="适应窗口" @click="fitGraph">
           <Icon name="fit" />
         </button>
+        <GraphExportButtons :target="graphRef" :name="`正式论证图-${sessionId}`" />
         <button
           class="btn btn-primary btn-sm"
           :disabled="generating || items.length === 0"

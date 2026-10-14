@@ -6,6 +6,7 @@
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ArgumentGraph from './ArgumentGraph.vue'
+import GraphExportButtons from './GraphExportButtons.vue'
 import BaseModal from '@/shared/BaseModal.vue'
 import Chip from '@/shared/Chip.vue'
 import Icon from '@/shared/Icon.vue'
@@ -753,6 +754,7 @@ async function saveLayout(): Promise<void> {
         <button class="btn btn-icon btn-ghost" title="回到原点" @click="resetView">
           <Icon name="undo" />
         </button>
+        <GraphExportButtons :target="graphRef" :name="`标注工作台-${draftId}`" />
         <button class="btn btn-secondary btn-sm" :disabled="saving" @click="saveLayout">
           <Icon name="save" />
           保存布局

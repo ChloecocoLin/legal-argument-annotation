@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>论证图 SVG / PNG 导出自检</title>
+    <style>
+      body { margin: 16px; background: #fff; font-family: system-ui, sans-serif; }
+      h2 { font-size: 14px; margin: 18px 0 6px; }
+      .stage-wrap { width: 900px; height: 520px; border: 1px solid #ccc; }
+      .stage-wrap > div { width: 100%; height: 100%; }
+      .out img, .out svg { border: 1px solid #ccc; background: #eee; max-width: 900px; }
+      pre { font-size: 10px; white-space: pre-wrap; word-break: break-all; max-height: 240px;
+            overflow: auto; background: #f6f6f6; padding: 8px; }
+      #status { font-size: 13px; font-weight: 600; }
+      #status.bad { color: #b00; }
+    </style>
+  </head>
+  <body>
+    <h2>1) 屏幕上那张图（组件本体）</h2>
+    <div class="stage-wrap"><div id="graph"></div></div>
+    <h2>2) exportPng() 的产物（同一份 SVG 经 canvas 光栅化）</h2>
+    <div class="out"><img id="png" alt="导出的 PNG 会显示在这里" /></div>
+    <h2>3) exportSvg() 的产物（重新排版成 SVG 显示，检验内联样式是否生效）</h2>
+    <div class="out" id="svg-out"></div>
+    <h2>4) 导出的 SVG 源码（前 1600 字，检查是否内联了 fill/stroke/font-*）</h2>
+    <pre id="src"></pre>
+    <h2>5) 逐图元比对：屏幕上的计算值 vs 导出内联值（不一致就是内联漏了）</h2>
+    <pre id="diff"></pre>
+    <h2>6) 无样式表环境里的导出 SVG（这才真正证明「自包含」：第 3 节有 app.css 兜着）</h2>
+    <iframe id="frame" style="width: 760px; height: 320px; border: 1px solid #ccc"></iframe>
+    <p id="status">运行中…</p>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
