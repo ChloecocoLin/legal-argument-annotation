@@ -89,4 +89,17 @@ INSERT INTO annotation_element (id, owner_type, owner_id, client_key, document_t
 ('a9564144-5a19-45e9-bb33-4d2758e68acf', 'ANNOTATION_VERSION', 'e4b02d3f-f041-48fa-bf91-7736a381eab9', NULL,
  '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 5, 20,
  '依法成立的合同，自成立时生效。', 'l12-gmi', 'GM-I', TRUE, 'P1', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('b0123456-0000-4000-8000-000000000001', 'ANNOTATION_VERSION', '402d8716-3ea0-46ac-9078-05545fe58071', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 20, 38,
+ '当事人应当按照约定全面履行自己的义务。', 'l12-gmi', 'GM-I', TRUE, 'P3', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('b0123456-0000-4000-8000-000000000002', 'ANNOTATION_VERSION', 'e4b02d3f-f041-48fa-bf91-7736a381eab9', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 20, 38,
+ '当事人应当按照约定全面履行自己的义务。', 'l12-gmi', 'GM-I', TRUE, 'P3', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+INSERT INTO proposition_adjudication_item (id, session_id, conflict_type, candidate_element_ids, status, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000003', 'aba39933-394e-41e0-aa76-1cf8acc57ba7', 'AGREEMENT',
+ '["b0123456-0000-4000-8000-000000000001","b0123456-0000-4000-8000-000000000002"]', 'DECIDED', 0,
  TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');

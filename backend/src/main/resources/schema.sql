@@ -1,4 +1,6 @@
 -- H2(local) 初始化表结构。每次启动随内存库重建。
+DROP TABLE IF EXISTS expert_issue;
+DROP TABLE IF EXISTS expert_review;
 DROP TABLE IF EXISTS arbiter_custom_annotation;
 DROP TABLE IF EXISTS annotation_element;
 DROP TABLE IF EXISTS proposition_adjudication_item;
@@ -172,3 +174,36 @@ CREATE TABLE arbiter_custom_annotation (
 
 CREATE INDEX idx_element_owner ON annotation_element(owner_type, owner_id);
 CREATE INDEX idx_prop_item_session ON proposition_adjudication_item(session_id);
+
+-- 专家复核（成员B M4）。复核单不存问题正文，问题统一存 expert_issue。
+CREATE TABLE expert_review (
+    id                     VARCHAR(36) PRIMARY KEY,
+    session_id             VARCHAR(36) NOT NULL,
+    expert_task_member_id  VARCHAR(36) NOT NULL,
+    requested_by_id        VARCHAR(36) NOT NULL,
+    status                 VARCHAR(30) NOT NULL,
+    opened_at              TIMESTAMP,
+    confirmed_at           TIMESTAMP,
+    record_version         INT DEFAULT 0,
+    created_at             TIMESTAMP,
+    updated_at             TIMESTAMP
+);
+
+CREATE TABLE expert_issue (
+    id                VARCHAR(36) PRIMARY KEY,
+    expert_review_id  VARCHAR(36) NOT NULL,
+    item_kind         VARCHAR(20) NOT NULL,
+    item_id           VARCHAR(36),
+    question          CLOB NOT NULL,
+    resolution         CLOB,
+    guide_basis       CLOB,
+    status            VARCHAR(20) NOT NULL,
+    resolved_at       TIMESTAMP,
+    record_version    INT DEFAULT 0,
+    created_at        TIMESTAMP,
+    updated_at        TIMESTAMP
+);
+
+CREATE INDEX idx_expert_review_expert ON expert_review(expert_task_member_id);
+CREATE INDEX idx_expert_review_session ON expert_review(session_id);
+CREATE INDEX idx_expert_issue_review ON expert_issue(expert_review_id);

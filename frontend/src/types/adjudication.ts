@@ -82,6 +82,12 @@ export interface PropositionReviewItem {
   currentDecision: RefObject | null
 }
 
+// J03 响应：完整会话 + 命题项列表（不分页）
+export interface J03View {
+  session: AdjudicationSession
+  items: PropositionReviewItem[]
+}
+
 // 关系（J10 编排所需，C 维护完整语义）
 export interface CustomRelation extends EntityBase {
   ownerType: string
