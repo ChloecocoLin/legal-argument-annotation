@@ -66,7 +66,7 @@ public class VersionService {
         require("ACTIVE".equals(draft.path("status").asText()),ErrorCode.LOCKED_RESOURCE,"草稿已提交或关闭");
         var all=repository.versions(doc.path("id").asText());
         String assignmentId=draft.path("assignmentId").asText();
-        require(all.stream().noneMatch(v->!"WITHDRAWN".equals(v.path("status").asText()) && assignmentId.equals(v.path("assignmentId").asText())),ErrorCode.LOCKED_RESOURCE,"此标注员已有有效正式版本");
+        require(all.stream().noneMatch(v->repository.effective(v) && assignmentId.equals(v.path("assignmentId").asText())),ErrorCode.LOCKED_RESOURCE,"此标注员已有有效正式版本");
         var checkpoint=dependencies.lock("checkpoint",draft.path("segmentationCheckpointId").asText());
         var elements=objects("element",draft.path("elementIds")); var relations=objects("relation",draft.path("relationIds"));
         var participants=new ArrayList<ObjectNode>(); for(var r:relations) participants.addAll(dependencies.find("participant","relationId",r.path("id").asText()));
@@ -100,7 +100,7 @@ public class VersionService {
         var previous=repository.receipt(actor.id(),operation,key,hash);if(previous!=null)return previous;
         version(expected,v,"AnnotationVersion");working(task,doc);
         require(!reason.isBlank(),ErrorCode.VALIDATION_ERROR,"撤回理由不能为空");
-        require("SUBMITTED".equals(v.path("status").asText()) && !dependencies.referencedByAdjudication(versionId),ErrorCode.ALREADY_IN_ADJUDICATION,"版本已进入裁定或不可撤回");
+        require("SUBMITTED".equals(v.path("status").asText()) && !repository.referenced(versionId) && !dependencies.referencedByAdjudication(versionId),ErrorCode.ALREADY_IN_ADJUDICATION,"版本已进入裁定或不可撤回");
         String time=VersionJson.now();var before=v.deepCopy();repository.withdraw(v,actor.id(),time);
         // Reactivate the preserved source draft; original snapshot is untouched. A/B edits it through their own APIs.
         var draft=dependencies.lock("draft",v.path("sourceDraftId").asText());
@@ -134,7 +134,7 @@ public class VersionService {
         require(actor.id().equals(v.path("submittedById").asText()) && actor.permission("ANNOTATION_SUBMIT") && validAssignment(actor,dependencies.read("assignment",v.path("assignmentId").asText()),"ANNOTATOR"),ErrorCode.FORBIDDEN,"只能撤回本人有效版本");
     }
     private void working(ObjectNode task,ObjectNode doc) { require("IN_PROGRESS".equals(task.path("status").asText()) && "ANNOTATING".equals(doc.path("status").asText()),ErrorCode.LOCKED_RESOURCE,"任务或案例已锁定"); }
-    private int validCount(List<ObjectNode> versions) { return (int)versions.stream().filter(v->!"WITHDRAWN".equals(v.path("status").asText())).map(v->v.path("submittedById").asText()).distinct().count(); }
+    private int validCount(List<ObjectNode> versions) { return (int)versions.stream().filter(repository::effective).map(v->v.path("submittedById").asText()).distinct().count(); }
     private void version(int expected,ObjectNode resource,String type) {
         if(expected!=resource.path("recordVersion").asInt())throw new VersionFailure(ErrorCode.VERSION_CONFLICT,"数据已变化，请刷新后重试",Map.of("objectType",type,"objectId",resource.path("id").asText(),"currentRecordVersion",resource.path("recordVersion").asInt()));
     }

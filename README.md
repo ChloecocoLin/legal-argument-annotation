@@ -216,3 +216,9 @@ npm run dev -- --host 127.0.0.1 --port 5174
 本地 H2 数据位于 `backend/.local-data`，不提交到 Git。正式公共审计、统一切割确认、裁定和入库、教学、导出不在本批次。旧指南表的整体规范迁移仍需团队统一。
 
 本项目用于课程设计与团队协作开发。业务规则、标签定义及接口字段发生冲突时，以团队确认的最新指南和接口契约为准。
+
+## 成员 D：裁定阶段联调
+
+第 5 步的会话、阶段门禁、关系决定与指定退回，以及第 6 步模型提案见 [交接与验收](docs/member-d/05-adjudication-handoff.md) 和 [待评审模型](docs/member-d/04-segmentation-and-mapping-proposal.md)。前端入口 `/adjudication/conflict`，也可从任务详情进入；自定义页复用 `/adjudication/annotate`。
+
+当前按本地预置切割/命题映射验收，J04、B 的自定义保存/专家指派、C 的完整图编辑校验待接入。最终审查与入库尚未交付；本批 FINAL_REVIEW 仅表示两阶段裁定完成。冻结 SDK 输入不变，新的会话传输补丁单独待团队评审。

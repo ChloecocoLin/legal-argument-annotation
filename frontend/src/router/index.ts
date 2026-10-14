@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
     path: '/adjudication/annotate',
     name: 'arbiter-annotate',
     component: () => import('@/features/adjudication/ArbiterAnnotate.vue'),
-    meta: { title: '裁定者标注' }
+    meta: { title: '裁定者自定义标注' }
   },
   {
     path: '/expert',

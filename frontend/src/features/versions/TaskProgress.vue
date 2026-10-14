@@ -43,7 +43,7 @@ onMounted(load)
           <div class="row d-actions">
             <router-link v-if="arbiter || draft(item.taskDocumentId)" class="btn btn-secondary" :to="`/tasks/${taskId}/cases/${item.taskDocumentId}/versions`">{{ arbiter ? '查看来源版本' : '查看本人版本' }}</router-link>
             <router-link v-if="draft(item.taskDocumentId)?.status === 'ACTIVE'" class="btn btn-primary" :to="`/annotations/${draft(item.taskDocumentId)?.id}/submit`">提交确认</router-link>
-            <span v-if="arbiter && item.submittedCount >= item.requiredAnnotators" class="muted t-xs">版本已齐备，裁定入口将在下一阶段接入</span>
+            <router-link v-if="arbiter && item.submittedCount >= item.requiredAnnotators" class="btn btn-primary" :to="{ path: '/adjudication/conflict', query: { caseId: item.taskDocumentId } }">进入多版本裁定</router-link>
           </div>
         </article>
       </div>

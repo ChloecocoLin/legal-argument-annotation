@@ -17,7 +17,7 @@ const titleMap: Record<string, string> = {
   '/': '系统总览',
   '/guide': '指南管理',
   '/adjudication/conflict': '冲突解决',
-  '/adjudication/annotate': '标注工作台',
+  '/adjudication/annotate': '裁定者自定义标注',
   '/expert': '专家工作台',
   '/expert/issues': '疑难问题说明文档'
 }

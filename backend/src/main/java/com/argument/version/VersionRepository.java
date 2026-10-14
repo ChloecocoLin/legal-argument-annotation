@@ -49,6 +49,15 @@ public class VersionRepository {
             Timestamp.from(Instant.parse(time)),actor,version.path("id").asText(),version.path("recordVersion").asInt());
         if(changed!=1) throw new BusinessException(ErrorCode.VERSION_CONFLICT,"版本已变化，请刷新后重试");
     }
+    public boolean effective(ObjectNode version) {
+        return !"WITHDRAWN".equals(version.path("status").asText()) && jdbc.queryForObject("SELECT COUNT(*) FROM adjudication_returned_versions WHERE version_id=?",Integer.class,version.path("id").asText())==0;
+    }
+    public boolean referenced(String versionId) {
+        return jdbc.queryForList("SELECT payload_json FROM adjudication_sessions",String.class).stream().map(s->VersionJson.parse(mapper,s)).anyMatch(s->{ for(var id:s.path("sourceVersionIds"))if(id.asText().equals(versionId))return true;return false; });
+    }
+    public void startAdjudication(ObjectNode version,String actor,String time) {
+        jdbc.update("UPDATE annotation_versions SET status='UNDER_ADJUDICATION',record_version=record_version+1,updated_at=?,updated_by_id=? WHERE id=? AND status='SUBMITTED'",Timestamp.from(Instant.parse(time)),actor,version.path("id").asText());
+    }
     public ObjectNode receipt(String actor,String operation,String key,String hash) {
         var rows=jdbc.query("SELECT request_sha256,result_json,expires_at FROM annotation_mutation_receipts WHERE actor_id=? AND operation_key=? AND idempotency_key=? FOR UPDATE",(rs,i)->{
             if(rs.getTimestamp(3).toInstant().isBefore(Instant.now())) return null;
