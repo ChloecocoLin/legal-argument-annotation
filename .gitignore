@@ -1,6 +1,7 @@
 # Frontend dependencies and build output
 frontend/node_modules/
 frontend/dist/
+frontend/.vite/
 frontend/*.tsbuildinfo
 
 # Backend build output

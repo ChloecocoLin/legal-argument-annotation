@@ -2,14 +2,14 @@
 
 面向中文裁判文书说理部分的法律论证结构标注平台。系统围绕“标注指南管理—要素标注—命题裁定—专家复核—论证图展示”组织业务流程，为法律论证语料建设、冲突裁定和质量复核提供统一的前后端工程。
 
-> 当前版本：`0.1.0`　|　开发分支：`main`　|　当前阶段：M1 已完成，M2 待开发
+> 当前版本：`0.1.0`　|　开发分支：`main`　|　当前阶段：M2 已完成，M2.5 待开发
 
 ## 项目功能
 
 | 模块 | 主要能力 | 当前状态 |
 | --- | --- | --- |
 | 标注指南管理 | 指南列表、版本详情、标签字典、版本创建/归档/审核/对比 | 已完成 |
-| 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 待开发 |
+| 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 已完成 |
 | 要素标注 | 文书片段选择、要素类型标注、自定义标注 | 待开发 |
 | 命题裁定 | 查看标注分歧、处理冲突、升级专家复核 | 页面与接口骨架 |
 | 专家复核 | 专家问题列表、复核详情、最终裁定 | 页面与接口骨架 |
@@ -159,11 +159,45 @@ java -jar backend/target/argument-annotation-backend-0.1.0.jar --spring.profiles
 
 合同及合同解释属于 `SM-C`，不启用早期原型中的 `GM-C`。
 
+## 共享要素类型组件
+
+`frontend/src/shared/ElementTypeSelector.vue` 是要素标注、命题裁定和专家复核页面共用的受控选择器。组件不维护业务字典，调用方应通过 G06 获取当前指南版本的 `LabelDefinition[]` 后传入。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import ElementTypeSelector from '@/shared/ElementTypeSelector.vue'
+import type { LabelDefinition } from '@/types/guide'
+
+const labels = ref<LabelDefinition[]>([])
+const selectedCode = ref<string | null>(null)
+</script>
+
+<template>
+  <ElementTypeSelector
+    v-model="selectedCode"
+    :labels="labels"
+    :loading="false"
+    clearable
+  />
+</template>
+```
+
+主要输入：
+
+- `labels`：G06 返回的标签定义数组。
+- `modelValue`：当前选中的标签代码，可通过 `v-model` 双向绑定。
+- `loading`、`error`：接口加载和失败状态。
+- `disabled`：禁用全部选项。
+- `clearable`：再次点击已选项时是否允许取消。
+
+组件发出 `update:modelValue`、`change` 和 `retry` 事件。标签按照接口返回的 `category`、`baseType`、`sortOrder` 动态分组和排序，未知命题基础类型会进入“其他命题要素”，不会被静默丢弃。
+
 ## 开发进度
 
 - [x] M0：前后端工程骨架与接口契约层
 - [x] M1：标注指南管理
-- [ ] M2：共享要素类型组件
+- [x] M2：共享要素类型组件
 - [ ] M2.5：要素标注
 - [ ] M3：命题裁定
 - [ ] M4：专家复核
