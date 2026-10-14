@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export type UserRole = 'admin' | 'annotator' | 'arbiter' | 'expert' | 'student' | 'teacher'
+export type UserRole = 'admin' | 'creator' | 'annotator' | 'arbiter' | 'expert' | 'student' | 'teacher'
 
 export const useUserStore = defineStore('user', () => {
   const id = ref<string>('')

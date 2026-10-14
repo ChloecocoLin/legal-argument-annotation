@@ -93,7 +93,7 @@ cd legal-argument-annotation
 
 ### 2. 启动后端
 
-默认启用 `local` profile，使用 H2 内存数据库，不需要提前安装 MySQL 或 Redis。
+默认启用 `local` profile，使用持久化 H2 文件数据库和 Flyway，不需要提前安装 MySQL 或 Redis；启动不会重建已有数据。
 
 ```powershell
 cd backend
@@ -195,6 +195,24 @@ git push -u origin feature/your-feature
 
 提交前至少执行前端构建和后端编译，且不要提交密码、IDE 配置、`node_modules` 或新的构建产物。
 
-## 说明
+## 成员 D 第 1–4 步
+
+已新增任务进度、版本列表/完整详情、提交确认与撤回页面，以及 T13、V01/V02、A04/A05 后端实现。使用数据库事务冻结完整快照，支持幂等、乐观锁、来源保留和盲标权限校验。
+
+访问 `/tasks`，在开发模式选择“本地联调身份”，可用陈晓/刘一鸣各自提交，然后以赵明远查看负责案例的版本。预置统一切割和 A/B/C 依赖不计为对应模块已实现；正式版本保存到数据库。生产必须由 A/B/C 提供正式适配器和认证。
+
+如果默认端口被原型或其他服务占用，可分别指定：
+
+```powershell
+# backend，已使用 JDK 17 打包后
+java -jar target/argument-annotation-backend-0.1.0.jar --server.port=18080
+# frontend，在另一个终端运行
+$env:VITE_API_TARGET='http://127.0.0.1:18080'
+npm run dev -- --host 127.0.0.1 --port 5174
+```
+
+后端检查：`mvn test`；前端检查：`npm run build`。D 的基线、接口评审补丁及适配边界见 [页面与契约基线](docs/member-d/01-page-and-contract-baseline.md)、[基础与接入](docs/member-d/02-foundation-and-integration.md)。共享 READY 契约文件未改动；V01/V02/A04/A05 按用户授权的修订版 Markdown 实现完整资源，OpenAPI 补丁单独待评审。
+
+本地 H2 数据位于 `backend/.local-data`，不提交到 Git。正式公共审计、统一切割确认、裁定和入库、教学、导出不在本批次。旧指南表的整体规范迁移仍需团队统一。
 
 本项目用于课程设计与团队协作开发。业务规则、标签定义及接口字段发生冲突时，以团队确认的最新指南和接口契约为准。

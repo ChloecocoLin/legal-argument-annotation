@@ -1,0 +1,2 @@
+# Preserve the team's SHA-256 contract bytes through Windows checkout.
+contracts/openapi-ready.yaml -text

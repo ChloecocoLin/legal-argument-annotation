@@ -27,7 +27,7 @@ export const NAV: NavGroup[] = [
   {
     group: '标注任务',
     items: [
-      { id: 'task-list', label: '任务列表', icon: 'list' },
+      { id: 'task-list', label: '任务进度', icon: 'list', path: '/tasks' },
       { id: 'task-create', label: '创建任务', icon: 'plus' },
       { id: 'task-assign', label: '任务分配', icon: 'share' }
     ]

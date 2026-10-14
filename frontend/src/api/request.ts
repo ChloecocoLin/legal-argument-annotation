@@ -41,9 +41,9 @@ instance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
 
-    // POST 默认补充幂等键
+    // 所有写请求遵守同一幂等协议；重要动作的重试键由调用方保留。
     const method = (config.method || '').toLowerCase()
-    if (method === 'post' && !config.headers['Idempotency-Key']) {
+    if (['post', 'put', 'patch', 'delete'].includes(method) && !config.headers['Idempotency-Key']) {
       config.headers['Idempotency-Key'] = crypto.randomUUID()
     }
     return config

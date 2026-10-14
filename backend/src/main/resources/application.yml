@@ -3,6 +3,12 @@ spring:
     active: local
   application:
     name: argument-annotation-backend
+  sql:
+    init:
+      mode: never
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common
+    clean-disabled: true
 
 server:
   port: 8080

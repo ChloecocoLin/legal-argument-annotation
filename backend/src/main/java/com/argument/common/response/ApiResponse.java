@@ -2,6 +2,8 @@ package com.argument.common.response;
 
 import com.argument.common.exception.ErrorCode;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -26,7 +28,7 @@ public class ApiResponse<T> {
         this.meta = meta;
         this.error = error;
         this.requestId = UUID.randomUUID().toString();
-        this.timestamp = OffsetDateTime.now();
+        this.timestamp = OffsetDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static <T> ApiResponse<T> ok(T data) {

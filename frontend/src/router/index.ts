@@ -2,6 +2,11 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 // 成员B负责的页面路由。其余成员页面在联调阶段接入。
 const routes: RouteRecordRaw[] = [
+  { path: '/tasks', name: 'task-progress', component: () => import('@/features/versions/TaskProgress.vue'), meta: { title: '任务进度' } },
+  { path: '/tasks/:taskId', name: 'task-detail', component: () => import('@/features/versions/TaskProgress.vue'), meta: { title: '任务详情' } },
+  { path: '/tasks/:taskId/cases/:caseId/versions', name: 'annotation-versions', component: () => import('@/features/versions/VersionList.vue'), meta: { title: '标注版本' } },
+  { path: '/versions/:versionId', name: 'annotation-version', component: () => import('@/features/versions/VersionDetail.vue'), meta: { title: '完整标注版本' } },
+  { path: '/annotations/:draftId/submit', name: 'annotation-submit', component: () => import('@/features/versions/SubmitAnnotation.vue'), meta: { title: '提交标注' } },
   {
     path: '/',
     name: 'home',

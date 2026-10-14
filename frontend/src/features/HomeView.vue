@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 const items = [
+  { path: '/tasks', title: '任务进度与版本', sub: '查看 X/N、完整提交与撤回' },
   { path: '/guide', title: '标注指南管理', sub: '指南库 G 系列' },
   { path: '/adjudication/conflict', title: '冲突解决', sub: '命题裁定 J 系列' },
   { path: '/adjudication/annotate', title: '裁定者标注', sub: '补页' },

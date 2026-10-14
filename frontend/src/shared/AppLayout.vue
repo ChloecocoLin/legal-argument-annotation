@@ -5,8 +5,13 @@ import Icon from './Icon.vue'
 import Toasts from './Toasts.vue'
 import { NAV } from './nav.config'
 import { toast } from './toast'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const user = useUserStore()
+const userName = computed(() => user.name || '未登录')
+const avatarText = computed(() => user.name ? user.name.slice(0, 2) : '—')
+const roleName = computed(() => ({ admin: '管理员', creator: '任务创建者', annotator: '标注员', arbiter: '裁定者', expert: '专家', teacher: '教师', student: '学生' }[user.roles[0] || ''] || '未登录'))
 
 const titleMap: Record<string, string> = {
   '/': '系统总览',
@@ -17,6 +22,10 @@ const titleMap: Record<string, string> = {
   '/expert/issues': '疑难问题说明文档'
 }
 const here = computed(() => {
+  if (route.path.startsWith('/annotations/')) return '提交标注'
+  if (route.path.startsWith('/versions/')) return '完整标注版本'
+  if (route.path.startsWith('/tasks/')) return route.path.endsWith('/versions') ? '标注版本' : '任务详情'
+  if (route.path === '/tasks') return '任务进度'
   if (route.path.startsWith('/guide/')) return '版本详情'
   return titleMap[route.path] || '系统总览'
 })
@@ -68,10 +77,10 @@ function openMobileNav() {
         </div>
       </nav>
       <div class="sidebar-foot">
-        <span class="avatar">WH</span>
+        <span class="avatar">{{ avatarText }}</span>
         <span>
-          <b style="color: #fff; font-size: 12.5px">王慧</b><br />
-          <span>管理员</span>
+          <b style="color: #fff; font-size: 12.5px">{{ userName }}</b><br />
+          <span>{{ roleName }}</span>
         </span>
       </div>
     </aside>
@@ -93,12 +102,12 @@ function openMobileNav() {
           <Icon name="user" />
           <span class="muted t-xs">角色</span>
           <select aria-label="切换角色" disabled>
-            <option>管理员</option>
+            <option>{{ roleName }}</option>
           </select>
         </div>
         <button class="btn btn-icon btn-ghost" title="帮助" @click="notReady('帮助')"><Icon name="help" /></button>
         <button class="btn btn-icon btn-ghost" title="通知" @click="notReady('通知')"><Icon name="bell" /></button>
-        <span class="avatar" title="平台管理员">WH</span>
+        <span class="avatar" :title="userName">{{ avatarText }}</span>
       </header>
 
       <main class="content">
