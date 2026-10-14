@@ -61,8 +61,8 @@ export function completePropositions(
 export function getCustomContext(
   sessionId: string,
   params: { itemKind: 'PROPOSITION' | 'RELATION'; itemId: string }
-): Promise<CustomContext> {
-  return get<CustomContext>(
+): Promise<CustomContext | null> {
+  return get<CustomContext | null>(
     `/adjudication-sessions/${sessionId}/custom-context`,
     params
   )
@@ -72,8 +72,8 @@ export function getCustomContext(
 export function saveCustomAnnotation(
   sessionId: string,
   body: CustomAnnotationRequest
-): Promise<CustomAnnotationResult> {
-  return post<CustomAnnotationResult>(
+): Promise<CustomAnnotationResult | null> {
+  return post<CustomAnnotationResult | null>(
     `/adjudication-sessions/${sessionId}/custom-annotations`,
     body
   )
