@@ -20,30 +20,43 @@ export function listMyExpertReviews(params?: {
 }
 
 // X02 读取问题、原文与指南依据
-export function getExpertReviewDetail(
-  reviewId: string
-): Promise<ExpertReviewDetail> {
+export function getExpertReviewDetail(reviewId: string): Promise<ExpertReviewDetail> {
   return get<ExpertReviewDetail>(`/expert-reviews/${reviewId}`)
 }
 
-// X03 专家接受复核申请（START：REQUESTED → IN_REVIEW）
-export function startExpertReview(reviewId: string): Promise<ExpertReview> {
-  return post<ExpertReview>(`/expert-reviews/${reviewId}/transitions`, {
-    action: 'START'
-  })
+// X03 专家接受复核申请（START：REQUESTED → IN_REVIEW）。需带当前 recordVersion。
+export function startExpertReview(
+  reviewId: string,
+  ifMatch: number
+): Promise<ExpertReview> {
+  return post<ExpertReview>(
+    `/expert-reviews/${reviewId}/transitions`,
+    { action: 'START' },
+    { headers: { 'If-Match': String(ifMatch) } }
+  )
 }
 
-// X04 专家提交问题结论和指南依据
+// X04 专家提交问题结论和指南依据。需带当前 issue 的 recordVersion。
 export function submitIssueResolution(
   issueId: string,
-  body: IssueResolutionRequest
+  body: IssueResolutionRequest,
+  ifMatch: number
 ): Promise<ExpertIssue> {
-  return post<ExpertIssue>(`/expert-issues/${issueId}/resolutions`, body)
+  return post<ExpertIssue>(
+    `/expert-issues/${issueId}/resolutions`,
+    body,
+    { headers: { 'If-Match': String(ifMatch) } }
+  )
 }
 
-// X05 确认专家复核完成（所有问题已 RESOLVED）
-export function confirmExpertReview(reviewId: string): Promise<ExpertReview> {
-  return post<ExpertReview>(`/expert-reviews/${reviewId}/confirm`, {
-    confirmed: true
-  })
+// X05 确认专家复核完成（所有问题已 RESOLVED）。需带当前 review 的 recordVersion。
+export function confirmExpertReview(
+  reviewId: string,
+  ifMatch: number
+): Promise<ExpertReview> {
+  return post<ExpertReview>(
+    `/expert-reviews/${reviewId}/confirm`,
+    { confirmed: true },
+    { headers: { 'If-Match': String(ifMatch) } }
+  )
 }
