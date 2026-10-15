@@ -2,7 +2,7 @@
 
 面向中文裁判文书说理部分的法律论证结构标注平台。系统围绕“标注指南管理—要素标注—命题裁定—专家复核—论证图展示”组织业务流程，为法律论证语料建设、冲突裁定和质量复核提供统一的前后端工程。
 
-> 当前版本：`0.1.0`　|　开发分支：功能分支协作　|　当前阶段：M3 自定义命题裁定闭环已完成
+> 当前版本：`0.1.0`　|　开发分支：功能分支协作　|　当前阶段：M4 专家复核闭环已完成
 
 ## 项目功能
 
@@ -12,7 +12,7 @@
 | 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 已完成 |
 | 要素标注 | 文书片段选择、偏移量计算、要素类型标注、J09/G06 加载与 J10 保存编排 | 前后端闭环已完成 |
 | 命题裁定 | 查看标注分歧、按锁定数据基础重新标注、保存不可变裁定快照 | J09/J10 已完成，列表与专家升级为接口骨架 |
-| 专家复核 | 专家问题列表、复核详情、最终裁定 | 页面与接口骨架 |
+| 专家复核 | 待办列表、接受任务、提交结论与指南依据、确认完成、已确认问题文档 | 已完成 |
 | 论证图展示 | 支持、反对、组合等关系的图形化展示 | 资源与基础依赖已接入 |
 
 ## 技术栈
@@ -151,6 +151,22 @@ java -jar backend/target/argument-annotation-backend-0.1.0.jar --spring.profiles
 - 前端请求层会为 POST 请求补充 `Idempotency-Key`。
 - 标签的存在性和分组以指南标签字典接口返回的 `category`、`baseType`、`sortOrder` 为准。
 
+## 专家复核接口附录
+
+专家接口可通过请求头 `X-User-Id` 指定当前用户；不传时 `local` 环境回退到演示专家（尾号 0010）。X03/X04/X05 是状态写操作，必须携带 `If-Match`，值为当前 `recordVersion`；版本不匹配返回 `CONFLICT`，缺头按参数校验失败处理。
+
+| 编号 | 方法与路径 | 必需请求头 | 正常状态 | 关键错误码 |
+| --- | --- | --- | --- | --- |
+| J03 | GET `/api/v1/adjudication-sessions/{sessionId}/proposition-items` | — | 200 | `NOT_FOUND` |
+| J12 | POST `/api/v1/adjudication-sessions/{sessionId}/expert-reviews` | `Idempotency-Key`（POST 自动带） | 200 | `EXPERT_NOT_ASSIGNED` |
+| X01 | GET `/api/v1/expert-reviews` | `X-User-Id`（可选） | 200 | `FORBIDDEN` |
+| X02 | GET `/api/v1/expert-reviews/{reviewId}` | `X-User-Id` | 200 | `FORBIDDEN` / `NOT_FOUND` |
+| X03 | POST `/api/v1/expert-reviews/{reviewId}/transitions` | `If-Match` | 200 | `INVALID_REVIEW_STATE` / `CONFLICT` |
+| X04 | POST `/api/v1/expert-issues/{issueId}/resolutions` | `If-Match` | 200 | `GUIDE_BASIS_REQUIRED` / `INVALID_REVIEW_STATE` / `CONFLICT` |
+| X05 | POST `/api/v1/expert-reviews/{reviewId}/confirm` | `If-Match` | 200 | `OPEN_EXPERT_ISSUES` / `INVALID_REVIEW_STATE` / `CONFLICT` |
+
+状态口径：复核单 `REQUESTED → IN_REVIEW → CONFIRMED`，问题 `OPEN → RESOLVED`；仍有未解决问题时 X05 返回 `OPEN_EXPERT_ISSUES`。
+
 ## 标签口径
 
 正式 v1.2 使用 15 个标签：
@@ -234,6 +250,21 @@ itemId = 058fa5ba-c4a8-457a-96f9-1efd15df8e20
 /adjudication/annotate?sessionId=aba39933-394e-41e0-aa76-1cf8acc57ba7&itemKind=PROPOSITION&itemId=058fa5ba-c4a8-457a-96f9-1efd15df8e20
 ```
 
+## 专家复核
+
+成员 B 的 M4 闭环包含三个前端页面：
+
+- `/adjudication/conflict`：命题冲突解决列表，按 `status`、`conflictType` 筛选命题项。
+- `/expert`：专家复核工作台，左列表右详情；可接受任务、逐条提交结论与指南依据、全部解决后确认完成。
+- `/expert/issues`：已确认疑难问题的只读文档，平铺展示问题、专家结论和指南依据。
+
+演示数据（H2 每次重启重建）：
+
+- 预置一张 `REQUESTED` 复核单（尾号 0030）和一个 `OPEN` 问题（尾号 0040）。
+- 演示专家尾号 0010，已被指派到演示会话；页面顶部仅在开发环境显示“当前专家：演示专家（尾号 0010）”。
+
+演示动线：打开 `/expert` → 选中预置复核单 → 点“接受任务”→ 填写专家结论和指南依据后“提交结论”→ 所有问题 `RESOLVED` 后点“确认完成”→ 打开 `/expert/issues` 查看只读结论。复核单状态变为 `CONFIRMED`；重启后端即恢复干净种子数据。
+
 ## 开发进度
 
 - [x] M0：前后端工程骨架与接口契约层
@@ -241,7 +272,7 @@ itemId = 058fa5ba-c4a8-457a-96f9-1efd15df8e20
 - [x] M2：共享要素类型组件
 - [x] M2.5：要素标注工作台前端与接口编排
 - [x] M3：自定义命题裁定（J09/J10 后端、数据结构、幂等与集成测试）
-- [ ] M4：专家复核
+- [x] M4：专家复核闭环（J03/J12/X01–X05 后端、专家工作台与问题文档前端）
 - [ ] M5：前后端联调与验收
 
 M1 当前保留事项：
