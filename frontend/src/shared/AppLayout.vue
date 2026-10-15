@@ -16,6 +16,7 @@ const roleName = computed(() => ({ admin: '管理员', creator: '任务创建者
 const titleMap: Record<string, string> = {
   '/': '系统总览',
   '/admin-home': '管理工作台',
+  '/audit': '入库与审计记录',
   '/export': '导出中心',
   '/export-records': '导出记录',
   '/guide': '指南管理',

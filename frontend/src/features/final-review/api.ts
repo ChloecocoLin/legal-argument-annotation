@@ -28,5 +28,8 @@ export async function getFinal(id: string): Promise<FinalWorkspace> {
 }
 export const listLocalFinals = (sessionId: string) => get<{ items: FinalVersion[] }>(`${local}/sessions/${sessionId}/versions`, undefined, { baseURL: '' })
 export const createFinal = (sessionId: string, number: number, key: string) => post<{ id: string; status: string }>(`/adjudication-sessions/${sessionId}/final-versions`, { versionNumber: number }, { headers: { 'Idempotency-Key': key } })
-export type ReviewAction = { operation: 'review'; body: { action: 'SUBMIT' } } | { operation: 'return'; body: { reason: string } } | { operation: 'approve'; body: { confirmed: true } }
-export const transitionFinal = (id: string, command: ReviewAction, key: string, version: number) => post<{ status: string; issues?: unknown[] }>(`/final-annotation-versions/${id}/${command.operation}`, command.body, { headers: { 'Idempotency-Key': key, 'If-Match': version } })
+export type ReviewAction = { operation: 'review'; body: { action: 'SUBMIT' } } | { operation: 'return'; body: { reason: string } } | { operation: 'approve' | 'commit'; body: { confirmed: true } }
+export const transitionFinal = (id: string, command: ReviewAction, key: string, version: number) => {
+  if (command.operation === 'commit' && !import.meta.env.DEV) throw new Error('入库试行仅在本地联调开放，公共模型仍待团队评审')
+  return post<{ status: string; issues?: unknown[] }>(`/final-annotation-versions/${id}/${command.operation}`, command.body, { headers: { 'Idempotency-Key': key, 'If-Match': version } })
+}

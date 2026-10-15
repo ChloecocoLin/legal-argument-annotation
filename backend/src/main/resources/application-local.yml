@@ -6,7 +6,7 @@ spring:
     username: sa
     password:
   flyway:
-    locations: classpath:db/migration/h2,classpath:db/migration/common,classpath:db/migration/dev
+    locations: classpath:db/migration/h2,classpath:db/migration/common,classpath:db/migration/dev,classpath:db/migration/trial
     # Local-only V900/V901 fixtures must not cause later shared V3+ migrations to be skipped.
     out-of-order: true
 

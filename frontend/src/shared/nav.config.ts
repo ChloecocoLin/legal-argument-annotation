@@ -20,6 +20,7 @@ export const NAV: NavGroup[] = [
     group: '指南与文书',
     items: [
       { id: 'admin-home', label: '管理工作台', icon: 'dash', path: '/admin-home' },
+      { id: 'audit-events', label: '入库与审计', icon: 'archive', path: '/audit' },
       { id: 'guide-management', label: '指南管理', icon: 'book', path: '/guide' },
       { id: 'document-library', label: '文书总库', icon: 'doc' }
     ]

@@ -67,6 +67,10 @@ public class FinalReviewService {
     public ObjectNode read(Actor actor,String id) {var snapshot=store.snapshot(VersionJson.uuid(id));authorize(actor,snapshot.path("version").path("taskDocumentId").asText());return snapshot;}
     public ObjectNode summary(Actor actor,String id) {var v=read(actor,id).path("version");var result=shortVersion(v);result.set("elementIds",v.path("elementIds"));result.put("provenanceCount",v.path("provenance").size());return result;}
     public ObjectNode assessment(ObjectNode snapshot,ObjectNode session) {
+        if("IN_DATABASE".equals(snapshot.path("version").path("status").asText())) {
+            var archived=mapper.createObjectNode().put("formalReady",false).put("mode","ARCHIVED").put("healthy",true).put("canSubmit",false).put("canApprove",false);
+            archived.putArray("issues");archived.putArray("checks").addObject().put("code","ARCHIVED").put("message","已入库版本永久只读；入库时的验证证据独立保留，当前不重复批准").put("passed",true);return archived;
+        }
         var result=mapper.createObjectNode();var checksList=result.putArray("checks");var issues=result.putArray("issues");boolean healthy=true;FinalReviewDependencies.Evidence evidence=null;
         try{completed(session);require(snapshot.path("decisionDigest").asText().equals(digest(session)),ErrorCode.SOURCE_INCOMPLETE,"快照对应的裁定决定已变化，请重建快照");checks.provenance(snapshot,adjudication.snapshots(session),items(session),decisions(session));checksList.addObject().put("code","PROVENANCE").put("message","采纳、排除与生效决定来源完整").put("passed",true);}
         catch(BusinessException e){healthy=false;issue(issues,checksList,e);}

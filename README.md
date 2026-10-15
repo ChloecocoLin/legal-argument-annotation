@@ -234,3 +234,9 @@ npm run dev -- --host 127.0.0.1 --port 5174
 U08 已按冻结响应实现，入口 `/admin-home`；管理员查看全局数量，任务创建者仅查看本人任务范围。生产需提供 DashboardData 权威数据适配器，本地统计由显式 local/test 适配器读取依赖数据与已保存版本。
 
 `/export` 和 `/export-records` 沿用可运行原型布局；导出预览只读取已入库最终版。现有本地最终版尚未入库，因此范围为空；生成文件、查询导出记录与下载仍待模型确认，页面不展示虚假成功。详情与统计口径见 [本批交接](docs/member-d/08-dashboard-and-export-preparation.md)，文件/导出/下载实体与传输缺口见 [待评审方案](contracts/review/member-d-export-model-proposal.md)。复核可运行 `python scripts/verify-member-d-dashboard.py`，全程只读。第 8、9 步仍需先确认 FV06/L/EX/F 模型，再实现完整入库与文件流程。
+
+## 成员 D：入库与审计试行
+
+用户已授权按现有提案在 D 分支试行，团队评审标记保留。FV06、L01 与最终版 L02/L03 仅在 local/test 且 !prod 开放；迁移位于 trial 目录。入库与永久审计、状态锁定、证据及幂等结果同事务保存，同案例唯一；任务仅在全部案例入库后完成。最终审查增加试行入库与只读状态，`/audit` 提供授权查询。正式验证门禁未绕过，现有本地 F2 仍未批准。
+
+详情、验证与待接入边界见 [试行交接](docs/member-d/09-commit-audit-trial-handoff.md)。下一步继续已获授权的文件/导出/下载试行，不视为共享契约已经冻结或生产联合验收完成。

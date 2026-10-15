@@ -23,16 +23,25 @@ public class ApiResponse<T> {
     private final OffsetDateTime timestamp;
 
     private ApiResponse(boolean success, T data, Object meta, ErrorInfo error) {
+        this(success, data, meta, error, UUID.randomUUID().toString());
+    }
+
+    private ApiResponse(boolean success, T data, Object meta, ErrorInfo error, String requestId) {
         this.success = success;
         this.data = data;
         this.meta = meta;
         this.error = error;
-        this.requestId = UUID.randomUUID().toString();
+        this.requestId = requestId;
         this.timestamp = OffsetDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static <T> ApiResponse<T> ok(T data) {
         return new ApiResponse<>(true, data, null, null);
+    }
+
+    /** Server-generated correlation ID shared with the transactional audit event. */
+    public static <T> ApiResponse<T> okWithRequestId(T data, String requestId) {
+        return new ApiResponse<>(true, data, null, null, requestId);
     }
 
     public static <T> ApiResponse<T> ok(T data, Object meta) {

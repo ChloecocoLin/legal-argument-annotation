@@ -2,6 +2,8 @@
 
 日期：2026-10-15。本提案对应计划第 8 步准备工作，涉及 FV06、L01–L03、T14；同时登记第 7 步退回后内容修订协议缺口。不修改冻结契约，不将 PENDING_MODEL 改为 READY。
 
+后续状态：用户已授权按本提案在 D 分支试行，仍待团队评审；试行实现、测试和生产隔离边界见 [09 试行交接](09-commit-audit-trial-handoff.md)。本次授权未冻结 CorrectionRound 或替代其他成员的生产适配器。
+
 ## 入库的原子边界
 
 FV06 只接受当前案例最新且 APPROVED 的最终版；请求带 Idempotency-Key 与 FinalAnnotationVersion 的 If-Match。按案例 → TaskDocument → Task → Session → FinalVersion 的统一锁顺序检查权限、状态、来源、全部命题及关系决定、正式验证证据、专家问题及任务专家要求。质量证据必须绑定最终内容摘要、指南/文本/切割版本和当前决定集合，不能使用客户端传入的“通过”布尔值。
