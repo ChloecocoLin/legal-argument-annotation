@@ -22,6 +22,7 @@ const titleMap: Record<string, string> = {
   '/expert/issues': '疑难问题说明文档'
 }
 const here = computed(() => {
+  if (route.path.startsWith('/final-review')) return '最终版本审查'
   if (route.path.startsWith('/annotations/')) return '提交标注'
   if (route.path.startsWith('/versions/')) return '完整标注版本'
   if (route.path.startsWith('/tasks/')) return route.path.endsWith('/versions') ? '标注版本' : '任务详情'

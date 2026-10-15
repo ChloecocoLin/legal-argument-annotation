@@ -222,3 +222,9 @@ npm run dev -- --host 127.0.0.1 --port 5174
 第 5 步的会话、阶段门禁、关系决定与指定退回，以及第 6 步模型提案见 [交接与验收](docs/member-d/05-adjudication-handoff.md) 和 [待评审模型](docs/member-d/04-segmentation-and-mapping-proposal.md)。前端入口 `/adjudication/conflict`，也可从任务详情进入；自定义页复用 `/adjudication/annotate`。
 
 当前按本地预置切割/命题映射验收，J04、B 的自定义保存/专家指派、C 的完整图编辑校验待接入。最终审查与入库尚未交付；本批 FINAL_REVIEW 仅表示两阶段裁定完成。冻结 SDK 输入不变，新的会话传输补丁单独待团队评审。
+
+## 成员 D：最终快照与审查
+
+本批实现 FV01–FV05 与 `/final-review` 页面，详情见 [最终审查交接](docs/member-d/07-final-review-handoff.md)。采用/一致/排除来源完整保留，原版内容不改写；送审、退回、批准使用乐观锁、幂等与永久流程历史。
+
+本地可验证生成、送审、退回和重建，正式批准因 A/B/C 正式验证依赖尚未齐全而被服务端禁止。批准路径通过服务端证据替身测试，APPROVED 不等于入库。正式图示、最终草稿内容修订、FV06 与公共审计模型仍待对接/确认；参见 [模型提案](docs/member-d/06-commit-audit-and-revision-proposal.md) 和 [FV02 读取提案](contracts/review/member-d-final-read-proposal.md)。本批公开接口保持冻结响应，完整页面读取仅使用显式 local/test 适配器。

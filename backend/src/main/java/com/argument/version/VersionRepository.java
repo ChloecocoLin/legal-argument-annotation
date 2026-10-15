@@ -58,6 +58,9 @@ public class VersionRepository {
     public void startAdjudication(ObjectNode version,String actor,String time) {
         jdbc.update("UPDATE annotation_versions SET status='UNDER_ADJUDICATION',record_version=record_version+1,updated_at=?,updated_by_id=? WHERE id=? AND status='SUBMITTED'",Timestamp.from(Instant.parse(time)),actor,version.path("id").asText());
     }
+    public void finishAdjudication(ObjectNode version,String actor,String time) {
+        jdbc.update("UPDATE annotation_versions SET status='ADJUDICATED',record_version=record_version+1,updated_at=?,updated_by_id=? WHERE id=? AND status='UNDER_ADJUDICATION'",Timestamp.from(Instant.parse(time)),actor,version.path("id").asText());
+    }
     public ObjectNode receipt(String actor,String operation,String key,String hash) {
         var rows=jdbc.query("SELECT request_sha256,result_json,expires_at FROM annotation_mutation_receipts WHERE actor_id=? AND operation_key=? AND idempotency_key=? FOR UPDATE",(rs,i)->{
             if(rs.getTimestamp(3).toInstant().isBefore(Instant.now())) return null;

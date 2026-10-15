@@ -53,16 +53,22 @@ public class SubmissionChecks {
         // Arbitrary deviation from the confirmed boundary requires pending M10/M13. Do not invent reasons.
         var boundaries=checkpoint.path("unifiedBoundaries"); require(boundaries.size()==sorted.size(),"要素边界偏离统一切割，需先完成边界变更流程");
         for(int i=0;i<sorted.size();i++) require(sorted.get(i).path("startOffset").equals(boundaries.get(i).path("startOffset")) && sorted.get(i).path("endOffset").equals(boundaries.get(i).path("endOffset")),"要素边界偏离统一切割");
+        checkRelationStructure(draft,"DRAFT",task.path("guideVersionId"),elements,relations,participants,graph);
+    }
+    /** Shared structural guards; C remains responsible for full graph semantics and rendering. */
+    public void checkRelationStructure(ObjectNode owner,String ownerType,JsonNode guideVersionId,List<ObjectNode> elements,List<ObjectNode> relations,List<ObjectNode> participants,ObjectNode graph) {
+        Set<String> elementIds=ids(elements),relationIds=ids(relations);var propositionIds=new HashSet<String>();
+        elements.stream().filter(e->e.path("isProposition").asBoolean()).forEach(e->propositionIds.add(e.path("id").asText()));
         var byRelation=new HashMap<String,ObjectNode>(); relations.forEach(r->byRelation.put(r.path("id").asText(),r));
         var byElement=new HashMap<String,ObjectNode>(); elements.forEach(e->byElement.put(e.path("id").asText(),e));
         var children=new HashMap<String,List<String>>();
         ids(participants);
         for(var participant:participants) require(relationIds.contains(participant.path("relationId").asText()),"关系参与项没有所属关系");
         for(var relation:relations) {
-            own(relation,draft); String rid=relation.path("id").asText(),code=relation.path("relationCode").asText();
+            own(relation,owner,ownerType); String rid=relation.path("id").asText(),code=relation.path("relationCode").asText();
             require("ACTIVE".equals(relation.path("status").asText()),"提交包含已移除关系");
             var definition=dependencies.read("relationDefinition",relation.path("relationDefinitionId").asText());
-            require(definition.path("guideVersionId").equals(task.path("guideVersionId")) && definition.path("code").asText().equals(code) && definition.path("directed").equals(relation.path("directed")),"关系字典不匹配");
+            require(definition.path("guideVersionId").equals(guideVersionId) && definition.path("code").asText().equals(code) && definition.path("directed").equals(relation.path("directed")),"关系字典不匹配");
             var parts=participants.stream().filter(p->rid.equals(p.path("relationId").asText())).sorted(Comparator.comparingInt(p->p.path("ordinal").asInt())).toList();
             boolean directed=Set.of("S","A","M").contains(code);
             require(directed?parts.size()==2:parts.size()>=2,"关系参与项数量错误");
@@ -96,7 +102,7 @@ public class SubmissionChecks {
         for(var relation:relations) if("M".equals(relation.path("relationCode").asText()))
             for(var p:participants) if(p.path("relationId").equals(relation.path("id")) && "SOURCE".equals(p.path("role").asText()) && "RELATION".equals(p.path("targetKind").asText()))
                 individualJoint(p.path("targetId").asText(),byRelation,byElement,participants);
-        own(graph,draft); require("VALID".equals(graph.path("status").asText()),"论证图尚未通过校验");
+        own(graph,owner,ownerType); require("VALID".equals(graph.path("status").asText()),"论证图尚未通过校验");
         require(arrayIds(graph.path("elementIds")).equals(propositionIds) && arrayIds(graph.path("relationIds")).equals(relationIds),"论证图未覆盖全部命题和关系");
     }
     private void individualJoint(String id,Map<String,ObjectNode> relations,Map<String,ObjectNode> elements,List<ObjectNode> participants) {
@@ -109,6 +115,7 @@ public class SubmissionChecks {
     }
     private static boolean individual(ObjectNode e) { String c=e.path("labelCode").asText(); return c.equals("SF") || c.equals("SM") || c.equals("SM-C"); }
     private static boolean boundary(String text,int i) { return i==0 || i==text.length() || !(Character.isHighSurrogate(text.charAt(i-1)) && Character.isLowSurrogate(text.charAt(i))); }
+    private static void own(ObjectNode n,ObjectNode owner,String ownerType) { require(ownerType.equals(n.path("ownerType").asText()) && owner.path("id").equals(n.path("ownerId")),"对象不属于当前快照"); }
     private static void own(ObjectNode n,ObjectNode draft) { require("DRAFT".equals(n.path("ownerType").asText()) && draft.path("id").equals(n.path("ownerId")),"对象不属于当前草稿"); }
     private static Set<String> ids(List<ObjectNode> objects) { var ids=new HashSet<String>(); for(var o:objects) require(ids.add(VersionJson.uuid(o.path("id").asText())),"对象身份重复"); return ids; }
     private static Set<String> arrayIds(JsonNode array) { require(array.isArray(),"对象集合缺失"); var ids=new HashSet<String>(); for(var id:array) require(ids.add(VersionJson.uuid(id.asText())),"对象集合重复"); return ids; }

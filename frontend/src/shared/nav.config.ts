@@ -36,7 +36,7 @@ export const NAV: NavGroup[] = [
     group: '标注与裁定',
     items: [
       { id: 'conflict-resolve', label: '冲突解决', icon: 'merge', path: '/adjudication/conflict' },
-      { id: 'final-review', label: '最终版本审查', icon: 'checkc' }
+      { id: 'final-review', label: '最终版本审查', icon: 'checkc', path: '/final-review' }
     ]
   },
   {
