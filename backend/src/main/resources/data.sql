@@ -103,3 +103,14 @@ INSERT INTO proposition_adjudication_item (id, session_id, conflict_type, candid
 ('b0123456-0000-4000-8000-000000000003', 'aba39933-394e-41e0-aa76-1cf8acc57ba7', 'AGREEMENT',
  '["b0123456-0000-4000-8000-000000000001","b0123456-0000-4000-8000-000000000002"]', 'DECIDED', 0,
  TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+-- 专家复核：一张 REQUESTED 单 + 一个 OPEN 问题，供 X01->X02->X03->X04->X05 全链路演示。
+INSERT INTO expert_review (id, session_id, expert_task_member_id, requested_by_id, status, opened_at, confirmed_at, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000030', 'aba39933-394e-41e0-aa76-1cf8acc57ba7',
+ 'b0123456-0000-4000-8000-000000000010', 'b0123456-0000-4000-8000-000000000020', 'REQUESTED', NULL, NULL, 0,
+ TIMESTAMP '2026-10-10 10:00:00', TIMESTAMP '2026-10-10 10:00:00');
+
+INSERT INTO expert_issue (id, expert_review_id, item_kind, item_id, question, resolution, guide_basis, status, resolved_at, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000040', 'b0123456-0000-4000-8000-000000000030',
+ 'GENERAL', NULL, '预置问题：请说明 GM-L 与 GM-I 的判定边界。', NULL, NULL, 'OPEN', NULL, 0,
+ TIMESTAMP '2026-10-10 10:00:00', TIMESTAMP '2026-10-10 10:00:00');
