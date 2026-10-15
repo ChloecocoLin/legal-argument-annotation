@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+withDefaults(defineProps<{ description?: string }>(), { description: '统一切割及 A/B/C 草稿使用预置场景，正式提交保存到数据库' })
 const enabled = import.meta.env.DEV
 const token = ref(localStorage.getItem('token') || '')
 const choices = [
@@ -10,7 +11,7 @@ function change() { localStorage.setItem('token', token.value); window.location.
 </script>
 <template>
   <div v-if="enabled" class="local-session panel between">
-    <div><b>本地联调</b><span class="muted t-xs"> · 统一切割及 A/B/C 草稿使用预置场景，正式提交保存到数据库</span></div>
+    <div><b>本地联调</b><span class="muted t-xs"> · {{ description }}</span></div>
     <select class="select" aria-label="本地联调身份" v-model="token" @change="change">
       <option value="">请选择联调身份</option><option v-for="[value, label] in choices" :key="value" :value="value">{{ label }}</option>
     </select>

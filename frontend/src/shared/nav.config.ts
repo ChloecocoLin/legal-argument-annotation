@@ -19,7 +19,7 @@ export const NAV: NavGroup[] = [
   {
     group: '指南与文书',
     items: [
-      { id: 'admin-home', label: '管理工作台', icon: 'dash' },
+      { id: 'admin-home', label: '管理工作台', icon: 'dash', path: '/admin-home' },
       { id: 'guide-management', label: '指南管理', icon: 'book', path: '/guide' },
       { id: 'document-library', label: '文书总库', icon: 'doc' }
     ]
@@ -50,8 +50,8 @@ export const NAV: NavGroup[] = [
     group: '自动化与导出',
     items: [
       { id: 'auto-annotate', label: '自动标注', icon: 'cpu' },
-      { id: 'export', label: '导出中心', icon: 'download' },
-      { id: 'export-records', label: '导出记录', icon: 'archive' }
+      { id: 'export', label: '导出中心', icon: 'download', path: '/export' },
+      { id: 'export-records', label: '导出记录', icon: 'archive', path: '/export-records' }
     ]
   }
 ]
