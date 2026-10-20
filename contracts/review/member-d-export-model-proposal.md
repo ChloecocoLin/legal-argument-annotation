@@ -1,5 +1,7 @@
 # 导出、文件与下载模型提案
 
+2026-10-20 进展：用户另授权切割算法及独立补正轮次试行；已实现范围、接口和未完成依赖见 [第 1–3 批交接](../../docs/member-d/10-batches-1-3-handoff.md)。下文为原提案/阶段记录，正式共享模型仍待评审。
+
 状态：DRAFT / 待 A/B/C/D 共同评审，2026-10-15。对应详细计划第 9 步及契约 M4/M6/M7/M9。本文不替代共享模型，不开放 EX/F/L/FV06 写接口。入库与 AuditEvent 的事务边界沿用 docs/member-d/06-commit-audit-and-revision-proposal.md。
 
 ## 1. 首批范围与权限

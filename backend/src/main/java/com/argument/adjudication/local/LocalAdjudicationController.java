@@ -18,7 +18,7 @@ public class LocalAdjudicationController {
     public ApiResponse<ObjectNode> sessions(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String caseId) { var result=mapper.createObjectNode();var items=result.putArray("items");service.localSessions(identity.authenticate(auth),caseId).forEach(items::add);return ApiResponse.ok(result); }
     @GetMapping("/sessions/{id}")
     public ApiResponse<ObjectNode> workspace(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String id) { return ApiResponse.ok(service.workspace(identity.authenticate(auth),id)); }
-    @PostMapping("/proposition-items/{itemId}/fixture-decisions")
+    @PostMapping({"/proposition-items/{itemId}/trial-decisions","/proposition-items/{itemId}/fixture-decisions"})
     public ApiResponse<ObjectNode> fixture(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String itemId,@RequestHeader(value="Idempotency-Key",required=false) String key,@RequestHeader(value="If-Match",required=false) String match,@RequestBody ObjectNode body) {
         var actor=identity.authenticate(auth);AdjudicationController.decisionBody(body);return ApiResponse.ok(service.decideLocalProposition(actor,itemId,key,AdjudicationController.integer(match),body));
     }

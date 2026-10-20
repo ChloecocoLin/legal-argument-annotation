@@ -20,6 +20,7 @@ export const NAV: NavGroup[] = [
     group: '指南与文书',
     items: [
       { id: 'admin-home', label: '管理工作台', icon: 'dash', path: '/admin-home' },
+      { id: 'research-results', label: '已入库成果', icon: 'archive', path: '/results' },
       { id: 'audit-events', label: '入库与审计', icon: 'archive', path: '/audit' },
       { id: 'guide-management', label: '指南管理', icon: 'book', path: '/guide' },
       { id: 'document-library', label: '文书总库', icon: 'doc' }
@@ -36,6 +37,7 @@ export const NAV: NavGroup[] = [
   {
     group: '标注与裁定',
     items: [
+      { id: 'segmentation', label: '独立切割与关口', icon: 'merge', path: '/segmentation' },
       { id: 'conflict-resolve', label: '冲突解决', icon: 'merge', path: '/adjudication/conflict' },
       { id: 'final-review', label: '最终版本审查', icon: 'checkc', path: '/final-review' }
     ]

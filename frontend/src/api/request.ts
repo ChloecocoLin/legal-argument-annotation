@@ -75,7 +75,10 @@ instance.interceptors.response.use(
     ElMessage.error(body.error?.message || '请求失败')
     return Promise.reject(new Error(body.error?.code || 'Business error'))
   },
-  (error) => {
+  async (error) => {
+    if (error.response?.data instanceof Blob && error.response.data.type.includes('json')) {
+      try { error.response.data = JSON.parse(await error.response.data.text()) } catch { /* Keep original error when a proxy sends malformed JSON. */ }
+    }
     const body = error.response?.data
     if (isEnvelope(body) && !body.success) {
       const code = body.error?.code

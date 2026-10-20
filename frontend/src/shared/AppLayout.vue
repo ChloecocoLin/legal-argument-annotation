@@ -17,6 +17,8 @@ const titleMap: Record<string, string> = {
   '/': '系统总览',
   '/admin-home': '管理工作台',
   '/audit': '入库与审计记录',
+  '/segmentation': '独立切割与统一关口',
+  '/results': '已入库成果',
   '/export': '导出中心',
   '/export-records': '导出记录',
   '/guide': '指南管理',

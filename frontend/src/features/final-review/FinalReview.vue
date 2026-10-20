@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import { openCorrection } from './api'
 import { get } from '@/api/request'
 import LocalSession from '@/features/versions/LocalSession.vue'
 import { getLocalContext, errorMessage, errorCode, mutationAttempt, formatTime } from '@/features/versions/api'
@@ -10,13 +12,14 @@ import { formula } from '@/features/versions/formula'
 import FinalGraphPreview from './FinalGraphPreview.vue'
 import { getFinal, createFinal, listLocalFinals, transitionFinal, type FinalWorkspace, type ReviewAction, type Provenance } from './api'
 const route = useRoute(), router = useRouter(), local = import.meta.env.DEV
-const view = ref<FinalWorkspace>(), candidates = ref<AdjudicationSession[]>([]), selectedSession = ref('')
+const view = ref<FinalWorkspace>(), candidates = ref<AdjudicationSession[]>([]), selectedSession = ref(''), nextVersionNumber = ref(1)
 const loading = ref(false), busy = ref(false), error = ref(''), notice = ref(''), dialog = ref<ReviewAction['operation']>(), reason = ref(''), confirmed = ref(false), pending = ref(false)
+const correctionAttempt = mutationAttempt<{id:string;reason:string}>()
 const createAttempt = mutationAttempt<{ sessionId: string; number: number }>(), actionAttempt = mutationAttempt<ReviewAction>()
 const version = computed(() => view.value?.snapshot.version), snapshot = computed(() => view.value?.snapshot)
 const stateNames: Record<string, string> = { DRAFT: '待送审草稿', IN_REVIEW: '审查中', APPROVED: '已批准 · 尚未入库', IN_DATABASE: '已入库' }
 const operationNames: Record<string, string> = { FV01: '生成独立快照', FV03: '提交审查', FV04: '退回修改', FV05: '批准最终版本', FV06: '确认入库（试行）' }
-const canRebuild = computed(() => view.value?.latest && version.value?.status === 'DRAFT' && view.value.history.some(h => h.operation === 'FV04'))
+const canRebuild = computed(() => view.value?.latest && version.value?.status === 'DRAFT' && !version.value.correctionSessionId && view.value.history.some(h => h.operation === 'FV04'))
 const sourceLabel = (id: string) => view.value?.sources?.find(s => s.id === id)?.displayCode || id
 const origin = (id: string) => version.value?.provenance.filter(p => p.resultId === id) || []
 const provenanceName = (p: Provenance) => `${p.sourceVersionIds.map(sourceLabel).join(' / ')}${p.expertIssueId ? ' · 专家依据' : ''}`
@@ -29,7 +32,7 @@ async function load(reset = true) {
   if (route.params.finalVersionId) { view.value = await getFinal(String(route.params.finalVersionId)); return }
   if (route.query.sessionId) {
    selectedSession.value = String(route.query.sessionId)
-   if (local) { const versions = await listLocalFinals(selectedSession.value); if (versions.items.length) { await router.replace(`/final-review/${versions.items[versions.items.length - 1]!.id}`); return } }
+   if (local) { const versions = await listLocalFinals(selectedSession.value); nextVersionNumber.value=versions.nextVersionNumber; if (versions.items.length) { await router.replace(`/final-review/${versions.items[versions.items.length - 1]!.id}`); return } }
    candidates.value = [await get<AdjudicationSession>(`/adjudication-sessions/${selectedSession.value}`)]
   } else if (local) {
    const context = await getLocalContext(), sessions = await Promise.all(context.taskDocuments.map(d => localSessions(d.id)))
@@ -41,7 +44,7 @@ async function load(reset = true) {
 async function generate(rebuild = false) {
  if (busy.value) return
  busy.value = true; error.value = ''
- const a = createAttempt.get({ sessionId: rebuild ? version.value!.sessionId : selectedSession.value, number: rebuild ? version.value!.versionNumber + 1 : 1 }, 1); pending.value = true
+ const a = createAttempt.get({ sessionId: rebuild ? version.value!.sessionId : selectedSession.value, number: rebuild ? version.value!.versionNumber + 1 : nextVersionNumber.value }, 1); pending.value = true
  try { const result = await createFinal(a.body.sessionId, a.body.number, a.key); resetAttempts(); notice.value = '独立最终快照已生成，尚未送审'; await router.push(`/final-review/${result.id}`) }
  catch (e) { error.value = errorMessage(e); if (errorCode(e)) resetAttempts() } finally { busy.value = false }
 }
@@ -53,6 +56,17 @@ async function execute() {
  try { const result = await transitionFinal(version.value.id, a.body, a.key, a.version); notice.value = result.status === 'IN_DATABASE' ? '试行入库已完成，最终结果只读，永久审计已同步保存' : result.status === 'APPROVED' ? '最终版本已批准，尚未入库，也不能导出科研数据' : result.status === 'DRAFT' ? '已退回草稿，理由与审查轨迹已保留' : '已提交最终审查'; resetAttempts(); dialog.value = undefined; await load(false) }
  catch (e) { error.value = errorMessage(e); if (errorCode(e)) resetAttempts() } finally { busy.value = false }
 }
+async function correction() {
+ if(!version.value || busy.value) return
+ try {
+  let a
+  if(correctionAttempt.pending()) a=correctionAttempt.get({id:version.value.id,reason:''},version.value.recordVersion)
+  else { const r=await ElMessageBox.prompt('填写需要实质调整的内容。新会话需重新完成命题及关系裁定，旧快照保留。','创建补正轮次（试行）',{inputValidator:v=>!!v?.trim()&&v.length<=2000||'请输入 1–2000 字'}); a=correctionAttempt.get({id:version.value.id,reason:r.value.trim()},version.value.recordVersion) }
+  busy.value=true
+  const result=await openCorrection(a.body.id,a.body.reason,a.key,a.version);correctionAttempt.reset()
+  await router.push({path:'/adjudication/conflict',query:{sessionId:result.sessionId,caseId:version.value.taskDocumentId}})
+ }catch(e){if(e!=='cancel'&&e!=='close'){error.value=errorMessage(e);if(errorCode(e))correctionAttempt.reset()}}finally{busy.value=false}
+}
 watch(() => route.fullPath, () => load(), { immediate: true })
 </script>
 <template>
@@ -61,6 +75,8 @@ watch(() => route.fullPath, () => load(), { immediate: true })
  <div v-if="loading" class="card card-body muted" role="status">正在读取最终快照与质量检查…</div>
  <div v-if="error" class="note danger" role="alert">{{ error }} <button class="btn btn-secondary" :disabled="busy" @click="load()">刷新</button></div>
  <div v-if="notice" class="note accent" role="status">{{ notice }}</div>
+ <div v-if="version?.correctionSessionId" class="note accent">此退回快照已开启独立补正轮次，原内容保留。<router-link :to="{path:'/adjudication/conflict',query:{sessionId:version.correctionSessionId,caseId:version.taskDocumentId}}">进入补正裁定</router-link></div>
+ <div v-if="local && canRebuild" class="note warn">需要修改命题或关系时，请创建独立补正轮次。<button class="btn btn-secondary" :disabled="busy" @click="correction">{{ correctionAttempt.pending() ? '重试创建补正轮次' : '创建补正轮次（试行）' }}</button></div>
  <div v-if="pending && !busy" class="note warn">上次操作结果尚未确认。<button v-if="dialog" class="btn btn-secondary" @click="execute">重试相同操作</button><button v-else class="btn btn-secondary" @click="generate(!!version)">重试生成</button></div>
  <div v-if="!view && !loading" class="card"><div class="card-head"><div class="card-title">生成待审最终快照</div></div><div class="card-body stack-3"><p>只有全部命题、非命题及关系项已有生效决定的会话才能生成快照。</p><label for="final-session">选择裁定会话</label><select id="final-session" v-model="selectedSession" class="select" :disabled="busy || pending"><option value="">请选择</option><option v-for="s in candidates" :key="s.id" :value="s.id">案例 {{ s.taskDocumentId }} · {{ s.id }}</option></select><p v-if="!candidates.length" class="muted">尚无待最终审查会话，请先完成两阶段裁定。</p><button class="btn btn-primary" :disabled="busy || !selectedSession" @click="generate()">{{ busy ? '正在生成…' : '生成或读取首个最终快照' }}</button></div></div>
  <template v-if="view && snapshot && version && !loading">

@@ -34,4 +34,9 @@ public final class VersionJson {
         object.put("id", uuid()); object.put("createdAt", time); object.put("updatedAt", time);
         object.put("createdById", actor); object.put("updatedById", actor); object.put("recordVersion", 1);
     }
+    /** Stable object-key order; array order remains meaningful. */
+    public static com.fasterxml.jackson.databind.JsonNode canonical(com.fasterxml.jackson.databind.JsonNode n) {
+        if(n.isObject()){var o=com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();var keys=new java.util.TreeSet<String>();n.fieldNames().forEachRemaining(keys::add);keys.forEach(k->o.set(k,canonical(n.get(k))));return o;}if(n.isArray()){var a=com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.arrayNode();n.forEach(v->a.add(canonical(v)));return a;}return n;
+    }
+    public static String canonicalHash(com.fasterxml.jackson.databind.JsonNode n){return sha256(canonical(n).toString());}
 }

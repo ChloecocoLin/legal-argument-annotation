@@ -1,0 +1,177 @@
+{
+  "notice": "Synthetic schema examples only; not loaded into runtime; digests are illustrative, token is never issued.",
+  "examples": {
+    "ExportRecord": {
+      "id": "4f175bd9-2bf8-440b-a1f8-a85f17e5a934",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "sourceType": "FINAL_ANNOTATION",
+      "finalVersionIds": [
+        "3400779b-4367-41bc-b571-5e4b9da32d33"
+      ],
+      "format": "JSON",
+      "include": [
+        "ELEMENTS",
+        "RELATIONS",
+        "PARTICIPANTS",
+        "DICTIONARIES",
+        "VERSIONS",
+        "PROVENANCE"
+      ],
+      "status": "QUEUED",
+      "requestedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "requestedAt": "2026-10-20T01:00:00Z",
+      "completedAt": null,
+      "fileId": null,
+      "failureCode": null,
+      "failureMessage": null,
+      "sourceManifest": [
+        {
+          "finalVersionId": "3400779b-4367-41bc-b571-5e4b9da32d33",
+          "taskId": "6705cc74-4fa6-4f4c-9c71-c0ede3f9e689",
+          "taskDocumentId": "1322a868-e57e-4b09-9615-9c994ed55f8a",
+          "documentTextVersionId": "46f1de4e-2c30-4ccd-b4eb-6f0c9a9e837a",
+          "annotationScopeId": "057ea05f-ba52-4a5e-980e-3030d951d1e7",
+          "guideVersionId": "4efc7980-facf-4774-99e8-c98090ce580d",
+          "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "FileAsset": {
+      "id": "6559d228-302d-49e0-a22f-34e09a325cc4",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "fileName": "example.txt",
+      "mimeType": "text/plain",
+      "sizeBytes": 7,
+      "sha256": "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c",
+      "status": "AVAILABLE"
+    },
+    "SegmentationSubmission": {
+      "id": "0096c4de-4480-4277-80fa-c11e231f99b0",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "taskDocumentId": "1322a868-e57e-4b09-9615-9c994ed55f8a",
+      "documentTextVersionId": "46f1de4e-2c30-4ccd-b4eb-6f0c9a9e837a",
+      "annotationScopeId": "057ea05f-ba52-4a5e-980e-3030d951d1e7",
+      "textSha256": "0e94ae36da6ff03992a57fddbdf4728b609d0d7fe6eb019fa9f1b9b5b540d835",
+      "boundaries": [
+        {
+          "startOffset": 0,
+          "endOffset": 5
+        },
+        {
+          "startOffset": 5,
+          "endOffset": 12
+        }
+      ],
+      "submittedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "attemptNumber": 1
+    },
+    "AgreementCalculation": {
+      "id": "6d61580c-0aec-467e-9a81-4a8b37180264",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "taskDocumentId": "1322a868-e57e-4b09-9615-9c994ed55f8a",
+      "documentTextVersionId": "46f1de4e-2c30-4ccd-b4eb-6f0c9a9e837a",
+      "annotationScopeId": "057ea05f-ba52-4a5e-980e-3030d951d1e7",
+      "textSha256": "0e94ae36da6ff03992a57fddbdf4728b609d0d7fe6eb019fa9f1b9b5b540d835",
+      "algorithmCode": "PAIRWISE_INTERNAL_BOUNDARY_F1_MEAN",
+      "algorithmVersion": "trial-1",
+      "threshold": 0.8,
+      "thresholdOperator": ">",
+      "aggregateScore": 1.0,
+      "passed": true,
+      "scoreNumerator": "1",
+      "scoreDenominator": "1",
+      "computedAt": "2026-10-20T01:00:00Z",
+      "inputSubmissionIds": [
+        "0096c4de-4480-4277-80fa-c11e231f99b0",
+        "98317692-8735-4d90-81f0-305bb4b25821"
+      ],
+      "perPairScores": [
+        {
+          "leftSubmissionId": "0096c4de-4480-4277-80fa-c11e231f99b0",
+          "rightSubmissionId": "98317692-8735-4d90-81f0-305bb4b25821",
+          "common": 1,
+          "leftCount": 1,
+          "rightCount": 1,
+          "score": 1.0
+        }
+      ],
+      "inputDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "Checkpoint": {
+      "id": "33b7c8a0-6bbb-4be3-aeda-eaeeafa9d647",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "taskDocumentId": "1322a868-e57e-4b09-9615-9c994ed55f8a",
+      "documentTextVersionId": "46f1de4e-2c30-4ccd-b4eb-6f0c9a9e837a",
+      "annotationScopeId": "057ea05f-ba52-4a5e-980e-3030d951d1e7",
+      "textSha256": "0e94ae36da6ff03992a57fddbdf4728b609d0d7fe6eb019fa9f1b9b5b540d835",
+      "calculationId": "6d61580c-0aec-467e-9a81-4a8b37180264",
+      "sourceSubmissionIds": [
+        "0096c4de-4480-4277-80fa-c11e231f99b0",
+        "98317692-8735-4d90-81f0-305bb4b25821"
+      ],
+      "agreementScore": 1.0,
+      "requiredThreshold": 0.8,
+      "status": "CONFIRMED",
+      "reason": "共同确认边界",
+      "confirmedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "confirmedAt": "2026-10-20T01:00:00Z",
+      "unifiedBoundaries": [
+        {
+          "startOffset": 0,
+          "endOffset": 5
+        },
+        {
+          "startOffset": 5,
+          "endOffset": 12
+        }
+      ],
+      "boundaryHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "CorrectionRound": {
+      "id": "80628d4d-a050-47a6-a706-3c45ec6359e7",
+      "createdAt": "2026-10-20T01:00:00Z",
+      "updatedAt": "2026-10-20T01:00:00Z",
+      "createdById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "updatedById": "7ffe3e54-9ce7-4312-90d6-98a7a9a319bb",
+      "recordVersion": 1,
+      "parentFinalVersionId": "3400779b-4367-41bc-b571-5e4b9da32d33",
+      "previousSessionId": "43eeaa0a-0881-4eab-8146-fb0f24b36031",
+      "sessionId": "a699b319-d346-49c4-aa4b-269227d5bc85",
+      "reason": "重新核查关系",
+      "expertInheritance": "NONE_RECHECK_REQUIRED",
+      "teamReviewRequired": true,
+      "sourceVersionIds": [
+        "e458d412-121d-456f-ad9d-b56a1eb7d57b",
+        "a7cf0cbb-7f79-4dde-bde9-39a8db0272a4"
+      ]
+    },
+    "Ticket": {
+      "fileId": "6559d228-302d-49e0-a22f-34e09a325cc4",
+      "downloadRecordId": "b606512b-acdc-4f4c-b2dc-d88e2d140414",
+      "expiresAt": "2026-10-20T01:05:00Z",
+      "downloadToken": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "contentUrl": "/api/v1/file-assets/6559d228-302d-49e0-a22f-34e09a325cc4/content"
+    }
+  }
+}

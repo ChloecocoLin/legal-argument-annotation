@@ -1,7 +1,7 @@
 import { get, post } from '@/api/request'
 import type { Element, Relation, RelationParticipant, AdjudicationSession, GuideVersion } from '@/generated/api-client/types.gen'
 export interface FinalVersion {
-  id: string; taskDocumentId: string; sessionId: string; versionNumber: number
+  correctionSessionId?: string; id: string; taskDocumentId: string; sessionId: string; versionNumber: number
   status: 'DRAFT' | 'IN_REVIEW' | 'APPROVED' | 'IN_DATABASE'
   documentTextVersionId: string; annotationScopeId: string; guideVersionId: string
   elementIds: string[]; relationIds: string[]; graphId: string
@@ -26,10 +26,12 @@ export async function getFinal(id: string): Promise<FinalWorkspace> {
   if (!('snapshot' in data) || !data.snapshot.version.recordVersion) throw new Error('最终审查完整读取尚未接入，请按待评审传输提案补齐 FV02；当前摘要不提供写入所需的版本号')
   return data
 }
-export const listLocalFinals = (sessionId: string) => get<{ items: FinalVersion[] }>(`${local}/sessions/${sessionId}/versions`, undefined, { baseURL: '' })
+export const listLocalFinals = (sessionId: string) => get<{ items: FinalVersion[]; nextVersionNumber: number }>(`${local}/sessions/${sessionId}/versions`, undefined, { baseURL: '' })
 export const createFinal = (sessionId: string, number: number, key: string) => post<{ id: string; status: string }>(`/adjudication-sessions/${sessionId}/final-versions`, { versionNumber: number }, { headers: { 'Idempotency-Key': key } })
 export type ReviewAction = { operation: 'review'; body: { action: 'SUBMIT' } } | { operation: 'return'; body: { reason: string } } | { operation: 'approve' | 'commit'; body: { confirmed: true } }
 export const transitionFinal = (id: string, command: ReviewAction, key: string, version: number) => {
   if (command.operation === 'commit' && !import.meta.env.DEV) throw new Error('入库试行仅在本地联调开放，公共模型仍待团队评审')
   return post<{ status: string; issues?: unknown[] }>(`/final-annotation-versions/${id}/${command.operation}`, command.body, { headers: { 'Idempotency-Key': key, 'If-Match': version } })
 }
+
+export const openCorrection = (id: string, reason: string, key: string, version: number) => post<{sessionId: string}>(`/api/local/member-d/final-versions/${id}/correction-rounds`, {reason}, {baseURL:'',headers:{'Idempotency-Key':key,'If-Match':version}})

@@ -41,8 +41,10 @@ public class FinalReviewService {
         completed(s);adjudicationDeps.checkExperts(s);
         var existing=store.versions(s.path("taskDocumentId").asText());var same=existing.stream().filter(v->v.path("versionNumber").asInt()==number).findFirst();
         if(same.isPresent()){var v=same.get();require(v.path("sessionId").equals(s.path("id")),ErrorCode.CONFLICT,"此版本号属于其他裁定会话");var response=shortVersion(v);versions.receipt(actor.id(),op,key,VersionJson.sha256(body.toString()),response,v,v,"");return response;}
+        if(!existing.isEmpty()&&existing.get(existing.size()-1).hasNonNull("correctionSessionId"))require(existing.get(existing.size()-1).path("correctionSessionId").equals(s.path("id")),ErrorCode.LOCKED_RESOURCE,"请在新补正会话完成重新裁定后生成最终版");
         int next=existing.isEmpty()?1:existing.get(existing.size()-1).path("versionNumber").asInt()+1;require(next==number,ErrorCode.CONFLICT,"请使用下一连续最终版本号");
         if(!existing.isEmpty()){var last=existing.get(existing.size()-1);require("DRAFT".equals(last.path("status").asText()) && store.history(last.path("id").asText()).stream().anyMatch(h->"FV04".equals(h.path("operation").asText())),ErrorCode.INVALID_FINAL_STATE,"只能在退回修改后重建下一独立快照");}
+        if(s.hasNonNull("correctionOriginDecisionSubject"))require(!s.path("correctionOriginDecisionSubject").asText().equals(AdjudicationService.decisionSubject(decisions(s))),ErrorCode.INVALID_FINAL_STATE,"补正必须调整实质决定，不能仅换编号或理由后重建同一结果");
         var sources=adjudication.snapshots(s);var propositions=sessions.items(sessionId,"PROPOSITION");var relations=sessions.items(sessionId,"RELATION");var current=decisions(s);var resolved=deps.resolve(s,sources,propositions,relations,current);require(resolved!=null,ErrorCode.SOURCE_INCOMPLETE,"映射适配器没有返回快照内容");
         var snapshot=freeze(actor,s,number,resolved);snapshot.put("decisionDigest",digest(s));checks.provenance(snapshot,sources,items(s),current);
         store.insert(snapshot);var v=(ObjectNode)snapshot.get("version");store.transition("FV01",actor.id(),body,mapper.createObjectNode(),v);
@@ -83,7 +85,7 @@ public class FinalReviewService {
         boolean bound=evidence!=null && contentDigest(snapshot).equals(evidence.contentDigest()) && snapshot.path("decisionDigest").asText().equals(evidence.decisionDigest()) && snapshot.path("version").path("guideVersionId").asText().equals(evidence.guideVersionId());
         if(evidence!=null && evidence.formalReady() && !bound){healthy=false;issue(issues,checksList,new BusinessException(ErrorCode.SOURCE_INCOMPLETE,"正式验证证据未绑定当前内容、决定或指南"));}
         boolean ready=evidence!=null && evidence.formalReady() && "PRODUCTION".equals(evidence.mode()) && bound;result.put("formalReady",ready);result.put("mode",evidence==null?"UNAVAILABLE":evidence.mode());result.put("healthy",healthy);
-        String status=snapshot.path("version").path("status").asText();result.put("canSubmit",healthy && "DRAFT".equals(status));result.put("canApprove",healthy && ready && "IN_REVIEW".equals(status));return result;
+        String status=snapshot.path("version").path("status").asText();result.put("canSubmit",healthy && !snapshot.path("version").hasNonNull("correctionSessionId") && "DRAFT".equals(status));result.put("canApprove",healthy && ready && "IN_REVIEW".equals(status));return result;
     }
     private void issue(com.fasterxml.jackson.databind.node.ArrayNode issues,com.fasterxml.jackson.databind.node.ArrayNode cs,BusinessException e) {issues.addObject().put("code",e.getErrorCode().getCode()).put("message",e.getMessage()).put("blocking",true);cs.addObject().put("code",e.getErrorCode().getCode()).put("message",e.getMessage()).put("passed",false);}
     @Transactional
@@ -91,6 +93,7 @@ public class FinalReviewService {
         VersionJson.uuid(key);var initial=read(actor,id);var session=session(actor,initial.path("version").path("sessionId").asText(),true);var snapshot=store.snapshot(id);var v=(ObjectNode)snapshot.get("version");String op=operation+":"+id;
         var cached=versions.receipt(actor.id(),op,key,VersionJson.sha256(body.toString()));if(cached!=null)return cached;
         if(v.path("recordVersion").asInt()!=expected)throw new VersionFailure(ErrorCode.VERSION_CONFLICT,"最终版本已变化，请刷新",Map.of("objectType","FinalAnnotationVersion","objectId",id,"currentRecordVersion",v.path("recordVersion").asInt()));
+        require(!v.hasNonNull("correctionSessionId"),ErrorCode.LOCKED_RESOURCE,"该退回快照已开启补正轮次，请操作新会话");
         var all=store.versions(v.path("taskDocumentId").asText());require(all.get(all.size()-1).path("id").equals(v.path("id")),ErrorCode.LOCKED_RESOURCE,"历史最终快照只读，请操作最新版本");
         var before=v.deepCopy();String status=v.path("status").asText();
         if("FV04".equals(operation)){require("IN_REVIEW".equals(status),ErrorCode.INVALID_FINAL_STATE,"只能退回正在审查的最终版");require(!body.path("reason").asText().isBlank(),ErrorCode.VALIDATION_ERROR,"退回理由不能为空");v.put("status","DRAFT");}
@@ -105,11 +108,11 @@ public class FinalReviewService {
         var snapshot=read(actor,id);var v=snapshot.path("version");var s=session(actor,v.path("sessionId").asText(),false);var result=mapper.createObjectNode();result.put("fixture",true);result.set("snapshot",snapshot);result.set("session",s);result.set("quality",assessment(snapshot,s));var history=result.putArray("history");store.history(id).forEach(history::add);
         var doc=data.read("taskDocument",v.path("taskDocumentId").asText());result.set("document",data.read("document",doc.path("documentId").asText()));result.set("guideVersion",data.read("guideVersion",v.path("guideVersionId").asText()));result.set("taskDocument",doc);var summary=result.putObject("summary");summary.put("propositions",sessions.items(s.path("id").asText(),"PROPOSITION").size());summary.put("relations",sessions.items(s.path("id").asText(),"RELATION").size());summary.put("expertReviews",data.find("expertReview","sessionId",s.path("id").asText()).size());summary.put("excluded",java.util.stream.StreamSupport.stream(v.path("provenance").spliterator(),false).filter(p->p.path("resultKind").asText().startsWith("EXCLUDED_")).count());var latest=store.versions(v.path("taskDocumentId").asText());result.put("latest",latest.get(latest.size()-1).path("id").equals(v.path("id")));var sources=result.putArray("sources");for(var source:adjudication.snapshots(s)){var sv=source.path("version");sources.addObject().put("id",sv.path("id").asText()).put("displayCode",sv.path("displayCode").asText());}return result;
     }
-    public ObjectNode listLocal(Actor actor,String sessionId) {var s=session(actor,sessionId,false);var result=mapper.createObjectNode();var items=result.putArray("items");store.versions(s.path("taskDocumentId").asText()).stream().filter(v->sessionId.equals(v.path("sessionId").asText())).forEach(items::add);return result;}
+    public ObjectNode listLocal(Actor actor,String sessionId) {var s=session(actor,sessionId,false);var result=mapper.createObjectNode();var items=result.putArray("items");var all=store.versions(s.path("taskDocumentId").asText());result.put("nextVersionNumber",all.isEmpty()?1:all.get(all.size()-1).path("versionNumber").asInt()+1);all.stream().filter(v->sessionId.equals(v.path("sessionId").asText())).forEach(items::add);return result;}
     private ObjectNode shortVersion(JsonNode v) {return mapper.createObjectNode().put("id",v.path("id").asText()).put("status",v.path("status").asText());}
     /** Internal certificate subject: canonical immutable snapshot; workflow timestamps/status do not change its subject. */
     public static String contentDigest(ObjectNode snapshot) {
-        var subject=snapshot.deepCopy();subject.remove("decisionDigest");var version=(ObjectNode)subject.get("version");for(String f:List.of("status","recordVersion","updatedAt","updatedById","approvedAt","approvedById","committedAt"))version.remove(f);
+        var subject=snapshot.deepCopy();subject.remove("decisionDigest");var version=(ObjectNode)subject.get("version");for(String f:List.of("status","recordVersion","updatedAt","updatedById","approvedAt","approvedById","committedAt","correctionSessionId"))version.remove(f);
         return VersionJson.sha256(canonical(subject).toString());
     }
     private static JsonNode canonical(JsonNode node) {

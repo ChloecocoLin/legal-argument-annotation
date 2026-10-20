@@ -1,4 +1,4 @@
-import { get } from '@/api/request'
+import { get, post } from '@/api/request'
 
 export interface ExportCandidate {
   id: string; versionNumber: number; guideVersionId: string; guideVersionCode: string
@@ -6,8 +6,19 @@ export interface ExportCandidate {
   elementCount: number; relationCount: number
   preview: { id: string; displayNo: string; text: string; type: string }[]
 }
-export interface ExportPreview { mode: 'LOCAL_PREVIEW'; exportAvailable: false; reason: string; items: ExportCandidate[] }
-export async function loadExportPreview(): Promise<ExportPreview> {
-  if (import.meta.env.DEV) return get<ExportPreview>('/api/local/member-d/export-preview', undefined, { baseURL: '' })
-  throw new Error('导出范围与预览尚未接入，请等待导出模型评审和正式接口联调')
+export interface ExportPreview { items: ExportCandidate[]; total: number }
+export interface ExportRecord { file?: {fileName:string;sizeBytes:number;sha256:string}; id: string; status: string; format: string; requestedById: string; requestedAt: string; completedAt: string | null; fileId: string | null; failureMessage: string | null; finalVersionIds: string[]; sourceDigest: string; sourceManifest: Record<string, unknown>[] }
+export const coreIncludes = ['ELEMENTS','RELATIONS','PARTICIPANTS','DICTIONARIES','VERSIONS','PROVENANCE']
+export async function loadExportPreview(page = 1): Promise<ExportPreview> {
+  const r = await get<{ data: {items: {finalVersion:{id:string;versionNumber:number;status:'IN_DATABASE';guideVersionId:string};document:{title:string;caseNumber?:string;sourceType:string};guideVersion:{versionCode:string};elementCount:number;relationCount:number;previewElements:ExportCandidate['preview']}[]}; meta: { total: number } }>('/exports/eligible-final-versions', { page, size: 100 }, { _withMeta: true })
+  return { items: r.data.items.map(x=>({...x.finalVersion,...x.document,guideVersionCode:x.guideVersion.versionCode,elementCount:x.elementCount,relationCount:x.relationCount,preview:x.previewElements})), total: r.meta.total }
+}
+export const createExport = (body: object, key: string) => post<ExportRecord>('/exports', body, { headers: { 'Idempotency-Key': key } })
+export const listExports = (page: number, status?: string) => get<{data: {items: ExportRecord[]}; meta: {total: number}}>('/exports', { page, size: 20, ...(status ? {status} : {}) }, {_withMeta: true})
+export const readExport = (id: string) => get<ExportRecord>(`/exports/${id}`)
+export const requestDownload = (id: string, purpose: string, key: string) => post<{fileId: string; downloadToken: string; expiresAt: string}>(`/exports/${id}/download-tickets`, {purpose}, {headers: {'Idempotency-Key': key}})
+export async function saveDownload(ticket: {fileId: string; downloadToken: string}, name: string) {
+  const blob = await get<Blob>(`/file-assets/${ticket.fileId}/content`, {downloadToken: ticket.downloadToken}, {responseType: 'blob'})
+  const url = URL.createObjectURL(blob), a = document.createElement('a')
+  a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

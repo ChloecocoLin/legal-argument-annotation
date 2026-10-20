@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(basePackages={"com.argument.version","com.argument.adjudication","com.argument.finalreview","com.argument.committrial"})
+@RestControllerAdvice(basePackages={"com.argument.version","com.argument.adjudication","com.argument.finalreview","com.argument.committrial","com.argument.exporttrial","com.argument.segmentationtrial","com.argument.correctiontrial","com.argument.resulttrial"})
 public class VersionExceptionAdvice {
     @ExceptionHandler(VersionFailure.class)
     public ResponseEntity<Map<String,Object>> conflict(VersionFailure ex) {
         return failure(ex.getErrorCode(),ex.getMessage(),List.of(ex.detail()));
     }
-    @ExceptionHandler({HttpMessageNotReadableException.class,MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler({HttpMessageNotReadableException.class,MethodArgumentTypeMismatchException.class,org.springframework.web.multipart.support.MissingServletRequestPartException.class,org.springframework.web.multipart.MaxUploadSizeExceededException.class})
     public ResponseEntity<Map<String,Object>> invalid(Exception ex) {
         return failure(ErrorCode.VALIDATION_ERROR,"请求格式不正确",List.of());
     }

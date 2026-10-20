@@ -90,7 +90,7 @@ public class AdjudicationService {
     private ObjectNode locked(Actor actor,String id) {
         var read=store.session(VersionJson.uuid(id),false);authorize(actor,read.path("taskDocumentId").asText());versions.lockCase(read.path("taskDocumentId").asText());
         var doc=data.lock("taskDocument",read.path("taskDocumentId").asText());var task=data.lock("task",doc.path("taskId").asText());var s=store.session(id,true);authorize(actor,s.path("taskDocumentId").asText());
-        require("IN_PROGRESS".equals(task.path("status").asText()),ErrorCode.LOCKED_RESOURCE,"任务已锁定");return s;
+        require("IN_PROGRESS".equals(task.path("status").asText())&&!s.hasNonNull("correctionSessionId"),ErrorCode.LOCKED_RESOURCE,"任务已锁定或会话已由新补正会话接替");return s;
     }
     @Transactional
     public ObjectNode complete(Actor actor,String id,String key,int expected,ObjectNode body,String kind) {
@@ -176,4 +176,8 @@ public class AdjudicationService {
     private void phase(ObjectNode s,String expected) { require(expected.equals(s.path("status").asText()),ErrorCode.INVALID_REVIEW_STATE,"必须按命题、关系、最终审查顺序操作"); }
     private void match(int expected,ObjectNode n,String type) { if(expected!=n.path("recordVersion").asInt())throw new VersionFailure(ErrorCode.VERSION_CONFLICT,"数据已变化，请刷新",Map.of("objectType",type,"objectId",n.path("id").asText(),"currentRecordVersion",n.path("recordVersion").asInt())); }
     public static void require(boolean condition,ErrorCode code,String message) { if(!condition)throw new BusinessException(code,message); }
+    /** Stable semantic decision subject across correction rounds; new IDs/reasons alone are insufficient. */
+    public static String decisionSubject(List<ObjectNode> decisions) {
+        var rows=new ArrayList<String>();for(var d:decisions)rows.add(d.path("itemKind").asText()+":"+d.path("action").asText()+":"+d.path("sourceVersionId").asText()+":"+d.path("sourceObjectId").asText()+":"+d.path("customAnnotationId").asText());Collections.sort(rows);return VersionJson.sha256(rows.toString());
+    }
 }

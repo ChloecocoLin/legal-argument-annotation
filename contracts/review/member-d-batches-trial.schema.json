@@ -1,0 +1,835 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:member-d:batches-trial:1",
+  "title": "Member D authorized trial; pending shared review; never a READY replacement",
+  "x-team-review-required": true,
+  "$defs": {
+    "Boundary": {
+      "type": "object",
+      "required": [
+        "startOffset",
+        "endOffset"
+      ],
+      "properties": {
+        "startOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endOffset": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "FileAsset": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "fileName",
+        "mimeType",
+        "sizeBytes",
+        "sha256",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "status": {
+          "const": "AVAILABLE"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SourceManifestEntry": {
+      "type": "object",
+      "required": [
+        "finalVersionId",
+        "taskId",
+        "taskDocumentId",
+        "documentTextVersionId",
+        "annotationScopeId",
+        "guideVersionId",
+        "contentDigest"
+      ],
+      "properties": {
+        "finalVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "taskId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "taskDocumentId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "documentTextVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "annotationScopeId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "guideVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "contentDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Ticket": {
+      "type": "object",
+      "required": [
+        "fileId",
+        "downloadRecordId",
+        "expiresAt",
+        "downloadToken",
+        "contentUrl"
+      ],
+      "properties": {
+        "fileId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "downloadRecordId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "downloadToken": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        },
+        "contentUrl": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateExport": {
+      "type": "object",
+      "required": [
+        "finalVersionIds",
+        "format",
+        "include"
+      ],
+      "properties": {
+        "finalVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true
+        },
+        "format": {
+          "enum": [
+            "JSON",
+            "XLSX"
+          ]
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ELEMENTS",
+              "RELATIONS",
+              "PARTICIPANTS",
+              "DICTIONARIES",
+              "VERSIONS",
+              "PROVENANCE",
+              "ACTOR_DISPLAY_NAMES"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "SegmentationSubmissionCommand": {
+      "type": "object",
+      "required": [
+        "boundaries"
+      ],
+      "properties": {
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Boundary"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConfirmCheckpointCommand": {
+      "type": "object",
+      "required": [
+        "calculationId",
+        "unifiedBoundaries",
+        "reason"
+      ],
+      "properties": {
+        "calculationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "unifiedBoundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Boundary"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "BindDraftCommand": {
+      "type": "object",
+      "required": [
+        "draftId",
+        "checkpointId"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "checkpointId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CorrectionCommand": {
+      "type": "object",
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "CorrectionRound": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "parentFinalVersionId",
+        "previousSessionId",
+        "sessionId",
+        "reason",
+        "expertInheritance",
+        "teamReviewRequired",
+        "sourceVersionIds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parentFinalVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "previousSessionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "sessionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "expertInheritance": {
+          "const": "NONE_RECHECK_REQUIRED"
+        },
+        "teamReviewRequired": {
+          "const": true
+        },
+        "sourceVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ExportRecord": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "sourceType",
+        "finalVersionIds",
+        "format",
+        "include",
+        "status",
+        "requestedById",
+        "requestedAt",
+        "completedAt",
+        "fileId",
+        "failureCode",
+        "failureMessage",
+        "sourceManifest",
+        "sourceDigest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceType": {
+          "const": "FINAL_ANNOTATION"
+        },
+        "finalVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          }
+        },
+        "format": {
+          "enum": [
+            "JSON",
+            "XLSX"
+          ]
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "enum": [
+            "QUEUED",
+            "RUNNING",
+            "COMPLETED",
+            "FAILED"
+          ]
+        },
+        "requestedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "requestedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fileId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failureCode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failureMessage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceManifest": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceManifestEntry"
+          }
+        },
+        "sourceDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "file": {
+          "$ref": "#/$defs/FileAsset"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SegmentationSubmission": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "taskDocumentId",
+        "documentTextVersionId",
+        "annotationScopeId",
+        "textSha256",
+        "boundaries",
+        "submittedById",
+        "attemptNumber"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "taskDocumentId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "documentTextVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "annotationScopeId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "textSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Boundary"
+          }
+        },
+        "submittedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "AgreementCalculation": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "taskDocumentId",
+        "documentTextVersionId",
+        "annotationScopeId",
+        "textSha256",
+        "algorithmCode",
+        "algorithmVersion",
+        "threshold",
+        "thresholdOperator",
+        "aggregateScore",
+        "passed",
+        "scoreNumerator",
+        "scoreDenominator",
+        "computedAt",
+        "inputSubmissionIds",
+        "perPairScores",
+        "inputDigest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "taskDocumentId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "documentTextVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "annotationScopeId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "textSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "algorithmCode": {
+          "type": "string"
+        },
+        "algorithmVersion": {
+          "type": "string"
+        },
+        "threshold": {
+          "const": 0.8
+        },
+        "thresholdOperator": {
+          "const": ">"
+        },
+        "aggregateScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "scoreNumerator": {
+          "type": "string"
+        },
+        "scoreDenominator": {
+          "type": "string"
+        },
+        "computedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "inputSubmissionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          }
+        },
+        "perPairScores": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "leftSubmissionId",
+              "rightSubmissionId",
+              "common",
+              "leftCount",
+              "rightCount",
+              "score"
+            ],
+            "properties": {
+              "leftSubmissionId": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "rightSubmissionId": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "common": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "leftCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "rightCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "inputDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Checkpoint": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "createdById",
+        "updatedById",
+        "recordVersion",
+        "taskDocumentId",
+        "documentTextVersionId",
+        "annotationScopeId",
+        "textSha256",
+        "calculationId",
+        "sourceSubmissionIds",
+        "agreementScore",
+        "requiredThreshold",
+        "status",
+        "reason",
+        "confirmedById",
+        "confirmedAt",
+        "unifiedBoundaries",
+        "boundaryHash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "createdById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "updatedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "taskDocumentId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "documentTextVersionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "annotationScopeId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "textSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "calculationId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "sourceSubmissionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          }
+        },
+        "agreementScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "requiredThreshold": {
+          "const": 0.8
+        },
+        "status": {
+          "const": "CONFIRMED"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "confirmedById": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "confirmedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "unifiedBoundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Boundary"
+          }
+        },
+        "boundaryHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

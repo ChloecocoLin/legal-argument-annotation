@@ -29,6 +29,6 @@ export async function workspace(id: string): Promise<Workspace> {
 export const completePhase = (id: string, phase: 'propositions' | 'relations', key: string, version: number) => post<AdjudicationSession | { status: string }>(`/adjudication-sessions/${id}/${phase}/complete`, { confirmed: true }, { headers: { 'Idempotency-Key': key, 'If-Match': version } })
 export const decide = (itemId: string, kind: 'PROPOSITION' | 'RELATION', body: J07Request, key: string, version: number) => {
   if (kind === 'PROPOSITION' && !import.meta.env.DEV) throw new Error('命题决定 J04 模型仍待确认')
-  return post<{ itemId: string; status: string }>(kind === 'PROPOSITION' ? `${local}/proposition-items/${itemId}/fixture-decisions` : `/relation-adjudication-items/${itemId}/decisions`, body, { ...(kind === 'PROPOSITION' ? { baseURL: '' } : {}), headers: { 'Idempotency-Key': key, 'If-Match': version } })
+  return post<{ itemId: string; status: string }>(kind === 'PROPOSITION' ? `${local}/proposition-items/${itemId}/trial-decisions` : `/relation-adjudication-items/${itemId}/decisions`, body, { ...(kind === 'PROPOSITION' ? { baseURL: '' } : {}), headers: { 'Idempotency-Key': key, 'If-Match': version } })
 }
 export const returnSession = (id: string, body: J11Request, key: string, version: number) => post<{ status: string }>(`/adjudication-sessions/${id}/return`, body, { headers: { 'Idempotency-Key': key, 'If-Match': version } })
