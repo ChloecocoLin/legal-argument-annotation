@@ -1,0 +1,85 @@
+{
+  "reviewDate": "2026-10-20",
+  "method": "Read Git branch trees, implementations, schema/config and frontend sources; no merge or runtime joint acceptance performed.",
+  "branches": {
+    "feature/member-a-document-task": "4b8cb14f5724d6440de2d2922e712e35c5240d3f",
+    "feature/member-b-m2-type-selector": "daf13fe2fac1f43dc9df65d0c50f71666e67af51",
+    "feature/member-b-element-annotation": "99397e695f778db7bcb6bb6d93741590da5361a8",
+    "feature/member-b-adjudication-backend": "2da0a98774b4be6fb18b92b9eee55fca92e75b86",
+    "feature/member-b-expert-review": "e100f381baefa53cc3738258f0c30a8f5a25eb47",
+    "feature/member-c-relation-graph": "ab6f03d49db0441f0ebd7a7ee1f8bcb587c66280",
+    "feature/member-d": "8b3ecc226614bc38e1552a2542eda00e6b5a2b90"
+  },
+  "bExpertIncludes": [
+    "feature/member-b-m2-type-selector",
+    "feature/member-b-element-annotation",
+    "feature/member-b-adjudication-backend"
+  ],
+  "evidence": [
+    {
+      "branch": "feature/member-a-document-task",
+      "path": "backend/src/main/java/com/argument/membera/store/WorkflowStore.java",
+      "finding": "ConcurrentHashMap stores initialized from mock-data, including finalVersions; not a transaction-joining durable repository."
+    },
+    {
+      "branch": "feature/member-a-document-task",
+      "path": "backend/src/main/java/com/argument/membera/web/SegmentationController.java",
+      "finding": "S01-S03 implemented; checkpoint GET reads preset; S04 rejects pending; S05 returns preset score/count."
+    },
+    {
+      "branch": "feature/member-a-document-task",
+      "path": "backend/src/main/java/com/argument/membera/service/TaskService.java",
+      "finding": "T14 reannotate lines 454-480 reads store.finalVersions, checks IN_DATABASE, creates task and saves both source IDs; shared ownership/transaction still need integration."
+    },
+    {
+      "branch": "feature/member-b-expert-review",
+      "path": "backend/src/main/java/com/argument/adjudication/service/impl/CustomAnnotationServiceImpl.java",
+      "finding": "J09/J10 persist custom proposition elements; rejects RELATION; initializes recordVersion to 0 in current implementation."
+    },
+    {
+      "branch": "feature/member-b-expert-review",
+      "path": "backend/src/main/java/com/argument/expert/provider/CurrentUserProvider.java",
+      "finding": "Uses X-User-Id or demo expert fallback; replace with authenticated principal."
+    },
+    {
+      "branch": "feature/member-b-expert-review",
+      "path": "backend/src/main/java/com/argument/expert/service/ExpertAssignmentService.java",
+      "finding": "Static session-to-demo-expert assignments; replace with actual task member/case assignment lookup."
+    },
+    {
+      "branch": "feature/member-b-expert-review",
+      "path": "backend/src/main/java/com/argument/expert/service/ExpertReviewCommandService.java",
+      "finding": "J12/X03/X05 implementation exists; J12 explicitly rejects RELATION issues in this branch."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "backend/src/main/java/com/argument/proposition/PropositionSource.java",
+      "finding": "Explicit replaceable proposition read port, current implementation reads mock_proposition."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "backend/src/main/java/com/argument/proposition/PropositionMappingSource.java",
+      "finding": "Map<String,String> mapping port; current mock uses displayNo/text; cannot express arbitrary split/merge without a reviewed extension."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "backend/src/main/java/com/argument/graph/service/impl/ArgumentGraphServiceImpl.java",
+      "finding": "GR01 getGraph calls upsertGraph; GR02 draft validation treats GRAPH_INCOMPLETE as warning; final approval must add strict coverage and read-only snapshot validation."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "frontend/src/features/annotation/GraphExportButtons.vue",
+      "finding": "Uses target.exportSvg/exportPng and browser downloadBlob; not a server archived FileAsset pipeline."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "backend/src/main/java/com/argument/security/AppUserPrincipal.java",
+      "finding": "Role-based authenticated principal; D still needs permission-code mapping plus current task/document ownership checks."
+    },
+    {
+      "branch": "feature/member-c-relation-graph",
+      "path": "backend/src/main/java/com/argument/teaching/service/TeachingScorer.java",
+      "finding": "Existing relation/graph exercise scoring implementation is reusable; not D full course/assignment/attempt/grade model."
+    }
+  ]
+}

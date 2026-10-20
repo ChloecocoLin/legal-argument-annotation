@@ -99,3 +99,5 @@ T14 只提供当前授权已入库版的 `sourceTaskId + sourceFinalVersionId + 
 剩余推进顺序：先 A/B/C 交付及公共模型评审 → 正式对齐/自定义/专家/完整图和认证/共享事务 → 正式证据批准及 T14 建任务 → PNG/SVG 和生产数据库联合验收。可独立的自动任务和教学模型准备按原后续批次推进，不提前宣布科研正式主线完成。
 
 离线复核工具：`scripts/verify-member-d-trial.py`（校验工具依赖 jsonschema/openpyxl，不增加后端运行依赖）。可用有相应库的 Python 分别执行 `--schema-only` 和 `--export-only`；先运行 Maven 测试生成 target/member-d-export.xlsx 与长文本对照文件。最终源码回归报告位于 backend/target/surefire-reports，构建及测试输出不入库。
+
+后续核查更正（2026-10-20）：已读到 A/B/C 的任务、专家、关系/图和认证等实现，不能把当前 D 分支未接入写成其他成员未交付。具体可接入能力和仍需适配的边界以 [修订接入计划](11-cross-member-integration-plan.md) 为准。
