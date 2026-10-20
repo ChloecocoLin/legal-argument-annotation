@@ -10,6 +10,7 @@ const routes: RouteRecordRaw[] = [
   {path:'/tasks/:taskId/assign',component:()=>import('@/features/task/TaskAssign.vue'),meta:{title:'任务分配'}},
   {path:'/tasks/:taskId/progress',component:()=>import('@/features/versions/TaskProgress.vue'),meta:{title:'版本进度'}},
   { path: '/results', component: () => import('@/features/results/ResultLibrary.vue'), meta: {title:'已入库成果'} },
+  { path: '/tasks/:taskId/cases/:caseId/annotate', component: () => import('@/features/annotate/DraftWorkbench.vue'), meta: {title:'本人命题标注'} },
   { path: '/segmentation', component: () => import('@/features/annotate/IndependentSegmentation.vue'), meta: {title:'独立切割与统一关口'} },
   { path: '/tasks/:taskId/cases/:caseId/segmentation', component: () => import('@/features/annotate/IndependentSegmentation.vue'), meta: {title:'独立切割与统一关口'} },
   { path: '/audit', name: 'audit-events', component: () => import('@/features/audit/AuditEvents.vue'), meta: { title: '入库与审计记录' } },

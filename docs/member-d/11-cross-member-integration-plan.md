@@ -154,3 +154,5 @@ M01–M04 管理持久化状态、模型版本与执行适配；核对 B 是否�
 第一批基础接入已形成可运行修改，具体来源、迁移、页面、验收与尚未接入的模块见 [12-shared-foundation-handoff.md](12-shared-foundation-handoff.md)。下一执行批次仍为第 2 批真实切割/本人草稿/提交闭环；不将 B/C 全模块合并、正式图验证或后续批次标记为完成。
 
 第二批前半段已接真实独立切割与审核、一致性和统一关口，见 [13-independent-segmentation-handoff.md](13-independent-segmentation-handoff.md)。后半段本人草稿、命题/关系编辑及新任务完整提交尚待继续。
+
+第二批续段已补本人草稿 A01–A03、命题 E01–E04 和 B 动态类型组件，见 [14-ordinary-draft-handoff.md](14-ordinary-draft-handoff.md)。下一步按关系实体与校验 → 图/布局与正式验证 → 新案例完整提交闭环推进；第二批尚未整体完成。

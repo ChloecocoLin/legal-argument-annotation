@@ -96,7 +96,7 @@ onMounted(()=>load());watch(()=>route.params.caseId,()=>{view.value=undefined;ca
     </template>
     <template v-else-if="view">
       <el-alert v-if="view.checkpoints.length" type="success" :closable="false" :title="`统一切割已确认：一致性 ${(view.checkpoints[0].agreementScore*100).toFixed(2)}%。本轮独立输入只读保留，后续标注须引用此关口。`" style="margin-bottom:16px" />
-      <el-row :gutter="16">
+      <div v-if="view.assignment&&view.checkpoints.length" class="toolbar"><RouterLink :to="`/tasks/${view.taskDocument.taskId}/cases/${caseId}/annotate`">进入本人命题标注</RouterLink></div><el-row :gutter="16">
         <el-col :span="14"><el-card><template #header>规范化原文</template>
           <div ref="sourceEl" class="source" @mouseup="rememberSelection">{{ text }}</div>
           <p class="muted">标注范围 [{{ view.scope.startOffset }}, {{ view.scope.endOffset }})</p>
