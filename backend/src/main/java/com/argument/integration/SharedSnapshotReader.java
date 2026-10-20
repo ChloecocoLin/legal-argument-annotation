@@ -14,9 +14,10 @@ import static com.argument.adjudication.AdjudicationService.require;
 /** Internal B/C projection boundary. Reads the same owner IDs, never copies content into mock tables. */
 @Component
 public class SharedSnapshotReader {
- private final AnnotationDependencies data;private final VersionService versions;private final FinalReviewService finals;private final FinalReviewRepository finalStore;private final ObjectMapper mapper;
- public SharedSnapshotReader(AnnotationDependencies data,VersionService versions,FinalReviewService finals,FinalReviewRepository finalStore,ObjectMapper mapper){this.data=data;this.versions=versions;this.finals=finals;this.finalStore=finalStore;this.mapper=mapper;}
+ private final AnnotationDependencies data;private final VersionService versions;private final FinalReviewService finals;private final FinalReviewRepository finalStore;private final ObjectMapper mapper;private final com.argument.adjudication.AdjudicationService adjud;
+ public SharedSnapshotReader(AnnotationDependencies data,VersionService versions,FinalReviewService finals,FinalReviewRepository finalStore,ObjectMapper mapper,com.argument.adjudication.AdjudicationService adjud){this.data=data;this.versions=versions;this.finals=finals;this.finalStore=finalStore;this.mapper=mapper;this.adjud=adjud;}
  public ObjectNode read(Actor actor,String type,String id){VersionJson.uuid(id);
+  if("ARBITER_CUSTOM".equals(type)){var custom=data.read("custom",id);adjud.read(actor,custom.path("sessionId").asText());return custom;}
   if("ANNOTATION_VERSION".equals(type))return versions.read(actor,id);
   if("FINAL_VERSION".equals(type)){var snapshot=finalStore.snapshot(id);var version=snapshot.path("version");var doc=data.read("taskDocument",version.path("taskDocumentId").asText());var task=data.read("task",doc.path("taskId").asText());if("IN_DATABASE".equals(version.path("status").asText())&&actor.permission("DOCUMENT_VIEW")&&(actor.role("ADMIN")||actor.role("TASK_CREATOR")&&actor.id().equals(task.path("ownerUserId").asText())))return snapshot;return finals.read(actor,id);}
   require("DRAFT".equals(type),ErrorCode.SOURCE_INCOMPLETE,"该快照类型尚未接入统一读取");var draft=data.read("draft",id);var a=data.read("assignment",draft.path("assignmentId").asText());String c=draft.path("taskDocumentId").asText();var member=data.read("member",a.path("taskMemberId").asText());var doc=data.read("taskDocument",c);

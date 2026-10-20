@@ -46,3 +46,5 @@ export function mutationAttempt<T>() {
     pending() { return !!attempt }
   }
 }
+
+export const getDraftPreview = (id:string) => get<SubmissionPreview>(`/integration/drafts/${id}/submission-preview`)

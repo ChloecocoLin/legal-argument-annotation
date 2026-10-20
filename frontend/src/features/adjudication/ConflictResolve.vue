@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { post } from '@/api/request'
+import { onBeforeRouteLeave } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 import LocalSession from '@/features/versions/LocalSession.vue'
-import { getLocalContext, errorMessage, errorCode, mutationAttempt, formatTime } from '@/features/versions/api'
+import { errorMessage, errorCode, mutationAttempt, formatTime } from '@/features/versions/api'
 import { formula } from '@/features/versions/formula'
 import { availableVersions, createSession, localSessions, workspace, decide, completePhase, returnSession, type Workspace, type PropositionAdjudicationItem, type RelationAdjudicationItem, type J07Request } from './api'
 import type { AnnotationVersion, SnapshotView } from '@/features/versions/types'
@@ -10,8 +12,9 @@ const route = useRoute(), router = useRouter(), view = ref<Workspace>(), version
 const caseId = ref(String(route.query.caseId || '')), selected = ref<string[]>([])
 const loading = ref(false), busy = ref(false), error = ref(''), notice = ref(''), reason = ref(''), returnDialog = ref(false), targets = ref<string[]>([])
 const local = import.meta.env.DEV
+const expertTarget=ref<{id:string;kind:'PROPOSITION'}>(),expertId=ref(''),expertQuestion=ref('')
  type Item = PropositionAdjudicationItem | RelationAdjudicationItem
- type Command = { action: 'decision' | 'propositions' | 'relations' | 'return'; itemId?: string; kind?: 'PROPOSITION' | 'RELATION'; body: J07Request | { confirmed: true } | { targetAssignmentIds: string[]; reason: string } }
+ type Command = { action: 'decision' | 'propositions' | 'relations' | 'return' | 'expert'; itemId?: string; kind?: 'PROPOSITION' | 'RELATION'; body: J07Request | { confirmed: true } | { targetAssignmentIds: string[]; reason: string } | {expertUserId:string;itemKind:'PROPOSITION';itemId:string;question:string} }
 const choice = ref<{ item: Item; kind: 'PROPOSITION' | 'RELATION'; body: J07Request }>()
 const createAttempt = mutationAttempt<{ sourceVersionIds: string[] }>(), actionAttempt = mutationAttempt<Command>(), pending = ref(false), pendingAction = ref<Command['action']>()
 const active = computed(() => view.value?.session.status)
@@ -25,11 +28,11 @@ function resetAttempts() { createAttempt.reset(); actionAttempt.reset(); pending
 async function load(reset = true) {
  loading.value = true; error.value = ''; if (reset) resetAttempts()
  try {
-  if (local) { const c = await getLocalContext(); caseId.value ||= c.taskDocuments[0]?.id || '' }
-  if (route.query.sessionId) { view.value = await workspace(String(route.query.sessionId)); if (route.query.customAnnotationId && route.query.itemKind === 'RELATION') { const item = view.value.relationItems.find(i => i.id === route.query.itemId); if (item && active.value === 'RELATION_REVIEW') choice.value = { item, kind: 'RELATION', body: { action: 'CUSTOM', reason: '', customAnnotationId: String(route.query.customAnnotationId) } } } }
+
+  if (route.query.sessionId) { view.value = await workspace(String(route.query.sessionId)); if(route.query.customAnnotationId){const kind=route.query.itemKind==='RELATION'?'RELATION':'PROPOSITION';const item=(kind==='RELATION'?view.value.relationItems:view.value.propositionItems).find(i=>i.id===route.query.itemId);if(item&&!view.value.decisions.some(d=>d.id===item.decisionId&&d.customAnnotationId===String(route.query.customAnnotationId))&&active.value===(kind==='RELATION'?'RELATION_REVIEW':'PROPOSITION_REVIEW'))choice.value={item,kind,body:{action:'CUSTOM',reason:'',customAnnotationId:String(route.query.customAnnotationId)}}} }
   else {
    if (!caseId.value) throw new Error('请从任务详情选择要裁定的案例')
-   if (local) { const sessions = await localSessions(caseId.value); const latest = sessions.items.filter(s => s.status !== 'RETURNED').sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]; if (latest) { await router.replace({ path: route.path, query: { caseId: caseId.value, sessionId: latest.id } }); view.value = await workspace(latest.id); return } }
+   { const sessions = await localSessions(caseId.value); const latest = sessions.items.filter(s => s.status !== 'RETURNED').sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]; if (latest) { await router.replace({ path: route.path, query: { caseId: caseId.value, sessionId: latest.id } }); view.value = await workspace(latest.id); return } }
    versions.value = await availableVersions(caseId.value)
    // Default to the latest version per author, while J01 enforces actual eligibility.
    const latest = new Map<string, AnnotationVersion>()
@@ -50,18 +53,20 @@ function pick(item: Item, kind: 'PROPOSITION' | 'RELATION', action: 'ADOPT_VERSI
 async function mutate(action: Command['action']) {
  if (!view.value || busy.value) return
  busy.value = true; error.value = ''; notice.value = ''
- const command: Command = action === 'decision' ? { action, itemId: choice.value!.item.id, kind: choice.value!.kind, body: { ...choice.value!.body, reason: reason.value.trim() } } : action === 'return' ? { action, body: { targetAssignmentIds: [...targets.value], reason: reason.value.trim() } } : { action, body: { confirmed: true } }
+ const command: Command = action === 'expert' ? {action,body:{expertUserId:expertId.value,itemKind:'PROPOSITION',itemId:expertTarget.value!.id,question:expertQuestion.value.trim()}} : action === 'decision' ? { action, itemId: choice.value!.item.id, kind: choice.value!.kind, body: { ...choice.value!.body, reason: reason.value.trim() } } : action === 'return' ? { action, body: { targetAssignmentIds: [...targets.value], reason: reason.value.trim() } } : { action, body: { confirmed: true } }
  const a = actionAttempt.get(command, action === 'decision' ? choice.value!.item.recordVersion : view.value.session.recordVersion); pending.value = true; pendingAction.value = action
  try {
-  if (a.body.action === 'decision') await decide(a.body.itemId!, a.body.kind!, a.body.body as J07Request, a.key, a.version)
+  if(a.body.action==='expert')await post(`/adjudication-sessions/${view.value.session.id}/expert-reviews`,a.body.body,{headers:{'Idempotency-Key':a.key,'If-Match':a.version}})
+  else if (a.body.action === 'decision') await decide(a.body.itemId!, a.body.kind!, a.body.body as J07Request, a.key, a.version)
   else if (a.body.action === 'return') await returnSession(view.value.session.id, a.body.body as { targetAssignmentIds: string[]; reason: string }, a.key, a.version)
   else await completePhase(view.value.session.id, a.body.action, a.key, a.version)
-  notice.value = action === 'decision' && choice.value?.kind === 'PROPOSITION' ? '本地命题演示决定已保存，正式 J04 尚未接通' : '操作已保存'
-  choice.value = undefined; returnDialog.value = false; resetAttempts(); await load(false)
+  notice.value = action === 'decision' && choice.value?.kind === 'PROPOSITION' ? '命题试行决定已保存；正式 J04 模型仍待评审' : '操作已保存'
+  expertTarget.value=undefined;expertQuestion.value='';choice.value = undefined; returnDialog.value = false; resetAttempts(); await load(false)
  } catch (e) { error.value = errorMessage(e); if (errorCode(e)) resetAttempts() } finally { busy.value = false }
 }
 function candidates(item: Item, s: SnapshotView) { return 'candidateElementIds' in item ? s.elements.filter(e => item.candidateElementIds.includes(e.id)) : s.relations.filter(r => item.candidateRelationIds.includes(r.id)) }
 function current(item: Item) { return view.value?.decisions.find(d => d.id === item.decisionId) }
+onBeforeRouteLeave(()=>!busy.value&&!pending.value)
 onMounted(() => load())
 </script>
 <template>
@@ -75,7 +80,7 @@ onMounted(() => load())
  <div v-if="!loading && !view" class="card"><div class="card-head"><div class="card-title">选择来源版本</div></div><div class="card-body stack-3"><p class="muted t-sm">需满足案例人数要求，每人选择一份有效成果；会话建立后来源固定。</p><label v-for="v in versions.filter(v => ['SUBMITTED', 'UNDER_ADJUDICATION'].includes(v.status))" :key="v.id" class="panel version-option"><input type="checkbox" v-model="selected" :value="v.id" :disabled="busy || pending" /><b>{{ v.displayCode }}</b><span class="muted t-xs">{{ formatTime(v.submittedAt) }} · {{ v.elementIds.length }} 个要素</span></label><p v-if="!versions.length" class="muted">尚无可用版本，请先完成独立提交。</p><button class="btn btn-primary" :disabled="busy || selected.length < 2" @click="start">{{ busy ? '正在建立…' : '获取或创建裁定会话' }}</button></div></div>
  <section v-if="view && !loading" class="grid-2 conflict-layout">
   <div class="stack-5">
-   <div v-if="view.fixture" class="note warn">本地联调：命题对齐为试行适配器，决定由人工逐项提交，正式 J04 / M13 待确认；拆分合并、自定义图和专家指派需接入 B/C。</div>
+   <div v-if="view.decisionMode" class="note warn">来源为真实固定版本；命题逐项决定继续使用已授权试行入口。当前映射支持一对一，拆分合并仍待 M13 评审。</div>
    <div v-if="active === 'RETURNED'" class="note warn">本会话已退回，原版本和决定只读。指定成员补交后，从任务详情建立新会话。</div>
    <div v-for="kind in (['PROPOSITION', 'RELATION'] as const)" :key="kind" class="card" :class="{ 'locked-card': kind === 'RELATION' && !view.session.propositionCompletedAt }">
     <div class="card-head between"><div class="card-title"><span class="dot"></span>{{ kind === 'PROPOSITION' ? '第一阶段 · 命题裁定' : '第二阶段 · 关系裁定' }}</div><span class="badge warn">{{ (kind === 'PROPOSITION' ? view.propositionItems : view.relationItems).filter(i => i.status !== 'DECIDED').length }} 项待定</span></div>
@@ -85,14 +90,17 @@ onMounted(() => load())
      <article v-for="(item, index) in (kind === 'PROPOSITION' ? view.propositionItems : view.relationItems)" :key="item.id" class="cf-row" :class="{ conflict: item.conflictType !== 'AGREEMENT' }">
       <div class="cf-head"><b class="mono">{{ kind === 'PROPOSITION' ? '命题项' : '关系项' }} {{ index + 1 }}</b><span class="badge" :class="item.conflictType === 'AGREEMENT' ? 'success' : 'danger'">{{ conflictNames[item.conflictType] }}</span><span class="muted t-xs">{{ item.status === 'DECIDED' ? decisionNames[current(item)?.action || ''] || '已决定' : '未完成' }}</span></div>
       <div class="cf-body" :style="{ gridTemplateColumns: `repeat(${view.snapshots.length}, minmax(190px, 1fr))` }"><div v-for="s in view.snapshots" :key="s.version.id" class="cf-side"><div class="who">{{ s.version.displayCode }} · <router-link :to="`/versions/${s.version.id}`">完整版本</router-link></div><p v-if="!candidates(item, s).length" class="muted">该版本未标注</p><div v-for="obj in candidates(item, s)" :key="obj.id" class="candidate"><template v-if="'text' in obj"><span class="badge outline">{{ obj.labelCode }}</span><span class="t-xs muted"> [{{ obj.startOffset }}, {{ obj.endOffset }})</span><p>{{ obj.text }}</p></template><template v-else><span class="badge outline">{{ obj.relationCode }}</span><p class="mono">{{ formula(obj, s.elements, s.relations, s.participants) }}</p></template><button v-if="item.conflictType !== 'AGREEMENT'" class="btn btn-secondary" :disabled="!editable(kind)" @click="pick(item, kind, 'ADOPT_VERSION', s, obj.id)">采用 {{ s.version.displayCode }}</button></div></div></div>
-      <div class="cf-decide"><button v-if="item.conflictType === 'AGREEMENT'" class="btn btn-secondary" :disabled="!editable(kind)" @click="pick(item, kind, 'CONFIRM_AGREEMENT')">人工确认一致</button><button v-else class="btn btn-secondary" :disabled="!editable(kind)" @click="pick(item, kind, 'DELETE')">删除此项</button><router-link class="btn btn-secondary" :to="{ path: '/adjudication/annotate', query: { sessionId: view.session.id, itemKind: kind, itemId: item.id } }">自定义上下文</router-link><span v-if="current(item)" class="muted t-xs">理由：{{ current(item)?.reason || '未要求填写' }}</span></div>
+      <div class="cf-decide"><button v-if="item.conflictType === 'AGREEMENT'" class="btn btn-secondary" :disabled="!editable(kind)" @click="pick(item, kind, 'CONFIRM_AGREEMENT')">人工确认一致</button><button v-else class="btn btn-secondary" :disabled="!editable(kind)" @click="pick(item, kind, 'DELETE')">删除此项</button><router-link class="btn btn-secondary" :to="{ path: '/adjudication/annotate', query: { sessionId: view.session.id, itemKind: kind, itemId: item.id } }">自定义上下文</router-link><button v-if="kind==='PROPOSITION'" class="btn btn-secondary" :disabled="!editable(kind)" @click="expertTarget={id:item.id,kind:'PROPOSITION'};expertQuestion=''">请专家复核</button><span v-if="current(item)" class="muted t-xs">理由：{{ current(item)?.reason || '未要求填写' }}</span></div>
      </article>
      <button v-if="active === (kind === 'PROPOSITION' ? 'PROPOSITION_REVIEW' : 'RELATION_REVIEW')" class="btn btn-primary" :disabled="busy || pending || (kind === 'PROPOSITION' ? propDone !== view.propositionItems.length : relDone !== view.relationItems.length)" @click="mutate(kind === 'PROPOSITION' ? 'propositions' : 'relations')">{{ kind === 'PROPOSITION' ? '确认命题阶段完成' : '确认关系阶段完成' }}</button>
     </div>
    </div>
   </div>
-  <aside class="stack-5"><div class="card"><div class="card-head"><div class="card-title">对比版本</div></div><div class="card-body"><div v-for="s in view.snapshots" :key="s.version.id" class="source-row"><span class="avatar">{{ s.version.displayCode }}</span><div><b>{{ s.version.displayCode }}</b><p class="muted t-xs">{{ formatTime(s.version.submittedAt) }}</p></div><router-link :to="`/versions/${s.version.id}`">查看</router-link></div></div></div>
-   <div class="card"><div class="card-head"><div class="card-title">裁定进度</div><span class="badge accent">{{ phaseNames[active || ''] || active }}</span></div><div class="card-body"><div class="between t-xs"><span>命题及非命题项</span><span>{{ propDone }}/{{ view.propositionItems.length }}</span></div><div class="progress"><i :style="{ width: (view.propositionItems.length ? propDone / view.propositionItems.length * 100 : 0) + '%' }"></i></div><div class="between t-xs"><span>关系项</span><span>{{ relDone }}/{{ view.relationItems.length }}</span></div><div class="progress warm"><i :style="{ width: (view.relationItems.length ? relDone / view.relationItems.length * 100 : 0) + '%' }"></i></div><p class="muted t-xs">未决专家问题会阻止阶段完成。专家指派待 B 接入 J12。</p><button v-if="!readOnly" class="btn btn-secondary" :disabled="busy || pending" @click="targets = []; reason = ''; returnDialog = true">退回标注员补正</button></div></div>
+  <aside class="stack-5">
+   <div v-if="expertTarget" class="card"><div class="card-head">提交专家复核</div><div class="card-body"><select v-model="expertId" class="select" :disabled="busy||pending"><option value="">选择本任务专家</option><option v-for="e in view.experts||[]" :key="e.id" :value="e.id">{{ e.name }}</option></select><textarea v-model="expertQuestion" class="textarea" :disabled="busy||pending" placeholder="描述需专家判断的问题" /><button class="btn btn-primary" :disabled="busy||pending||!expertId||!expertQuestion.trim()||active!=='PROPOSITION_REVIEW'" @click="mutate('expert')">提交专家</button><button class="btn btn-secondary" :disabled="busy||pending" @click="expertTarget=undefined">取消</button><p v-if="!view.experts?.length" class="muted">本任务尚无有效专家成员，请任务创建者添加。</p></div></div>
+   <div v-if="view.expertReviews?.length" class="card"><div class="card-head">专家复核记录</div><div class="card-body"><p v-for="r in view.expertReviews" :key="r.id">{{ view.experts?.find(e=>e.id===r.expertUserId)?.name||'专家' }} · {{ r.status }}</p></div></div>
+<div class="card"><div class="card-head"><div class="card-title">对比版本</div></div><div class="card-body"><div v-for="s in view.snapshots" :key="s.version.id" class="source-row"><span class="avatar">{{ s.version.displayCode }}</span><div><b>{{ s.version.displayCode }}</b><p class="muted t-xs">{{ formatTime(s.version.submittedAt) }}</p></div><router-link :to="`/versions/${s.version.id}`">查看</router-link></div></div></div>
+   <div class="card"><div class="card-head"><div class="card-title">裁定进度</div><span class="badge accent">{{ phaseNames[active || ''] || active }}</span></div><div class="card-body"><div class="between t-xs"><span>命题及非命题项</span><span>{{ propDone }}/{{ view.propositionItems.length }}</span></div><div class="progress"><i :style="{ width: (view.propositionItems.length ? propDone / view.propositionItems.length * 100 : 0) + '%' }"></i></div><div class="between t-xs"><span>关系项</span><span>{{ relDone }}/{{ view.relationItems.length }}</span></div><div class="progress warm"><i :style="{ width: (view.relationItems.length ? relDone / view.relationItems.length * 100 : 0) + '%' }"></i></div><p class="muted t-xs">未决专家问题会阻止阶段完成；专家确认后返回原命题项，仍需裁定者作出决定。</p><button v-if="!readOnly" class="btn btn-secondary" :disabled="busy || pending" @click="targets = []; reason = ''; returnDialog = true">退回标注员补正</button></div></div>
    <div class="card"><div class="card-body"><b>{{ active === 'FINAL_REVIEW' ? '两阶段裁定已完成' : '请先完成两阶段裁定' }}</b><p class="muted t-sm">{{ active === 'FINAL_REVIEW' ? '已进入待最终审查阶段，可生成独立最终快照并核查来源。' : '全部项目确认后进入最终审查。' }}</p><router-link v-if="active === 'FINAL_REVIEW'" class="btn btn-primary" :to="{ path: '/final-review', query: { sessionId: view.session.id } }">进入最终审查</router-link><button v-else class="btn btn-primary" disabled>最终审查</button></div></div><button class="btn btn-secondary" :disabled="busy" @click="load()">刷新会话</button>
   </aside>
  </section>

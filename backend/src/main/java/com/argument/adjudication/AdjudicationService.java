@@ -87,7 +87,7 @@ public class AdjudicationService {
     private void insertItems(ObjectNode s,String kind,List<ObjectNode> items,Actor actor) {
         for(var i:items){VersionJson.stamp(i,actor.id(),VersionJson.now());i.put("sessionId",s.path("id").asText());i.put("status","OPEN");i.putNull("decisionId");store.insertItem(i,kind);}
     }
-    private ObjectNode locked(Actor actor,String id) {
+    ObjectNode locked(Actor actor,String id) {
         var read=store.session(VersionJson.uuid(id),false);authorize(actor,read.path("taskDocumentId").asText());versions.lockCase(read.path("taskDocumentId").asText());
         var doc=data.lock("taskDocument",read.path("taskDocumentId").asText());var task=data.lock("task",doc.path("taskId").asText());var s=store.session(id,true);authorize(actor,s.path("taskDocumentId").asText());
         require("IN_PROGRESS".equals(task.path("status").asText())&&!s.hasNonNull("correctionSessionId"),ErrorCode.LOCKED_RESOURCE,"任务已锁定或会话已由新补正会话接替");return s;

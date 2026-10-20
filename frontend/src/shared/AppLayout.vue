@@ -19,8 +19,8 @@ const navigation = computed(() => {
     'audit-events':['admin','creator','arbiter'], 'guide-management':['admin','creator','annotator','arbiter','teacher','student','expert'],
     'document-library':['admin','creator','annotator','arbiter'], 'task-list':['admin','creator','annotator','arbiter'],
     'task-create':['creator'], 'task-assign':['creator'], 'segmentation':['annotator','arbiter'],
-    'conflict-resolve':['arbiter'], 'final-review':['arbiter'], 'expert-review':['expert','arbiter'],
-    'expert-issues':['expert','arbiter'], 'auto-annotate':['creator','arbiter'],
+    'conflict-resolve':['arbiter'], 'final-review':['arbiter'], 'expert-review':['expert'],
+    'expert-issues':['expert'], 'auto-annotate':['creator','arbiter'],
     'export':['creator','arbiter'], 'export-records':['creator','arbiter']
   }
   return NAV.map(group => ({ ...group, items: group.items.filter(item => !allowed[item.id] || user.roles.some(role => allowed[item.id].includes(role))) })).filter(group => group.items.length)
@@ -48,7 +48,7 @@ const here = computed(() => {
   if (route.path === '/documents') return '文书总库'
   if (route.path === '/tasks/create') return '创建任务'
   if (route.path.endsWith('/assign')) return '任务分配'
-  if (route.path.endsWith('/annotate')) return '本人命题标注'
+  if (route.path.startsWith('/tasks/')&&route.path.endsWith('/annotate')) return '本人标注工作台'
   if (route.path.endsWith('/segmentation')) return '独立切割与统一关口'
   if (route.path.startsWith('/tasks/')) return route.path.endsWith('/versions') ? '标注版本' : '任务详情'
   if (route.path === '/tasks') return '任务列表'

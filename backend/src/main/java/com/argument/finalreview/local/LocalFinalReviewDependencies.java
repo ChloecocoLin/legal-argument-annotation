@@ -23,10 +23,13 @@ public class LocalFinalReviewDependencies implements FinalReviewDependencies {
         var result=mapper.createObjectNode();var elements=result.putArray("elements");var rs=result.putArray("relations");var ps=result.putArray("participants");var provenance=result.putArray("provenance");var aliases=new HashMap<String,String>();var chosenRelations=new HashSet<String>();
         for(String kind:List.of("ELEMENT","RELATION"))for(var item:kind.equals("ELEMENT")?propositions:relations) {
             var decision=decisions.stream().filter(d->d.path("id").equals(item.path("decisionId"))).findFirst().orElseThrow();String action=decision.path("action").asText();
-            require(!"CUSTOM".equals(action),ErrorCode.INVALID_CUSTOM_GRAPH,"自定义结果需 B 的完整快照与正式映射适配器");
+
             var candidates=item.path(kind.equals("ELEMENT")?"candidateElementIds":"candidateRelationIds");require(candidates.isArray() && !candidates.isEmpty(),ErrorCode.SOURCE_INCOMPLETE,"候选集合缺失");
             var ids=new ArrayList<String>();candidates.forEach(id->ids.add(id.asText()));require(ids.stream().allMatch(all::containsKey),ErrorCode.SOURCE_INCOMPLETE,"候选来源不属于固定源版本");
             if("DELETE".equals(action)){provenance.add(provenance("EXCLUDED_"+kind,null,ids,owners,decision));continue;}
+            if("CUSTOM".equals(action)) {
+                require("ELEMENT".equals(kind),ErrorCode.INVALID_CUSTOM_GRAPH,"关系自定义仍需下一批的结构模型");var custom=data.read("custom",decision.path("customAnnotationId").asText());require(custom.path("sessionId").equals(session.path("id"))&&custom.path("itemId").equals(item.path("id"))&&custom.path("elements").size()==1,ErrorCode.INVALID_CUSTOM_GRAPH,"自定义快照来源不一致");var object=((ObjectNode)custom.path("elements").get(0)).deepCopy();var accepted=new ArrayList<String>();object.path("sourceElementIds").forEach(id->accepted.add(id.asText()));require(!accepted.isEmpty()&&ids.containsAll(accepted),ErrorCode.SOURCE_INCOMPLETE,"自定义来源越出当前项");String chosen=object.path("id").asText();elements.add(object);ids.forEach(id->aliases.put(id,chosen));provenance.add(provenance(kind,chosen,accepted,owners,decision));var excluded=ids.stream().filter(id->!accepted.contains(id)).toList();if(!excluded.isEmpty())provenance.add(provenance("EXCLUDED_"+kind,null,excluded,owners,decision));continue;
+            }
             boolean agreement="CONFIRM_AGREEMENT".equals(action);String chosen=agreement?ids.get(0):decision.path("sourceObjectId").asText();require(ids.contains(chosen),ErrorCode.SOURCE_INCOMPLETE,"采纳对象不属于此项");
             var object=all.get(chosen).deepCopy();if(kind.equals("ELEMENT")) {
                 // This explicit adapter supports only the previously frozen one-to-one mapping.

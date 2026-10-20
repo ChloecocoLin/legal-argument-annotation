@@ -1,47 +1,15 @@
 package com.argument.expert.controller;
-
-import com.argument.common.response.ApiResponse;
+import com.argument.adjudication.*;
+import com.argument.common.response.*;
+import com.argument.version.port.VersionIdentity;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.web.bind.annotation.*;
-
-/**
- * 专家复核单接口（成员B）。M0 骨架，M4 实现。
- * X01 列表、X02 详情、X03 接受、X05 确认。
- */
-@RestController
-@RequestMapping("/api/v1")
+@RestController @RequestMapping("/api/v1")
 public class ExpertReviewController {
-
-    // X01 列出本人专家待办（分页）
-    @GetMapping("/expert-reviews")
-    public ApiResponse<Object> listMyReviews(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String q,
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "20") int size) {
-        // TODO(M4)
-        return ApiResponse.ok(null);
-    }
-
-    // X02 读取问题、原文与指南依据
-    @GetMapping("/expert-reviews/{reviewId}")
-    public ApiResponse<Object> getDetail(@PathVariable String reviewId) {
-        // TODO(M4)
-        return ApiResponse.ok(null);
-    }
-
-    // X03 专家接受复核申请（START）
-    @PostMapping("/expert-reviews/{reviewId}/transitions")
-    public ApiResponse<Object> transition(
-            @PathVariable String reviewId, @RequestBody Object request) {
-        // TODO(M4)
-        return ApiResponse.ok(null);
-    }
-
-    // X05 确认专家复核完成
-    @PostMapping("/expert-reviews/{reviewId}/confirm")
-    public ApiResponse<Object> confirm(
-            @PathVariable String reviewId, @RequestBody Object request) {
-        // TODO(M4)
-        return ApiResponse.ok(null);
-    }
+ private final ReviewWorkflowService service;private final VersionIdentity identity;
+ public ExpertReviewController(ReviewWorkflowService service,VersionIdentity identity){this.service=service;this.identity=identity;}
+ @GetMapping("/expert-reviews") public ApiResponse<ObjectNode> list(@RequestHeader(value="Authorization",required=false)String auth,@RequestParam(required=false)String status,@RequestParam(required=false)String q,@RequestParam(defaultValue="1")int page,@RequestParam(defaultValue="20")int size){var result=service.list(identity.authenticate(auth),status,q,page,size);return ApiResponse.ok((ObjectNode)result.get("data"),new PageMeta(page,size,result.path("total").asLong()));}
+ @GetMapping("/expert-reviews/{id}") public ApiResponse<ObjectNode> detail(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id){return ApiResponse.ok(service.detail(identity.authenticate(auth),id));}
+ @PostMapping("/expert-reviews/{id}/transitions") public ApiResponse<ObjectNode> start(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.start(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
+ @PostMapping("/expert-reviews/{id}/confirm") public ApiResponse<ObjectNode> confirm(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.confirm(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
 }

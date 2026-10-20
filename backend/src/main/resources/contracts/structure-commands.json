@@ -1,0 +1,168 @@
+{
+  "R02": {
+    "type": "object",
+    "properties": {
+      "relationCode": {
+        "type": "string",
+        "enum": [
+          "S",
+          "A",
+          "J",
+          "M",
+          "I"
+        ]
+      },
+      "participants": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "ordinal": {
+              "type": "integer"
+            },
+            "role": {
+              "type": "string"
+            },
+            "targetKind": {
+              "type": "string"
+            },
+            "targetId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "ordinal",
+            "role",
+            "targetKind",
+            "targetId"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "relationCode",
+      "participants"
+    ],
+    "additionalProperties": false
+  },
+  "R03": {
+    "type": "object",
+    "properties": {
+      "participants": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "ordinal": {
+              "type": "integer"
+            },
+            "role": {
+              "type": "string"
+            },
+            "targetKind": {
+              "type": "string"
+            },
+            "targetId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "ordinal",
+            "role",
+            "targetKind",
+            "targetId"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "participants"
+    ],
+    "additionalProperties": false
+  },
+  "R04": {
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "reason"
+    ],
+    "additionalProperties": false
+  },
+  "GR02": {
+    "type": "object",
+    "properties": {
+      "elementIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "relationIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "required": [
+      "elementIds",
+      "relationIds"
+    ],
+    "additionalProperties": false
+  },
+  "GR03": {
+    "type": "object",
+    "properties": {
+      "canvasWidth": {
+        "type": "integer"
+      },
+      "canvasHeight": {
+        "type": "integer"
+      },
+      "nodePositions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "targetKind": {
+              "type": "string"
+            },
+            "targetId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x": {
+              "type": "integer"
+            },
+            "y": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "targetKind",
+            "targetId",
+            "x",
+            "y"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "canvasWidth",
+      "canvasHeight",
+      "nodePositions"
+    ],
+    "additionalProperties": false
+  }
+}

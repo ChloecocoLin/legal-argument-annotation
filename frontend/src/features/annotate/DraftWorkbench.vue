@@ -2,28 +2,43 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { get, post, patch, del } from '@/api/request'
+import { get, post, put, patch, del } from '@/api/request'
 import { errorMessage, errorCode, mutationAttempt } from '@/features/versions/api'
 import ElementTypeSelector from '@/shared/ElementTypeSelector.vue'
-import type { AnnotationDraft, Element } from '@/generated/api-client/types.gen'
+import type { AnnotationDraft, Element, Relation, RelationParticipant } from '@/generated/api-client/types.gen'
+import ArgumentGraph from '@/features/annotation/ArgumentGraph.vue'
+import type { GraphNode, GraphEdge, GraphNodePosition } from '@/types/graph'
+import { formula } from '@/features/versions/formula'
 import type { LabelDefinition } from '@/types/guide'
 import { useUserStore } from '@/stores/user'
 interface Bound {startOffset:number;endOffset:number}
-interface Workspace {draft:AnnotationDraft|null;assignment:{id:string};segmentationCheckpoint:{id:string;unifiedBoundaries:Bound[]};elements:Element[];labels:LabelDefinition[];text:{normalizedText:string};canWrite:boolean;canCreate:boolean}
-interface Command {method:'POST'|'PATCH'|'DELETE';url:string;body:object;actorId?:string}
+interface Workspace {draft:AnnotationDraft|null;assignment:{id:string};segmentationCheckpoint:{id:string;unifiedBoundaries:Bound[]};elements:Element[];labels:LabelDefinition[];text:{normalizedText:string};canWrite:boolean;canCreate:boolean;relations?:Relation[];participants?:RelationParticipant[];nodes?:GraphNode[];edges?:GraphEdge[];graph?:{id:string;status:string};layout?:{nodePositions?:GraphNodePosition[]};issues?:{message:string;level:string}[]}
+interface Command {method:'POST'|'PUT'|'PATCH'|'DELETE';url:string;body:object;actorId?:string}
 const route=useRoute(),view=ref<Workspace>(),error=ref(''),loading=ref(false),busy=ref(false),pending=ref(false),selected=ref(0),label=ref<string|null>(null)
 const attempt=mutationAttempt<Command>()
 const user=useUserStore()
+const section=ref('elements'),code=ref<Relation['relationCode']>('S'),editing=ref<Relation>(),targets=ref<string[]>(['','']),graphRef=ref<InstanceType<typeof ArgumentGraph>>()
+const directed=computed(()=>['S','A','M'].includes(code.value))
+const options=computed(()=>[...(view.value?.elements.filter(e=>e.isProposition).map(e=>({value:`ELEMENT:${e.id}`,label:`${e.displayNo} · ${e.text}`}))||[]),...(view.value?.relations?.filter(r=>r.id!==editing.value?.id).map(r=>({value:`RELATION:${r.id}`,label:expression(r)}))||[])])
+function expression(r:Relation){return formula(r,view.value?.elements||[],view.value?.relations||[],view.value?.participants||[])}
+function resetRelation(){editing.value=undefined;targets.value=['','']}
+function editRelation(r:Relation){editing.value=r;code.value=r.relationCode;targets.value=(view.value?.participants||[]).filter(p=>p.relationId===r.id).sort((a,b)=>a.ordinal-b.ordinal).map(p=>`${p.targetKind}:${p.targetId}`)}
+function saveRelation(){const d=view.value?.draft;if(!d||!view.value?.canWrite||pending.value)return;const participants=targets.value.map((v,index)=>{const [targetKind,targetId]=v.split(':');return {ordinal:index+1,role:directed.value?(index===0?'SOURCE':'TARGET'):'MEMBER',targetKind,targetId}});const r=editing.value;execute({method:r?'PUT':'POST',url:r?`/relations/${r.id}/participants`:`/annotation-drafts/${d.id}/relations`,body:r?{participants}:{relationCode:code.value,participants}},r?.recordVersion||0)}
+async function deleteRelation(r:Relation){try{const answer=await ElMessageBox.prompt('先处理外层引用，删除不会自动移除其他关系。','删除关系',{inputValidator:v=>!!v?.trim()||'请填写删除理由'});execute({method:'DELETE',url:`/relations/${r.id}`,body:{reason:answer.value.trim()}},r.recordVersion)}catch{/* 用户关闭 */}}
+function validateGraph(){const d=view.value?.draft;if(d)execute({method:'POST',url:`/annotation-drafts/${d.id}/graph/validate`,body:{elementIds:view.value!.elements.filter(e=>e.isProposition).map(e=>e.id),relationIds:view.value!.relations?.map(r=>r.id)||[]}},d.recordVersion)}
+function resetGraph(){const d=view.value?.draft;if(d)execute({method:'POST',url:`/integration/drafts/${d.id}/reset-graph`,body:{}},d.recordVersion)}
+function saveLayout(){if(!view.value?.graph)return;const nodePositions=(graphRef.value?.currentPositions()||[]).map(p=>({...p,x:Math.round(p.x),y:Math.round(p.y)}));execute({method:'POST',url:`/graphs/${view.value.graph.id}/layouts`,body:{canvasWidth:1600,canvasHeight:1200,nodePositions}})}
 const rows=computed(()=>view.value?.segmentationCheckpoint.unifiedBoundaries.map(b=>({...b,element:view.value?.elements.find(e=>e.startOffset===b.startOffset&&e.endOffset===b.endOffset)}))||[])
 const row=computed(()=>rows.value[selected.value]),remaining=computed(()=>rows.value.filter(r=>!r.element).length)
 function select(index:number){if(pending.value||busy.value)return;selected.value=index;label.value=rows.value[index]?.element?.labelCode||null}
-async function load(){loading.value=true;error.value='';view.value=undefined;try{view.value=await get<Workspace>(`/integration/cases/${route.params.caseId}/draft-workspace`);selected.value=Math.min(selected.value,Math.max(rows.value.length-1,0));label.value=row.value?.element?.labelCode||null}catch(e){error.value=errorMessage(e)}finally{loading.value=false}}
+async function load(){loading.value=true;error.value='';view.value=undefined;try{view.value=await get<Workspace>(`/integration/cases/${route.params.caseId}/annotation-workspace`);selected.value=Math.min(selected.value,Math.max(rows.value.length-1,0));label.value=row.value?.element?.labelCode||null;resetRelation()}catch(e){error.value=errorMessage(e)}finally{loading.value=false}}
 async function execute(command:Command,version=0){
   if(busy.value)return;busy.value=true;error.value=''
   const saved=attempt.get(JSON.parse(JSON.stringify({...command,actorId:user.id})),version);pending.value=true
   if(saved.body.actorId!==user.id){attempt.reset();pending.value=false;busy.value=false;error.value='账号已变化，请重新加载本人草稿';return}
   try{const config={headers:{'Idempotency-Key':saved.key,...(saved.version?{'If-Match':saved.version}:{})}};const c=saved.body
     if(c.method==='POST')await post(c.url,c.body,config)
+    else if(c.method==='PUT')await put(c.url,c.body,config)
     else if(c.method==='PATCH')await patch(c.url,c.body,config)
     else await del(c.url,{...config,data:c.body})
     attempt.reset();pending.value=false;await load();ElMessage.success('已保存本人草稿')
@@ -42,7 +57,7 @@ watch(()=>user.id,()=>{attempt.reset();pending.value=false;view.value=undefined;
 
 <template>
   <div v-loading="loading" class="page">
-    <div class="page-head"><h1>本人命题标注</h1><p class="muted">沿用已确认的统一边界，逐条阅读原文并选择当前指南中的类型。</p></div>
+    <div class="page-head"><h1>本人标注工作台</h1><p class="muted">沿用统一边界完成要素与关系，检查完整论证图后提交独立版本。</p></div>
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <div class="toolbar"><RouterLink :to="`/tasks/${route.params.taskId}/cases/${route.params.caseId}/segmentation`">查看统一切割</RouterLink><el-button :disabled="busy||pending" @click="load">刷新本人数据</el-button><el-button v-if="pending" :loading="busy" @click="retry">使用原请求重试保存</el-button></div>
     <template v-if="view">
@@ -50,7 +65,8 @@ watch(()=>user.id,()=>{attempt.reset();pending.value=false;view.value=undefined;
       <el-button v-if="!view.draft" type="primary" :disabled="!view.canCreate||busy||pending" @click="create">创建本人草稿</el-button>
       <template v-else>
         <div class="toolbar"><b>{{ view.canWrite?'本人草稿':'本人草稿（只读）' }}</b><span>已分类 {{ rows.length-remaining }} / {{ rows.length }} · 保存修订 {{ view.draft.revision }}</span><el-button :disabled="!view.canWrite||busy||pending" @click="save">保存草稿</el-button></div>
-        <el-row :gutter="20"><el-col :span="13"><el-card><template #header>原文与统一边界</template>
+        <el-radio-group v-model="section" :disabled="busy||pending" style="margin-bottom:16px"><el-radio-button value="elements">要素标注</el-radio-button><el-radio-button value="relations">关系标注</el-radio-button><el-radio-button value="graph">论证图示</el-radio-button></el-radio-group>
+        <el-row v-if="section==='elements'" :gutter="20"><el-col :span="13"><el-card><template #header>原文与统一边界</template>
           <p class="source">{{ view.text.normalizedText }}</p>
           <button v-for="(item,index) in rows" :key="item.startOffset" class="boundary" :class="{selected:selected===index}" :disabled="busy||pending" @click="select(index)"><b>{{ item.element?.displayNo|| (item.element?'非命题':'未分类') }}</b><span>{{ view.text.normalizedText.slice(item.startOffset,item.endOffset) }}</span><small>[{{ item.startOffset }}, {{ item.endOffset }}) · {{ item.element?.labelCode||'待选择类型' }}</small></button>
         </el-card></el-col><el-col :span="11"><el-card><template #header>要素类型</template>
@@ -59,7 +75,10 @@ watch(()=>user.id,()=>{attempt.reset();pending.value=false;view.value=undefined;
           <div class="toolbar"><el-button type="primary" :disabled="!view.canWrite||!row||!label||busy||pending" @click="classify">{{ row?.element?'保存类型修改':'确认分类' }}</el-button><el-button v-if="row?.element" type="danger" :disabled="!view.canWrite||busy||pending" @click="remove">删除分类</el-button></div>
           <p class="muted">命题编号随原文顺序自动更新。当前阶段可修改类型；切割边界调整需等待对应模型接入。</p>
         </el-card></el-col></el-row>
-        <el-alert style="margin-top:20px" type="info" :closable="false" :title="remaining?`还有 ${remaining} 条统一边界未分类。`:'命题分类已保存。下一阶段接入关系与正式图验证后，才能完成完整标注提交。'" />
+        <el-row v-if="section==='relations'" :gutter="20"><el-col :span="12"><el-card><template #header>关系清单</template><p v-if="!view.relations?.length">尚无关系，请核对是否存在论证联系。</p><div v-for="r in view.relations" :key="r.id" class="boundary"><b>{{ expression(r) }}</b><div><el-button :disabled="!view.canWrite||busy||pending" @click="editRelation(r)">编辑参与项</el-button><el-button :disabled="!view.canWrite||busy||pending" type="danger" @click="deleteRelation(r)">删除关系</el-button></div></div></el-card></el-col><el-col :span="12"><el-card><template #header>{{ editing?'修改关系参与项':'新建关系' }}</template><el-select v-model="code" :disabled="!!editing||busy||pending" @change="resetRelation"><el-option v-for="c in (['S','J','M','A','I'] as const)" :key="c" :value="c" :label="({S:'支持 S',J:'组合 J',M:'匹配 M',A:'反对 A',I:'同一 I'})[c]" /></el-select><div v-for="(_,index) in targets" :key="index" class="toolbar"><b>{{ directed?(index===0?'来源':'目标'):`成员 ${index+1}` }}</b><el-select v-model="targets[index]" filterable :disabled="busy||pending" placeholder="选择本人命题或关系整体" style="width:75%"><el-option v-for="option in options" :key="option.value" :value="option.value" :label="option.label" /></el-select><el-button v-if="!directed&&targets.length>2" :disabled="busy||pending" @click="targets.splice(index,1)">移除</el-button></div><el-button v-if="!directed" :disabled="busy||pending" @click="targets.push('')">增加成员</el-button><div class="toolbar"><el-button type="primary" :disabled="!view.canWrite||targets.some(t=>!t)||busy||pending" @click="saveRelation">保存关系</el-button><el-button :disabled="busy||pending" @click="resetRelation">新建另一关系</el-button></div><p class="muted">只记录直接关系；嵌套保留完整结构。服务端检查参与矩阵、方向、来源和循环，不自动补齐传递支持。</p></el-card></el-col></el-row>
+        <el-card v-if="section==='graph'"><template #header>完整论证图 · {{ view.graph?.status==='VALID'?'校验通过': '待校验' }}</template><ArgumentGraph ref="graphRef" :nodes="view.nodes||[]" :edges="view.edges||[]" :positions="view.layout?.nodePositions||[]" :editable="view.canWrite&&!busy&&!pending" /><div class="toolbar"><el-button type="primary" :disabled="!view.canWrite||busy||pending" @click="validateGraph">校验完整草稿</el-button><el-button :disabled="!view.canWrite||!view.graph||busy||pending" @click="saveLayout">保存图布局</el-button><el-button :disabled="!view.canWrite||!view.graph||busy||pending" @click="resetGraph">保留旧图并重新编辑</el-button></div><p v-for="(issue,index) in view.issues" :key="index" class="muted">{{ issue.message }}</p><p class="muted">显示所有命题、关系结构和孤立命题。拖动只改变布局，提交时会再次校验内容。</p></el-card>
+        <el-alert style="margin-top:20px" type="info" :closable="false" :title="remaining?`还有 ${remaining} 条统一边界未分类。`:view.graph?.status==='VALID'?'完整图已通过校验，请人工核对后进入提交确认。':'分类已保存，请继续检查关系并校验完整图。'" />
+        <div class="toolbar"><RouterLink v-if="!busy&&!pending" :to="`/annotations/${view.draft.id}/submit`">进入提交确认</RouterLink><RouterLink :to="`/tasks/${route.params.taskId}/cases/${route.params.caseId}/versions`">查看本人正式版本</RouterLink></div>
       </template>
     </template>
   </div>

@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import LocalSession from './LocalSession.vue'
-import { getLocalContext, getLocalPreview, submitDraft, mutationAttempt, errorMessage, errorCode } from './api'
+import { getDraftPreview, submitDraft, mutationAttempt, errorMessage, errorCode } from './api'
 import { formula } from './formula'
 import type { SubmissionPreview, AnnotationVersion } from './types'
 const route = useRoute(), preview = ref<SubmissionPreview>(), submitted = ref<AnnotationVersion>(), loading = ref(false), busy = ref(false), error = ref(''), note = ref(''), confirmed = ref(false), pending = ref(false), confirmDialog = ref(false)
@@ -25,9 +25,7 @@ const canSubmit = computed(() => !loading.value && !busy.value && !!preview.valu
 async function load() {
   loading.value = true; error.value = ''; preview.value = undefined; attempt.reset(); pending.value = false
   try {
-    if (!import.meta.env.DEV) throw new Error('草稿预览需要接入成员 A/B/C 的任务、草稿和图服务')
-    await getLocalContext()
-    preview.value = await getLocalPreview(String(route.params.draftId))
+    preview.value = await getDraftPreview(String(route.params.draftId))
   } catch (e) { error.value = errorMessage(e) } finally { loading.value = false }
 }
 async function submit() {

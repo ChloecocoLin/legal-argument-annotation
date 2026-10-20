@@ -156,3 +156,5 @@ M01–M04 管理持久化状态、模型版本与执行适配；核对 B 是否�
 第二批前半段已接真实独立切割与审核、一致性和统一关口，见 [13-independent-segmentation-handoff.md](13-independent-segmentation-handoff.md)。后半段本人草稿、命题/关系编辑及新任务完整提交尚待继续。
 
 第二批续段已补本人草稿 A01–A03、命题 E01–E04 和 B 动态类型组件，见 [14-ordinary-draft-handoff.md](14-ordinary-draft-handoff.md)。下一步按关系实体与校验 → 图/布局与正式验证 → 新案例完整提交闭环推进；第二批尚未整体完成。
+
+第二批普通标注闭环已完成，见 [15-complete-annotation-loop-handoff.md](15-complete-annotation-loop-handoff.md)。第三批一对一命题自定义、真实候选及专家回流已接入并联验，见 [16-proposition-custom-expert-handoff.md](16-proposition-custom-expert-handoff.md)。J04/M13 仍按已授权试行及待评审门禁执行；下一批为第四批关系裁定、自定义/关系专家及正式最终图验证。

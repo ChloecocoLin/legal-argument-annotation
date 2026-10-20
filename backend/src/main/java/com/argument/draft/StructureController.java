@@ -1,0 +1,22 @@
+package com.argument.draft;
+import com.argument.common.response.*;
+import com.argument.version.port.VersionIdentity;
+import com.argument.adjudication.AdjudicationController;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.web.bind.annotation.*;
+
+@RestController @RequestMapping("/api/v1")
+public class StructureController {
+    private final StructureService service;private final VersionIdentity identity;
+    public StructureController(StructureService service,VersionIdentity identity){this.service=service;this.identity=identity;}
+    @GetMapping("/annotation-drafts/{id}/relations") public ApiResponse<ObjectNode> list(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestParam(defaultValue="1")int page,@RequestParam(defaultValue="20")int size){var result=service.list(identity.authenticate(auth),id,page,size);return ApiResponse.ok((ObjectNode)result.get("data"),new PageMeta(page,size,result.path("total").asLong()));}
+    @PostMapping("/annotation-drafts/{id}/relations") public ApiResponse<ObjectNode> create(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestBody ObjectNode body){return ApiResponse.ok(service.create(identity.authenticate(auth),id,key,body));}
+    @PutMapping("/relations/{id}/participants") public ApiResponse<ObjectNode> replace(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.replace(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
+    @DeleteMapping("/relations/{id}") public ApiResponse<ObjectNode> remove(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.remove(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
+    @GetMapping("/annotation-owners/{type}/{id}/graph") public ApiResponse<ObjectNode> graph(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String type,@PathVariable String id,@RequestParam(required=false)Integer layoutVersion){return ApiResponse.ok(service.graph(identity.authenticate(auth),type,id,layoutVersion));}
+    @PostMapping("/annotation-drafts/{id}/graph/validate") public ApiResponse<ObjectNode> validate(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.validate(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
+    @PostMapping("/graphs/{id}/layouts") public ApiResponse<ObjectNode> layout(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestBody ObjectNode body){return ApiResponse.ok(service.saveLayout(identity.authenticate(auth),id,key,body));}
+    @PostMapping("/integration/drafts/{id}/reset-graph") public ApiResponse<ObjectNode> reset(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){return ApiResponse.ok(service.resetGraph(identity.authenticate(auth),id,key,AdjudicationController.integer(match),body));}
+    @GetMapping("/integration/cases/{id}/annotation-workspace") public ApiResponse<ObjectNode> workspace(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id){return ApiResponse.ok(service.workspace(identity.authenticate(auth),id));}
+    @GetMapping("/integration/drafts/{id}/submission-preview") public ApiResponse<ObjectNode> preview(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id){return ApiResponse.ok(service.preview(identity.authenticate(auth),id));}
+}

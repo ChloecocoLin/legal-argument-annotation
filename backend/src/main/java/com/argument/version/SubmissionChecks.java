@@ -12,9 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionChecks {
     private final AnnotationDependencies dependencies;
-    public SubmissionChecks(AnnotationDependencies dependencies) { this.dependencies=dependencies; }
+    private final com.argument.integration.StructureEngine engine;
+    public SubmissionChecks(AnnotationDependencies dependencies,com.argument.integration.StructureEngine engine) { this.dependencies=dependencies;this.engine=engine; }
     public void check(ObjectNode draft,ObjectNode task,ObjectNode taskDocument,ObjectNode checkpoint,List<ObjectNode> elements,List<ObjectNode> relations,List<ObjectNode> participants,ObjectNode graph) {
         require("CONFIRMED".equals(checkpoint.path("status").asText()),"统一切割尚未确认");
+        var current=dependencies.find("checkpoint","taskDocumentId",draft.path("taskDocumentId").asText()).stream().filter(cp->"CONFIRMED".equals(cp.path("status").asText())).toList();
+        // Legacy explicit trial cases retain the immutable fixture checkpoint; their trial checkpoint is separate.
+        // Canonical S01 cases never use this compatibility path.
+        if(current.size()>1&&dependencies.find("segmentationSubmission","taskDocumentId",draft.path("taskDocumentId").asText()).isEmpty())current=current.stream().filter(cp->cp.hasNonNull("calculationId")).toList();
+        require(current.size()==1&&current.get(0).path("id").equals(checkpoint.path("id")),"必须引用当前唯一确认关口");
         require(checkpoint.path("agreementScore").asDouble()>0.8,"切割一致性未超过 80%");
         for(String field:List.of("taskDocumentId","documentTextVersionId","annotationScopeId"))
             require(draft.path(field).equals(checkpoint.path(field)),"草稿与切割关口基准不一致");
@@ -57,6 +63,8 @@ public class SubmissionChecks {
     }
     /** Shared structural guards; C remains responsible for full graph semantics and rendering. */
     public void checkRelationStructure(ObjectNode owner,String ownerType,JsonNode guideVersionId,List<ObjectNode> elements,List<ObjectNode> relations,List<ObjectNode> participants,ObjectNode graph) {
+        var semantics=engine.inspect(owner.path("id").asText(),elements,relations,participants);
+        require(semantics.issues().stream().noneMatch(i->"ERROR".equals(i.level())),"本快照关系未通过 C 的结构校验："+semantics.issues());
         Set<String> elementIds=ids(elements),relationIds=ids(relations);var propositionIds=new HashSet<String>();
         elements.stream().filter(e->e.path("isProposition").asBoolean()).forEach(e->propositionIds.add(e.path("id").asText()));
         var byRelation=new HashMap<String,ObjectNode>(); relations.forEach(r->byRelation.put(r.path("id").asText(),r));

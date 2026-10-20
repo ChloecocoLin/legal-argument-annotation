@@ -22,7 +22,7 @@ interface LocalTaskDocument {
   documentTextVersionId: string; annotationScopeId: string
 }
 export interface LocalContext {
-  fixture: true
+  fixture: boolean
   actorId: string
   actorName: string
   roles: string[]
@@ -31,7 +31,7 @@ export interface LocalContext {
   drafts: AnnotationDraft[]
 }
 export interface SubmissionPreview {
-  fixture: true
+  fixture: boolean
   draft: AnnotationDraft
   task: LocalTask
   taskDocument: LocalTaskDocument

@@ -74,8 +74,8 @@ public class LocalAdjudicationDependencies implements AdjudicationDependencies {
         for(var entry:selected.entrySet()){String id=entry.getKey();var targets=new ArrayList<String>();var ps=new ArrayList<JsonNode>();snapshots.forEach(s->s.path("participants").forEach(p->{if(id.equals(p.path("relationId").asText()))ps.add(p);}));
             require(!ps.isEmpty(),ErrorCode.INVALID_RELATION_MAPPING,"关系参与项缺失");var roles=new HashMap<String,Long>();ps.forEach(p->roles.merge(p.path("role").asText(),1L,Long::sum));
             String code=entry.getValue().path("relationCode").asText();require(Set.of("S","A","J","M","I").contains(code),ErrorCode.INVALID_RELATION_MAPPING,"未知关系类型");
-            if(Set.of("S","A","I").contains(code))require(ps.size()==2 && roles.getOrDefault("SOURCE",0L)==1 && roles.getOrDefault("TARGET",0L)==1,ErrorCode.INVALID_RELATION_MAPPING,"有向关系参与项不完整");
-            else require(ps.size()>=2 && roles.getOrDefault("MEMBER",0L)==ps.size(),ErrorCode.INVALID_RELATION_MAPPING,"J/M 成员结构无效");
+            if(Set.of("S","A","M").contains(code))require(ps.size()==2 && roles.getOrDefault("SOURCE",0L)==1 && roles.getOrDefault("TARGET",0L)==1,ErrorCode.INVALID_RELATION_MAPPING,"有向关系参与项不完整");
+            else require(ps.size()>=2 && roles.getOrDefault("MEMBER",0L)==ps.size(),ErrorCode.INVALID_RELATION_MAPPING,"J/I 成员结构无效");
             for(var p:ps){String target=p.path("targetId").asText();if("ELEMENT".equals(p.path("targetKind").asText()))require(mapping.has(target),ErrorCode.INVALID_RELATION_MAPPING,"端点命题被删除、转为非命题或未映射");else {require(!dropped.contains(target),ErrorCode.INVALID_RELATION_MAPPING,"内层关系已删除，需先处理外层引用");String canonical=aliases.getOrDefault(target,target);require(all.containsKey(target),ErrorCode.INVALID_RELATION_MAPPING,"嵌套关系不存在");targets.add(canonical);}}
             edges.put(id,targets);
         }
