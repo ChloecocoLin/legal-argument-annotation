@@ -1,7 +1,14 @@
+import { useUserStore } from '@/stores/user'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 // 成员B负责的页面路由。其余成员页面在联调阶段接入。
 const routes: RouteRecordRaw[] = [
+  {path:'/login',component:()=>import('@/features/auth/LoginView.vue'),meta:{title:'登录工作台',public:true}},
+  {path:'/documents',component:()=>import('@/features/document/DocumentLibrary.vue'),meta:{title:'文书总库'}},
+  {path:'/documents/:documentId',component:()=>import('@/features/document/DocumentDetail.vue'),meta:{title:'文书详情'}},
+  {path:'/tasks/create',component:()=>import('@/features/task/TaskCreate.vue'),meta:{title:'创建任务'}},
+  {path:'/tasks/:taskId/assign',component:()=>import('@/features/task/TaskAssign.vue'),meta:{title:'任务分配'}},
+  {path:'/tasks/:taskId/progress',component:()=>import('@/features/versions/TaskProgress.vue'),meta:{title:'版本进度'}},
   { path: '/results', component: () => import('@/features/results/ResultLibrary.vue'), meta: {title:'已入库成果'} },
   { path: '/segmentation', component: () => import('@/features/segmentation/SegmentationTrial.vue'), meta: {title:'独立切割与统一关口'} },
   { path: '/audit', name: 'audit-events', component: () => import('@/features/audit/AuditEvents.vue'), meta: { title: '入库与审计记录' } },
@@ -10,8 +17,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/export-records', name: 'export-records', component: () => import('@/features/export/ExportRecords.vue'), meta: { title: '导出记录' } },
   { path: '/final-review', name: 'final-review-entry', component: () => import('@/features/final-review/FinalReview.vue'), meta: { title: '最终版本审查' } },
   { path: '/final-review/:finalVersionId', name: 'final-review', component: () => import('@/features/final-review/FinalReview.vue'), meta: { title: '最终版本审查' } },
-  { path: '/tasks', name: 'task-progress', component: () => import('@/features/versions/TaskProgress.vue'), meta: { title: '任务进度' } },
-  { path: '/tasks/:taskId', name: 'task-detail', component: () => import('@/features/versions/TaskProgress.vue'), meta: { title: '任务详情' } },
+  { path: '/tasks', name: 'task-list', component: () => import('@/features/task/TaskList.vue'), meta: { title: '任务进度' } },
+  { path: '/tasks/:taskId', name: 'task-detail', component: () => import('@/features/task/TaskDetail.vue'), meta: { title: '任务详情' } },
   { path: '/tasks/:taskId/cases/:caseId/versions', name: 'annotation-versions', component: () => import('@/features/versions/VersionList.vue'), meta: { title: '标注版本' } },
   { path: '/versions/:versionId', name: 'annotation-version', component: () => import('@/features/versions/VersionDetail.vue'), meta: { title: '完整标注版本' } },
   { path: '/annotations/:draftId/submit', name: 'annotation-submit', component: () => import('@/features/versions/SubmitAnnotation.vue'), meta: { title: '提交标注' } },
@@ -64,6 +71,12 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach(async to => {
+  if(to.meta.public) return true
+  const user=useUserStore()
+  if(!user.token || !await user.loadMe()) return {path:'/login',query:{redirect:to.fullPath}}
+  return true
+})
 router.afterEach((to) => {
   const title = (to.meta.title as string) || ''
   document.title = title ? `${title} · 法律论证标注系统` : '法律论证标注系统'

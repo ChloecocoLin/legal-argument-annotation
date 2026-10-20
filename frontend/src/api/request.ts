@@ -83,6 +83,7 @@ instance.interceptors.response.use(
     if (isEnvelope(body) && !body.success) {
       const code = body.error?.code
       if (code === 'UNAUTHENTICATED' || error.response.status === 401) {
+        if(!error.config?.url?.endsWith('/auth/login')) { localStorage.removeItem('token'); if(location.pathname !== '/login') location.assign('/login?redirect='+encodeURIComponent(location.pathname+location.search)) }
         ElMessage.error('登录已过期，请重新登录')
       } else if (code === 'FORBIDDEN' || error.response.status === 403) {
         ElMessage.error('没有操作权限')

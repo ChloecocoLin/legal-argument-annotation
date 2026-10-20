@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public class ExportTrialRepository {
     private final JdbcTemplate jdbc;private final ObjectMapper mapper;
     public ExportTrialRepository(JdbcTemplate jdbc,ObjectMapper mapper){this.jdbc=jdbc;this.mapper=mapper;}
-    public void lockActor(String actor){jdbc.queryForObject("SELECT payload_json FROM local_annotation_dependencies WHERE object_kind='user' AND object_id=? FOR UPDATE",String.class,actor);}
+    public void lockActor(String actor){jdbc.queryForObject("SELECT payload_json FROM workflow_records WHERE object_kind='user' AND object_id=? FOR UPDATE",String.class,actor);}
     public ObjectNode export(String id,boolean lock){return one("SELECT payload_json FROM trial_exports WHERE id=?"+(lock?" FOR UPDATE":""),id);}
     public List<ObjectNode> exports(){return many("SELECT payload_json FROM trial_exports ORDER BY id");}
     public void insertExport(ObjectNode n,ObjectNode input){jdbc.update("INSERT INTO trial_exports(id,status,payload_json,input_json) VALUES (?,?,?,?)",n.path("id").asText(),n.path("status").asText(),n.toString(),input.toString());}

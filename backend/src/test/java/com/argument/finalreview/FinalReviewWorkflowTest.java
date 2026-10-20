@@ -31,7 +31,7 @@ class FinalReviewWorkflowTest {
     @SpyBean FinalReviewRepository store;@SpyBean LocalFinalReviewDependencies deps;
     @BeforeEach void resetFixture() throws Exception {reset(store,deps);clean();loader.run(null);}
     @AfterEach void cleanup() {reset(store,deps);clean();}
-    void clean() {for(String table:List.of("final_review_transitions","final_annotation_versions","adjudication_transitions","adjudication_returned_versions","adjudication_decisions","adjudication_items","adjudication_sessions","annotation_mutation_receipts","annotation_version_snapshots","annotation_versions","annotation_case_counters","local_annotation_dependencies"))jdbc.update("DELETE FROM "+table);}
+    void clean() {for(String table:List.of("final_review_transitions","final_annotation_versions","adjudication_transitions","adjudication_returned_versions","adjudication_decisions","adjudication_items","adjudication_sessions","annotation_mutation_receipts","snapshot_object_owners","annotation_version_snapshots","annotation_versions","annotation_case_counters","workflow_records"))jdbc.update("DELETE FROM "+table);}
     com.argument.version.port.VersionIdentity.Actor arbiter() {return identity.authenticate("Bearer dev-arbiter-zhao");}
     ObjectNode json(String s) throws Exception {return mapper.readValue(s,ObjectNode.class);}
     ObjectNode request(String path,ObjectNode body,String key,int rv) throws Exception {return mapper.readValue(mvc.perform(post(path).header("Authorization","Bearer dev-arbiter-zhao").header("Idempotency-Key",key).header("If-Match",rv).contentType("application/json").content(body.toString())).andReturn().getResponse().getContentAsString(),ObjectNode.class);}

@@ -1,0 +1,193 @@
+{
+  "T02": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "guideVersionId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "taskType": {
+        "type": "string",
+        "enum": [
+          "TRAINING",
+          "PILOT",
+          "FORMAL_RESEARCH"
+        ]
+      },
+      "defaultRequiredAnnotators": {
+        "type": "integer"
+      },
+      "autoPreannotationEnabled": {
+        "type": "boolean"
+      },
+      "expertConfirmationRequired": {
+        "type": "boolean"
+      },
+      "adjudicationReasonRequired": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "guideVersionId",
+      "taskType",
+      "defaultRequiredAnnotators",
+      "autoPreannotationEnabled",
+      "expertConfirmationRequired",
+      "adjudicationReasonRequired"
+    ],
+    "additionalProperties": false
+  },
+  "T04": {
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string"
+      },
+      "dueAt": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "description",
+      "dueAt"
+    ],
+    "additionalProperties": false
+  },
+  "T05": {
+    "type": "object",
+    "properties": {
+      "documentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "documentTextVersionId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "annotationScopeId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requiredAnnotators": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "documentId",
+      "documentTextVersionId",
+      "annotationScopeId",
+      "requiredAnnotators"
+    ],
+    "additionalProperties": false
+  },
+  "T07": {
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "memberRole": {
+        "type": "string",
+        "enum": [
+          "OWNER",
+          "ANNOTATOR",
+          "ARBITER",
+          "EXPERT"
+        ]
+      }
+    },
+    "required": [
+      "userId",
+      "memberRole"
+    ],
+    "additionalProperties": false
+  },
+  "T08": {
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "reason"
+    ],
+    "additionalProperties": false
+  },
+  "T10": {
+    "type": "object",
+    "properties": {
+      "annotatorMemberIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "arbiterMemberId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "annotatorMemberIds",
+      "arbiterMemberId"
+    ],
+    "additionalProperties": false
+  },
+  "T11": {
+    "type": "object",
+    "properties": {
+      "assignmentMode": {
+        "type": "string",
+        "enum": [
+          "AUTO",
+          "MANUAL"
+        ]
+      }
+    },
+    "required": [
+      "assignmentMode"
+    ],
+    "additionalProperties": false
+  },
+  "T12": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "PUBLISH",
+          "START"
+        ]
+      }
+    },
+    "required": [
+      "action"
+    ],
+    "additionalProperties": false
+  },
+  "T14": {
+    "type": "object",
+    "properties": {
+      "sourceFinalVersionId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "sourceFinalVersionId",
+      "name"
+    ],
+    "additionalProperties": false
+  }
+}

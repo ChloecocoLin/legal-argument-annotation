@@ -31,7 +31,7 @@ class AdjudicationWorkflowTest {
     @SpyBean LocalAdjudicationDependencies deps;
     @BeforeEach void resetFixture() throws Exception { reset(deps);clean();loader.run(null); }
     @AfterEach void cleanup() { clean(); }
-    void clean() { for(String table:List.of("adjudication_transitions","adjudication_returned_versions","adjudication_decisions","adjudication_items","adjudication_sessions","annotation_mutation_receipts","annotation_version_snapshots","annotation_versions","annotation_case_counters","local_annotation_dependencies"))jdbc.update("DELETE FROM "+table); }
+    void clean() { for(String table:List.of("adjudication_transitions","adjudication_returned_versions","adjudication_decisions","adjudication_items","adjudication_sessions","annotation_mutation_receipts","snapshot_object_owners","annotation_version_snapshots","annotation_versions","annotation_case_counters","workflow_records"))jdbc.update("DELETE FROM "+table); }
     ObjectNode body(String json) throws Exception { return mapper.readValue(json,ObjectNode.class); }
     ObjectNode command(String token,String path,ObjectNode body,String key,int expected) throws Exception {
         var result=mvc.perform(post(path).header("Authorization","Bearer "+token).header("Idempotency-Key",key).header("If-Match",expected).contentType("application/json").content(body.toString())).andReturn();
@@ -111,7 +111,7 @@ class AdjudicationWorkflowTest {
     @Test void simultaneousSessionCreationReturnsOneFixedSession() throws Exception {
         var b=source(submitBoth());var pool=Executors.newFixedThreadPool(2);try { var a=pool.submit(()->service.create(identity.authenticate("Bearer dev-arbiter-zhao"),CASE,VersionJson.uuid(),b));var c=pool.submit(()->service.create(identity.authenticate("Bearer dev-arbiter-zhao"),CASE,VersionJson.uuid(),b));assertThat(a.get(10,TimeUnit.SECONDS).path("id")).isEqualTo(c.get(10,TimeUnit.SECONDS).path("id"));assertThat(store.sessions(CASE)).hasSize(1); }finally{pool.shutdownNow();}
     }
-    void localRecord(String kind,ObjectNode n) { jdbc.update("INSERT INTO local_annotation_dependencies(object_kind,object_id,payload_json) VALUES (?,?,?)",kind,n.path("id").asText(),n.toString()); }
+    void localRecord(String kind,ObjectNode n) { jdbc.update("INSERT INTO workflow_records(object_kind,object_id,payload_json) VALUES (?,?,?)",kind,n.path("id").asText(),n.toString()); }
     @Test void threeIndependentSourcesHaveSeparateIdsAndSharedAgreementGroup() {
         var vs=new ArrayList<>(submitBoth());var snapshot=versionStore.snapshot(vs.get(0).path("id").asText()).deepCopy();var v=(ObjectNode)snapshot.get("version");
         var assignment=data.read("assignment",v.path("assignmentId").asText()).deepCopy();var member=data.read("member",assignment.path("taskMemberId").asText()).deepCopy();String userId=VersionJson.uuid();

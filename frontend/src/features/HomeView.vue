@@ -2,7 +2,7 @@
   <div class="home">
     <el-card>
       <h2 style="margin: 0 0 6px">法律论证标注系统</h2>
-      <p class="muted">成员B 负责页面入口（M0 骨架）。</p>
+      <p class="muted">按已授权角色进入任务与标注流程。</p>
       <el-divider />
       <el-row :gutter="16">
         <el-col v-for="item in items" :key="item.path" :span="8">
@@ -19,14 +19,20 @@
 </template>
 
 <script setup lang="ts">
-const items = [
-  { path: '/tasks', title: '任务进度与版本', sub: '查看 X/N、完整提交与撤回' },
-  { path: '/guide', title: '标注指南管理', sub: '指南库 G 系列' },
-  { path: '/adjudication/conflict', title: '冲突解决', sub: '命题裁定 J 系列' },
-  { path: '/adjudication/annotate', title: '裁定者标注', sub: '补页' },
-  { path: '/expert', title: '专家复核工作台', sub: 'X 系列' },
-  { path: '/expert/issues', title: '疑难问题说明文档', sub: 'X 系列' }
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
+const user = useUserStore()
+const entries = [
+  { path: '/tasks', title: '标注任务', sub: '查看任务、案例及提交进度', roles: ['admin','creator','annotator','arbiter'] },
+  { path: '/tasks/create', title: '创建任务', sub: '选择指南、添加文书与分配人员', roles: ['creator'] },
+  { path: '/documents', title: '文书总库', sub: '浏览裁判文书与规范化原文', roles: ['admin','creator','annotator','arbiter'] },
+  { path: '/guide', title: '标注指南', sub: '查阅指南版本与标签定义', roles: ['admin','creator','annotator','arbiter','expert','teacher','student'] },
+  { path: '/adjudication/conflict', title: '冲突解决', sub: '比较完整版本并裁定命题与关系', roles: ['arbiter'] },
+  { path: '/final-review', title: '最终版本审查', sub: '检查最终标注与图验证结果', roles: ['arbiter'] },
+  { path: '/expert', title: '专家复核', sub: '查看指派的疑难问题', roles: ['expert'] }
 ]
+const items = computed(() => entries.filter(item => user.roles.some(role => item.roles.includes(role))))
+
 </script>
 
 <style scoped>

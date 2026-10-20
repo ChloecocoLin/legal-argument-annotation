@@ -147,3 +147,8 @@ M01–M04 管理持久化状态、模型版本与执行适配；核对 B 是否�
 本文件属于静态浏览后的执行规划，不是其他分支的全量代码审计，也没有运行它们的测试。计划中的“已有能力”表示读到实现，不能替代接入后的授权、并发、数据迁移和原型联合验收。
 
 可复核位置：A `WorkflowStore`、`SegmentationController`、`TaskService.reannotate`；B `CustomAnnotationServiceImpl`、`CurrentUserProvider`、`ExpertAssignmentService`、`ExpertReviewCommandService`；C `PropositionSource`、`PropositionMappingSource`、`MockPropositionMapping`、`ArgumentGraphServiceImpl`、`GraphExportButtons.vue`、`TeachingScorer`。精确分支、路径、摘要和 SHA 见同目录 JSON 核查清单。
+
+
+## 执行记录（2026-10-20）
+
+第一批基础接入已形成可运行修改，具体来源、迁移、页面、验收与尚未接入的模块见 [12-shared-foundation-handoff.md](12-shared-foundation-handoff.md)。下一执行批次仍为第 2 批真实切割/本人草稿/提交闭环；不将 B/C 全模块合并、正式图验证或后续批次标记为完成。

@@ -54,6 +54,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatus()).body(body);
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> accessDenied(Exception ex) { return ResponseEntity.status(403).body(ApiResponse.fail(ErrorCode.FORBIDDEN,"没有操作权限")); }
+
+    @ExceptionHandler(org.springframework.web.bind.ServletRequestBindingException.class)
+    public ResponseEntity<ApiResponse<Object>> missingBinding(Exception ex) { return ResponseEntity.badRequest().body(ApiResponse.fail(ErrorCode.VALIDATION_ERROR,"缺少必要的请求头或参数")); }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneric(Exception ex) {
         log.error("未处理异常", ex);

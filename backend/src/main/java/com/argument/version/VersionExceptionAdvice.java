@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(basePackages={"com.argument.version","com.argument.adjudication","com.argument.finalreview","com.argument.committrial","com.argument.exporttrial","com.argument.segmentationtrial","com.argument.correctiontrial","com.argument.resulttrial"})
+@RestControllerAdvice(basePackages={"com.argument.version","com.argument.adjudication","com.argument.finalreview","com.argument.committrial","com.argument.exporttrial","com.argument.segmentationtrial","com.argument.correctiontrial","com.argument.resulttrial","com.argument.membera","com.argument.auth"})
 public class VersionExceptionAdvice {
     @ExceptionHandler(VersionFailure.class)
     public ResponseEntity<Map<String,Object>> conflict(VersionFailure ex) {

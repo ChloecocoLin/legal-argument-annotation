@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 withDefaults(defineProps<{ description?: string }>(), { description: '统一切割及 A/B/C 草稿使用预置场景，正式提交保存到数据库' })
-const enabled = import.meta.env.DEV
+const enabled = import.meta.env.DEV && (localStorage.getItem('token') || '').startsWith('dev-')
 const token = ref(localStorage.getItem('token') || '')
 const choices = [
   ['dev-annotator-chen', '陈晓 · 标注员'], ['dev-annotator-liu', '刘一鸣 · 标注员'],

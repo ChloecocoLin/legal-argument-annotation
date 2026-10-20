@@ -1,5 +1,6 @@
 <template>
-  <AppLayout>
+  <router-view v-if="$route.meta.public" />
+  <AppLayout v-else>
     <router-view />
   </AppLayout>
 </template>

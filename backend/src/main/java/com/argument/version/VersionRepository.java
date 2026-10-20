@@ -43,6 +43,7 @@ public class VersionRepository {
             v.path("id").asText(),v.path("taskDocumentId").asText(),v.path("assignmentId").asText(),v.path("sourceDraftId").asText(),v.path("versionNumber").asInt(),v.path("status").asText(),1,
             Timestamp.from(Instant.parse(time)),v.path("createdById").asText(),Timestamp.from(Instant.parse(time)),v.path("updatedById").asText());
         jdbc.update("INSERT INTO annotation_version_snapshots(version_id,snapshot_json) VALUES (?,?)",v.path("id").asText(),snapshot.toString());
+        com.argument.integration.SnapshotObjectOwners.index(jdbc,snapshot,"ANNOTATION_VERSION");
     }
     public void withdraw(ObjectNode version,String actor,String time) {
         int changed=jdbc.update("UPDATE annotation_versions SET status='WITHDRAWN',record_version=record_version+1,updated_at=?,updated_by_id=? WHERE id=? AND record_version=? AND status='SUBMITTED'",

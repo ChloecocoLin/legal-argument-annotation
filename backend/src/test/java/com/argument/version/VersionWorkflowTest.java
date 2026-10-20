@@ -34,7 +34,7 @@ class VersionWorkflowTest {
     @SpyBean LocalAnnotationDependencies dependencies;
     @BeforeEach void resetFixture() throws Exception {
         reset(dependencies);
-        for(String table:List.of("annotation_mutation_receipts","annotation_version_snapshots","annotation_versions","annotation_case_counters","local_annotation_dependencies"))jdbc.update("DELETE FROM "+table);
+        for(String table:List.of("annotation_mutation_receipts","snapshot_object_owners","annotation_version_snapshots","annotation_versions","annotation_case_counters","workflow_records"))jdbc.update("DELETE FROM "+table);
         loader.run(null);
     }
     ObjectNode response(String token,String path) throws Exception {
@@ -136,9 +136,9 @@ class VersionWorkflowTest {
     @Test void adjudicationReferenceAndTaskLockBlockWithdrawal() throws Exception {
         var v=submit(CHEN,DRAFT,VersionJson.uuid(),1).path("data");String id=v.path("id").asText();
         var session=mapper.createObjectNode().put("id",VersionJson.uuid());session.putArray("sourceVersionIds").add(id);
-        jdbc.update("INSERT INTO local_annotation_dependencies VALUES ('session',?,?)",session.path("id").asText(),session.toString());
+        jdbc.update("INSERT INTO workflow_records VALUES ('session',?,?)",session.path("id").asText(),session.toString());
         assertThat(withdraw(id,VersionJson.uuid(),1,"重标").path("error").path("code").asText()).isEqualTo("ALREADY_IN_ADJUDICATION");
-        jdbc.update("DELETE FROM local_annotation_dependencies WHERE object_kind='session'");var t=dependencies.read("task",TASK);t.put("status","COMPLETED");dependencies.replace("task",t);
+        jdbc.update("DELETE FROM workflow_records WHERE object_kind='session'");var t=dependencies.read("task",TASK);t.put("status","COMPLETED");dependencies.replace("task",t);
         assertThat(withdraw(id,VersionJson.uuid(),1,"重标").path("error").path("code").asText()).isEqualTo("LOCKED_RESOURCE");
     }
     @Test void caseLockAssignsUniqueConsecutiveNumbersForConcurrentSubmit() throws Exception {

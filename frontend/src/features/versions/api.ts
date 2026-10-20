@@ -32,7 +32,7 @@ export function errorCode(error: unknown): string | undefined {
   return (error as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code
 }
 export const formatTime = (value: string) => new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
-export const statusName = (status: string) => ({ SUBMITTED: '已提交', WITHDRAWN: '已撤回', UNDER_ADJUDICATION: '裁定中', ADJUDICATED: '已裁定', ACTIVE: '草稿', IN_PROGRESS: '标注中', COMPLETED: '已完成', ANNOTATING: '标注中', DRAFT: '待发布' }[status] || status)
+export const statusName = (status: string) => ({ SUBMITTED: '已提交', WITHDRAWN: '已撤回', UNDER_ADJUDICATION: '裁定中', ADJUDICATED: '已裁定', ACTIVE: '草稿', IN_PROGRESS: '标注中', COMPLETED: '已完成', ANNOTATING: '标注中', DRAFT: '待发布', ASSIGNING: '待分配', PENDING_ASSIGNMENT: '待分配', SEGMENTING: '独立切割中', READY_FOR_ADJUDICATION: '待裁定' }[status] || status)
 
 /** One logical action keeps its key/body/version across network retries. Refresh starts a new action. */
 export function mutationAttempt<T>() {

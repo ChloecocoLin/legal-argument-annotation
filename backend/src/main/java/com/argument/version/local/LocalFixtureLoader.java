@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Component @org.springframework.core.annotation.Order(10)
 @Profile("(local | test) & !prod")
 public class LocalFixtureLoader implements ApplicationRunner {
     private final JdbcTemplate jdbc;
@@ -19,10 +19,10 @@ public class LocalFixtureLoader implements ApplicationRunner {
     @Override @Transactional
     public void run(ApplicationArguments args) throws Exception {
         // A persistent local database is never reset by starting the application.
-        if(jdbc.queryForObject("SELECT COUNT(*) FROM local_annotation_dependencies",Integer.class)>0)return;
+        if(jdbc.queryForObject("SELECT COUNT(*) FROM workflow_records",Integer.class)>0)return;
         try(InputStream input=new ClassPathResource("fixtures/member-d-ready-submission.json").getInputStream()) {
             var fixture=mapper.readTree(input);
-            for(var entry:fixture.path("records"))jdbc.update("INSERT INTO local_annotation_dependencies(object_kind,object_id,payload_json) VALUES (?,?,?)",entry.path("kind").asText(),entry.path("value").path("id").asText(),entry.path("value").toString());
+            for(var entry:fixture.path("records"))jdbc.update("INSERT INTO workflow_records(object_kind,object_id,payload_json) VALUES (?,?,?)",entry.path("kind").asText(),entry.path("value").path("id").asText(),entry.path("value").toString());
         }
     }
 }

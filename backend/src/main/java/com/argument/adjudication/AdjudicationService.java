@@ -128,7 +128,7 @@ public class AdjudicationService {
         String action=body.path("action").asText(),reason=body.path("reason").asText();
         require(Set.of("ADOPT_VERSION","CUSTOM","DELETE","CONFIRM_AGREEMENT").contains(action),ErrorCode.VALIDATION_ERROR,"退回使用 J11，专家指派使用 J12");
         var doc=data.read("taskDocument",s.path("taskDocumentId").asText());var task=data.read("task",doc.path("taskId").asText());
-        require(!reason.isBlank() || Set.of("ADOPT_VERSION","CONFIRM_AGREEMENT").contains(action) && !task.path("requireAdjudicationReason").asBoolean(),ErrorCode.VALIDATION_ERROR,"此操作必须填写理由");
+        require(!reason.isBlank() || Set.of("ADOPT_VERSION","CONFIRM_AGREEMENT").contains(action) && !task.path("adjudicationReasonRequired").asBoolean(task.path("requireAdjudicationReason").asBoolean()),ErrorCode.VALIDATION_ERROR,"此操作必须填写理由");
         require(!"AGREEMENT".equals(i.path("conflictType").asText()) || "CONFIRM_AGREEMENT".equals(action),ErrorCode.VALIDATION_ERROR,"一致项需人工确认一致");
         require(!"CONFIRM_AGREEMENT".equals(action) || "AGREEMENT".equals(i.path("conflictType").asText()),ErrorCode.VALIDATION_ERROR,"存在分歧的项目不能确认一致");
         var d=mapper.createObjectNode();String now=VersionJson.now();VersionJson.stamp(d,actor.id(),now);d.put("sessionId",s.path("id").asText());d.put("itemId",itemId);d.put("itemKind",kind);d.put("action",action);d.put("reason",reason);d.put("decidedById",actor.id());d.put("decidedAt",now);d.putNull("sourceVersionId");d.putNull("sourceObjectId");d.putNull("customAnnotationId");

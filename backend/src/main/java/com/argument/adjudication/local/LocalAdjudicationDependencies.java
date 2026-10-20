@@ -47,7 +47,7 @@ public class LocalAdjudicationDependencies implements AdjudicationDependencies {
             if(chosen.path("isProposition").asBoolean()){String unified=VersionJson.uuid();for(var id:candidates)ids.put(id.asText(),unified);}
         }
         require(covered.equals(elements.keySet()),ErrorCode.UNDECIDED_PROPOSITIONS,"未覆盖全部命题与非命题");
-        jdbc.update("INSERT INTO local_annotation_dependencies(object_kind,object_id,payload_json) VALUES ('adjudicationMapping',?,?)",session.path("id").asText(),mapping.toString());
+        jdbc.update("INSERT INTO workflow_records(object_kind,object_id,payload_json) VALUES ('adjudicationMapping',?,?)",session.path("id").asText(),mapping.toString());
     }
     public List<ObjectNode> compareRelations(ObjectNode session,List<ObjectNode> snapshots) {
         var mapping=data.read("adjudicationMapping",session.path("id").asText()).path("elementMap");var relations=objects(snapshots,"relations");var groups=new TreeMap<String,List<ObjectNode>>();

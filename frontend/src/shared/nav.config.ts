@@ -1,5 +1,5 @@
 // 侧边导航。path 为空表示该模块由其他成员负责、当前未接入。
-// 固定以 admin 角色视角展示（M1）。
+// AppLayout 按当前账号角色过滤可见入口，服务端独立执行对象授权。
 export interface NavItem {
   id: string
   label: string
@@ -23,14 +23,14 @@ export const NAV: NavGroup[] = [
       { id: 'research-results', label: '已入库成果', icon: 'archive', path: '/results' },
       { id: 'audit-events', label: '入库与审计', icon: 'archive', path: '/audit' },
       { id: 'guide-management', label: '指南管理', icon: 'book', path: '/guide' },
-      { id: 'document-library', label: '文书总库', icon: 'doc' }
+      { id: 'document-library', label: '文书总库', icon: 'doc', path: '/documents' }
     ]
   },
   {
     group: '标注任务',
     items: [
-      { id: 'task-list', label: '任务进度', icon: 'list', path: '/tasks' },
-      { id: 'task-create', label: '创建任务', icon: 'plus' },
+      { id: 'task-list', label: '任务列表', icon: 'list', path: '/tasks' },
+      { id: 'task-create', label: '创建任务', icon: 'plus', path: '/tasks/create' },
       { id: 'task-assign', label: '任务分配', icon: 'share' }
     ]
   },
