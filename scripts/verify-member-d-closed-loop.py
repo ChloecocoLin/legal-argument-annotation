@@ -71,6 +71,10 @@ try:
     query = request('/adjudication-sessions/' + args.session_id + '/proposition-items', token, operation='J03')
     for item in query['items']:
         request('/adjudication-sessions/' + args.session_id + '/custom-context?itemKind=PROPOSITION&itemId=' + item['item']['id'], token, operation='J09')
+    relation_query = request('/adjudication-sessions/' + args.session_id + '/relation-items', token, operation='J06')
+    for row in relation_query['items']:
+        item = row.get('item', row)
+        request('/adjudication-sessions/' + args.session_id + '/custom-context?itemKind=RELATION&itemId=' + item['id'], token, operation='J09')
     expert = tokens['expert.qian']
     summaries = request('/expert-reviews?size=100', expert, operation='X01')['items']
     relevant = [row for row in summaries if row['review']['sessionId'] == args.session_id]

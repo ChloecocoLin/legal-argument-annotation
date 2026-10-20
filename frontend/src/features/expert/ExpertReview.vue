@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formula } from '@/features/versions/formula'
 import { computed, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { post } from '@/api/request'
@@ -220,7 +221,7 @@ onMounted(loadList)
                   style="margin-bottom: 8px"
                 >
                   <div class="card-body tight">
-                    <div class="section-label">源版本 {{ g.displayCode }}</div>
+                    <div class="section-label">源版本 {{ g.displayCode }}</div><p v-for="r in g.relations" :key="r.id" class="mono t-sm">{{ formula(r,g.elements,g.relations,g.participants) }}</p>
                     <p v-for="(t, i) in g.elements.map(e=>e.text)" :key="i" class="t-sm" style="margin: 4px 0 0">{{ t }}</p>
                   </div>
                 </div>

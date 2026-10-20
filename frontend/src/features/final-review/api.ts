@@ -11,7 +11,7 @@ export interface FinalVersion {
 export interface Provenance { resultKind: 'ELEMENT' | 'RELATION' | 'EXCLUDED_ELEMENT' | 'EXCLUDED_RELATION'; resultId: string | null; sourceVersionIds: string[]; sourceObjectIds: string[]; decisionId: string | null; expertIssueId: string | null }
 export interface FinalSnapshot { version: FinalVersion; elements: Element[]; relations: Relation[]; participants: RelationParticipant[]; graph: { id: string; elementIds: string[]; relationIds: string[]; status: string } }
 export interface FinalWorkspace {
-  fixture?: boolean; snapshot: FinalSnapshot; session: AdjudicationSession
+  graphView: import('@/types/graph').GraphView; fixture?: boolean; snapshot: FinalSnapshot; session: AdjudicationSession
   quality: { checks: { code: string; message: string; passed: boolean }[]; issues: { code: string; message: string; blocking: boolean }[]; healthy: boolean; formalReady: boolean; mode: string; canSubmit: boolean; canApprove: boolean }
   document: { id: string; title: string; caseNumber?: string }; guideVersion: GuideVersion
   summary: { propositions: number; relations: number; expertReviews: number; excluded: number }

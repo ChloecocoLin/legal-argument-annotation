@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 public class AdjudicationController {
-    private final AdjudicationService service;
+    private final ReviewWorkflowService reviews;private final AdjudicationService service;
     private final VersionIdentity identity;
-    public AdjudicationController(AdjudicationService service,VersionIdentity identity) { this.service=service;this.identity=identity; }
+    public AdjudicationController(AdjudicationService service,VersionIdentity identity,ReviewWorkflowService reviews) { this.reviews=reviews;this.service=service;this.identity=identity; }
     @GetMapping("/task-documents/{caseId}/annotation-diff")
     public ApiResponse<ObjectNode> diff(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String caseId,@RequestParam Map<String,String> query) {
         var actor=identity.authenticate(auth);only(query.keySet(),Set.of("phase"));return ApiResponse.ok(service.diff(actor,caseId,query.get("phase")));
@@ -27,6 +27,10 @@ public class AdjudicationController {
     @PostMapping("/adjudication-sessions/{id}/propositions/complete")
     public ApiResponse<ObjectNode> propositions(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false) String key,@RequestHeader(value="If-Match",required=false) String match,@RequestBody ObjectNode body) {
         var actor=identity.authenticate(auth);confirmation(body);return ApiResponse.ok(service.complete(actor,id,key,integer(match),body,"PROPOSITION"));
+    }
+    @GetMapping("/adjudication-sessions/{id}/relation-items")
+    public ApiResponse<com.fasterxml.jackson.databind.JsonNode> relationItems(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestParam Map<String,String> query){
+        var actor=identity.authenticate(auth);only(query.keySet(),Set.of("status","conflictType","page","size"));int page=query.containsKey("page")?integer(query.get("page")):1,size=query.containsKey("size")?integer(query.get("size")):20;var result=reviews.relations(actor,id,query.get("status"),query.get("conflictType"),page,size);return ApiResponse.ok(result.get("data"),new com.argument.common.response.PageMeta(page,size,result.path("total").asLong()));
     }
     @PostMapping("/adjudication-sessions/{id}/relations/complete")
     public ApiResponse<ObjectNode> relations(@RequestHeader(value="Authorization",required=false) String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false) String key,@RequestHeader(value="If-Match",required=false) String match,@RequestBody ObjectNode body) {
