@@ -105,7 +105,7 @@ export function submitSegmentation(taskDocumentId: string, body: Record<string, 
 }
 
 export function listSegmentations(taskDocumentId: string) {
-  return getPage<{ attemptNumber: number; status: string; reviewedAt: string }>(
+  return getPage<{ attemptNumber: number; status: string; reviewedAt: string | null }>(
     `/task-documents/${taskDocumentId}/segmentation-submissions`
   )
 }

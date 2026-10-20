@@ -23,6 +23,7 @@
       <el-table-column prop="submittedCount" label="已收到 X" width="120" />
       <el-table-column prop="requiredAnnotators" label="需要 N" width="120" />
       <el-table-column label="状态" width="160"><template #default="{ row }">{{ statusName(row.status) }}</template></el-table-column>
+      <el-table-column v-if="user.roles.some(role=>['annotator','arbiter'].includes(role))" label="操作" width="140"><template #default="{ row }"><el-button link type="primary" @click="$router.push(`/tasks/${taskId}/cases/${row.taskDocumentId}/segmentation`)">独立切割</el-button></template></el-table-column>
     </el-table>
     <div style="margin-top: 16px">
       <el-button v-if="canManage" @click="$router.push(`/tasks/${taskId}/assign`)">去分配</el-button>

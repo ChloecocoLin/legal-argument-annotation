@@ -18,7 +18,7 @@ const navigation = computed(() => {
     'admin-home':['admin'], 'research-results':['admin','creator','arbiter'],
     'audit-events':['admin','creator','arbiter'], 'guide-management':['admin','creator','annotator','arbiter','teacher','student','expert'],
     'document-library':['admin','creator','annotator','arbiter'], 'task-list':['admin','creator','annotator','arbiter'],
-    'task-create':['creator'], 'task-assign':['creator'], 'segmentation':['creator','annotator','arbiter'],
+    'task-create':['creator'], 'task-assign':['creator'], 'segmentation':['annotator','arbiter'],
     'conflict-resolve':['arbiter'], 'final-review':['arbiter'], 'expert-review':['expert','arbiter'],
     'expert-issues':['expert','arbiter'], 'auto-annotate':['creator','arbiter'],
     'export':['creator','arbiter'], 'export-records':['creator','arbiter']
@@ -48,6 +48,7 @@ const here = computed(() => {
   if (route.path === '/documents') return '文书总库'
   if (route.path === '/tasks/create') return '创建任务'
   if (route.path.endsWith('/assign')) return '任务分配'
+  if (route.path.endsWith('/segmentation')) return '独立切割与统一关口'
   if (route.path.startsWith('/tasks/')) return route.path.endsWith('/versions') ? '标注版本' : '任务详情'
   if (route.path === '/tasks') return '任务列表'
   if (route.path.startsWith('/guide/')) return '版本详情'
@@ -59,6 +60,8 @@ async function logout() { await user.logout(); await router.replace('/login') }
 function isActive(path?: string): boolean {
   if (!path) return false
   if (path === '/') return route.path === '/'
+  if (path === '/segmentation') return route.path === path || route.path.endsWith('/segmentation')
+  if (path === '/tasks' && route.path.endsWith('/segmentation')) return false
   return route.path === path || route.path.startsWith(path + '/')
 }
 

@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "const": true
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "agreementScore": {
+          "type": "number"
+        },
+        "threshold": {
+          "type": "number"
+        },
+        "submissionCount": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "agreementScore",
+        "threshold",
+        "submissionCount"
+      ],
+      "additionalProperties": false
+    },
+    "meta": {
+      "type": "null"
+    },
+    "error": {
+      "type": "null"
+    },
+    "requestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "success",
+    "data",
+    "requestId",
+    "timestamp",
+    "meta",
+    "error"
+  ],
+  "additionalProperties": false
+}
