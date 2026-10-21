@@ -22,6 +22,7 @@ public class ExportTrialRepository {
     public void saveExport(ObjectNode n){jdbc.update("UPDATE trial_exports SET status=?,payload_json=? WHERE id=?",n.path("status").asText(),n.toString(),n.path("id").asText());}
     public void file(ObjectNode n,String exportId,ObjectNode generated){jdbc.update("INSERT INTO trial_files(id,export_id,payload_json,generated_json) VALUES (?,?,?,?)",n.path("id").asText(),exportId,n.toString(),generated==null?null:generated.toString());}
     public ObjectNode file(String id){return one("SELECT payload_json FROM trial_files WHERE id=?",id);}
+    public ObjectNode generated(String id){return one("SELECT generated_json FROM trial_files WHERE id=?",id);}
     public String fileExport(String id){return jdbc.queryForObject("SELECT export_id FROM trial_files WHERE id=?",String.class,id);}
     public void download(ObjectNode n){jdbc.update("INSERT INTO trial_downloads(id,file_id,token_digest,payload_json) VALUES (?,?,?,?)",n.path("id").asText(),n.path("fileId").asText(),n.path("tokenDigest").asText(),n.toString());}
     public ObjectNode ticket(String digest){return one("SELECT payload_json FROM trial_downloads WHERE token_digest=?",digest);}

@@ -1,0 +1,60 @@
+{
+  "checkedAt": "2026-10-21",
+  "mode": "D_BRANCH_TRIAL",
+  "finalId": "552259f0-374a-472f-9927-2697c7ad9371",
+  "frozenUnchanged": true,
+  "sameAfterRestart": true,
+  "repeatedContentGetReadOnly": true,
+  "tests": {
+    "total": 154,
+    "failures": 0,
+    "errors": 0
+  },
+  "frontendBuild": "PASS",
+  "exports": [
+    {
+      "id": "db0b0a77-267e-4b02-ba76-8fd7c2c9d554",
+      "format": "JSON",
+      "status": "COMPLETED",
+      "fileId": "4c9b2914-3047-476b-9516-726436e5ef9d",
+      "sourceDigest": "dfadb8f606e190f00b8e1928f6e611bb97f7ffdd730f31c1820743688d89ce6a",
+      "sha256": "aafb3513e9f2c91f517d7db2684e4e78f7b2b8402832f50ba48f887a20fe405e",
+      "sizeBytes": 39778,
+      "rendererVersion": null,
+      "componentCount": 0
+    },
+    {
+      "id": "a85905e3-db2b-4102-bfc4-91b9b750b957",
+      "format": "XLSX",
+      "status": "COMPLETED",
+      "fileId": "a8395125-9d57-4b44-a86a-788d838c4474",
+      "sourceDigest": "260ee18447824dabccfa79139a28544f1932be88504952c919dd8c3dedd8b842",
+      "sha256": "c600626dc3e9e69dc81107e1360d8160ba683a84edfdb58319ac129e7fdb3076",
+      "sizeBytes": 23126,
+      "rendererVersion": null,
+      "componentCount": 0
+    },
+    {
+      "id": "520d9cae-20c2-46e7-a1e8-4e32a7215b39",
+      "format": "PNG",
+      "status": "COMPLETED",
+      "fileId": "b983941a-ff14-4b50-8119-e59bd004598f",
+      "sourceDigest": "cb2412aa6977eee152ffa5f1e0b9fca32a77d17c947de084afb4d9d4b6350bce",
+      "sha256": "6d4b032ff75ed81159c37eb157924bccd1602e9903b51d65f9a2fe8167522d4c",
+      "sizeBytes": 7531,
+      "rendererVersion": "C-geometry+D-java2d-trial-1",
+      "componentCount": 1
+    },
+    {
+      "id": "0896889a-5bb2-40ba-b6f3-ce5c9367aad2",
+      "format": "SVG",
+      "status": "COMPLETED",
+      "fileId": "2de8ea6b-bfdd-40ee-b7d4-12ee096f733a",
+      "sourceDigest": "5e9805b382fb141fabc43ecc94990833b2237781945e9c18ddb11cf136f84545",
+      "sha256": "76745ff87f0ada4dee85842aa892995f768c99d13048a6369f5f7fd5f26c5350",
+      "sizeBytes": 1716,
+      "rendererVersion": "C-geometry+D-java2d-trial-1",
+      "componentCount": 1
+    }
+  ]
+}

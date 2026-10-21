@@ -87,3 +87,13 @@ F02 校验令牌摘要、当前主体、文件绑定、有效期、撤销和资�
 待确认：上述 RBAC 范围、单格式策略、DTO 增补、文件存储和保留期、5 分钟有效期、加密幂等响应、AuditEvent 及共享事务适配。确认后再实施：V6 迁移和审计原子事务 → FV06 唯一入库 → JSON/XLSX 文件生成 → EX 状态与不可变文件 → F03/EX05 签发与 F02 只读 → 接通页面 → C 全图及失败验收。模型确认是详细计划第 8、9 步的既定前置条件，不以本地预览替代正式验收。
 
 必须验证：无权限/跨任务/未入库拒绝；不同指南字典分别保留；快照与文件重启后不变；幂等、并发唯一入库和失败回滚；过期/错文件/错主体下载；连续 GET 不产生任何业务写入；失败导出不能签发票据；全部图分量可复现。
+
+## 5. 第六批授权试行增补（2026-10-21，仍待团队评审）
+
+已在 local/test 非 prod 实现等价服务器图示试行；独立 POST /api/local/member-d/graph-exports 仅接冻结版本 ID、format=PNG/SVG、include。公共 EX02 不扩展格式。ExportRecord 新增 validationMode=D_BRANCH_TRIAL、sourceType=ARGUMENT_GRAPH_RENDER、rendererVersion、renderInputDigest；sourceDigest 同时绑定这些渲染字段，原 READY/SDK 不改。
+
+GeneratedFileMetadata.componentManifest 当前为单张完整图示的 `{finalVersionId,graphId,componentId,componentNumber,fileEntryName,contentDigest,nodeIds,edgeIds,isolated,viewport:{x,y,width,height}}`[]，精确覆盖每个分量与孤立命题。元数据另含 rendererId=D_SERVER_FROZEN_GRAPH、rendererVersion=C-geometry+D-java2d-trial-1、width/height、renderInputDigest、validationMode；contentDigest 为实际字节摘要。服务端拒绝任意客户端图形内容及摘要。
+
+JSON/XLSX schemaVersion 升为 member-d-export-trial-2，新增明确引用的 customReferences/expertReferences；专家引用仅为最终结果的依据，不扩展为 EXPERT_ISSUE_DOCUMENT。只读详情返回 generatedMetadata 安全投影。后续正式冻结须与上文公共 DTO、跨成员附件权限、永久审计及生产配置一并评审。
+
+具体内部提案见 member-d-graph-export-trial.openapi.yaml；实现/实测边界见 ../../docs/member-d/19-structured-and-graph-export-handoff.md。
