@@ -3,6 +3,12 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 // 成员B负责的页面路由。其余成员页面在联调阶段接入。
 const routes: RouteRecordRaw[] = [
+  {path:'/teaching',component:()=>import('@/features/teaching/TeachingHub.vue'),props:{page:'home'},meta:{title:'教学工作台'}},
+  {path:'/assignment-create',component:()=>import('@/features/teaching/TeachingHub.vue'),props:{page:'assignment'},meta:{title:'创建教学作业'}},
+  {path:'/teaching-standard',component:()=>import('@/features/teaching/TeachingHub.vue'),props:{page:'standard'},meta:{title:'标准标注样例'}},
+  {path:'/student-results',component:()=>import('@/features/teaching/TeachingHub.vue'),props:{page:'results'},meta:{title:'学生结果总览'}},
+  {path:'/student-compare',component:()=>import('@/features/teaching/TeachingHub.vue'),props:{page:'compare'},meta:{title:'作答比对与反馈'}},
+  {path:'/student-annotate/:assignmentId?',component:()=>import('@/features/teaching/StudentPractice.vue'),meta:{title:'学生标注练习'}},
   {path:'/auto-annotate',component:()=>import('@/features/automation/AutomationCenter.vue'),meta:{title:'自动标注'}},
   {path:'/login',component:()=>import('@/features/auth/LoginView.vue'),meta:{title:'登录工作台',public:true}},
   {path:'/documents',component:()=>import('@/features/document/DocumentLibrary.vue'),meta:{title:'文书总库'}},

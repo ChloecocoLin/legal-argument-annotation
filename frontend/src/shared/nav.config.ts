@@ -12,6 +12,12 @@ export interface NavGroup {
 }
 
 export const NAV: NavGroup[] = [
+ {group:'实践教学',items:[
+ {id:'teaching-home',label:'教学工作台',icon:'book',path:'/teaching'},
+ {id:'teaching-assignment',label:'创建教学作业',icon:'plus',path:'/assignment-create'},
+ {id:'teaching-standard',label:'标准标注样例',icon:'doc',path:'/teaching-standard'},
+ {id:'teaching-practice',label:'学生标注练习',icon:'doc',path:'/student-annotate'},
+ {id:'teaching-results',label:'学生结果总览',icon:'list',path:'/student-results'}]},
   {
     group: '总览',
     items: [{ id: 'index', label: '系统总览', icon: 'grid', path: '/' }]

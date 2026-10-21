@@ -1,0 +1,41 @@
+{
+  "batch": 8,
+  "status": "D_BRANCH_TRIAL",
+  "publicEDContract": "PENDING_MODEL",
+  "ids": {
+    "courseId": "00f628da-184a-4712-ba56-5ffd607dc109",
+    "standardId": "4425f900-57c1-4a60-adbe-81c3fd1ab56e",
+    "revisionId": "dc61a05c-2c19-4747-bd15-ca53831a6620",
+    "assignmentIds": [
+      "3055f07f-00e3-460a-84f2-9705e9c83e26",
+      "cbbd0475-139e-4d9a-b27c-c6d60d22c545",
+      "2467841d-5add-42e1-bd5f-19dfd9228d2d"
+    ],
+    "resultIds": [
+      "bcc708b6-5d97-4487-b7cd-36cd253b3af6",
+      "15172dbf-e2af-4a57-b696-094b2397edd5",
+      "f71f7db5-8030-4635-a859-77a42b0a1ca4",
+      "f1cb4243-1d81-4648-a502-c0de344c9afc"
+    ]
+  },
+  "backendTests": 191,
+  "failures": 0,
+  "frontendBuild": "PASS",
+  "restartEquality": "PASS",
+  "researchClosedLoop": "PASS",
+  "exports": [
+    "JSON",
+    "XLSX",
+    "PNG",
+    "SVG"
+  ],
+  "automationRegression": "PASS",
+  "scoringRuleVersion": "C-TeachingScorer-ab6f03d+D-snapshot-v2",
+  "courseTotalScore": null,
+  "pending": [
+    "FULL_CASE boundary and element grading",
+    "course total weights",
+    "teaching archive exports",
+    "ED01-ED20 model freeze and production review"
+  ]
+}

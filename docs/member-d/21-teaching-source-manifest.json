@@ -1,0 +1,101 @@
+{
+  "ref": "origin/feature/member-c-relation-graph",
+  "commit": "ab6f03d49db0441f0ebd7a7ee1f8bcb587c66280",
+  "files": [
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/DimensionScore.java",
+      "sourceSha256": "950495e05348462a9627acbf0811e7db24566e1c795cc77aa5921c047b1628df",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/ExerciseDetail.java",
+      "sourceSha256": "efaf6be5e61d68462a8c4d113e2f2e44d4dfbf9f5f6235c68432e41c8be26a0a",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/ExerciseElement.java",
+      "sourceSha256": "646da6af30879bb17a6de0cde3a2b8f2322cf8e442ec696fa04188a1256d672d",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/ExerciseScoreRequest.java",
+      "sourceSha256": "bcc05d95dfdb8c42d1723228a1d2bba07c57ca59b2715a324b19b619dd73331d",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/ExerciseSummary.java",
+      "sourceSha256": "8e2b7351f82053c22ea7a57540f40149dafe7056e6c1da08337d42ac98a998db",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/RelationTemplate.java",
+      "sourceSha256": "459896fb79f46bd14a59a03c742ed404659ac61a61ac4d40eef8cff69adb224a",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/ScoreStatistics.java",
+      "sourceSha256": "6e4280a54d1402b7c85b2328ef6746aac6e4f051eef651b11c05e0557901fd3a",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/StandardAnswer.java",
+      "sourceSha256": "325de7dd7e14a05a2c96dccff5373588c2ce1e662dff862717a3dae0ba066421",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/TeachingFeedback.java",
+      "sourceSha256": "d752f4018fc605474e32a09a669aaece5ae2578f9cc9b1ce279fde47079c984c",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/TeachingGraphView.java",
+      "sourceSha256": "cc56b6275f936047f8929d0fc4744ff161fe9d7cb590efb816e395f5fa32c342",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/TeachingScoreResult.java",
+      "sourceSha256": "fb73a943c20aaa830ea96d749614587597e5b1052d46a989e964d816a5e63419",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/dto/TemplateParticipant.java",
+      "sourceSha256": "f8e88625427365a3179d1f1f928bc7e4a7be74171ff010f59482723e2fee6bd7",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/rules/TeachingDimension.java",
+      "sourceSha256": "83f4b6e822329d170384052900fc8d2cb7e90a969ab0bb3d37eb1a99233c990e",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/rules/TeachingExerciseType.java",
+      "sourceSha256": "298aaeb2953a202c1f227858dab74dcf448d432e9885a1dfd07f848f6b4faae9",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/rules/TeachingFeedbackCode.java",
+      "sourceSha256": "e380097e3b262e8f84e7e6539d5669aacef577c1d75fb9dee206119d64dbbef2",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/service/TeachingScorer.java",
+      "sourceSha256": "6a85907fa185495a8957d876773c577ead70946577ea0a662a3692c5049a2788",
+      "adaptation": "Remove Spring service registration; construct against snapshot-local sources"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/teaching/service/RelationTemplateCodec.java",
+      "sourceSha256": "c1e003a1fd2bbc134eba994f920c76b79851b387e0d32a307a0a8bb15fd66c5f",
+      "adaptation": "Remove Spring service registration; construct against snapshot-local sources"
+    },
+    {
+      "path": "backend/src/test/java/com/argument/teaching/TeachingScorerTest.java",
+      "sourceSha256": "fb5492dfd1b07ca07d1acec97efa28c3452f716dd123de2b9b3f4bcee3806743",
+      "adaptation": "Unchanged source"
+    },
+    {
+      "path": "backend/src/main/java/com/argument/relation/service/InMemoryRelationLookup.java",
+      "sourceSha256": "1c7c45c78be190c8abb4aad7885df9e69964bc38ef223d65072a788fcef87881",
+      "adaptation": "Unchanged source"
+    }
+  ]
+}

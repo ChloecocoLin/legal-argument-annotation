@@ -24,8 +24,8 @@ const DEMO_ACCOUNTS: DemoAccount[] = import.meta.env.DEV ? [
   {username:'arbiter.zhao',displayName:'赵明远',role:'arbiter',hint:'裁定与最终审查'},
   {username:'expert.qian',displayName:'钱学礼',role:'expert',hint:'被指派的专家复核'},
   {username:'admin.wang',displayName:'王慧',role:'admin',hint:'管理与授权概览'},
-  {username:'teacher.sun',displayName:'孙立',role:'teacher',hint:'教学模块待接入'},
-  {username:'student.zhou',displayName:'周雨桐',role:'student',hint:'教学模块待接入'}
+  {username:'teacher.sun',displayName:'孙立',role:'teacher',hint:'课程、教学作业与独立作答'},
+  {username:'student.zhou',displayName:'周雨桐',role:'student',hint:'课程、教学作业与独立作答'}
 ] : []
 
 const router = useRouter()

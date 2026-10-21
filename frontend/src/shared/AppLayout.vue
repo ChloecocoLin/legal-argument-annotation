@@ -15,6 +15,7 @@ const roleName = computed(() => ({ admin: '管理员', creator: '任务创建者
 
 const navigation = computed(() => {
   const allowed: Record<string, string[]> = {
+ 'teaching-home':['teacher','student','creator'],'teaching-assignment':['teacher'],'teaching-standard':['teacher'],'teaching-practice':['student'],'teaching-results':['teacher','student'],
     'admin-home':['admin'], 'research-results':['admin','creator','arbiter'],
     'audit-events':['admin','creator','arbiter'], 'guide-management':['admin','creator','annotator','arbiter','teacher','student','expert'],
     'document-library':['admin','creator','annotator','arbiter'], 'task-list':['admin','creator','annotator','arbiter'],
@@ -27,6 +28,7 @@ const navigation = computed(() => {
 })
 
 const titleMap: Record<string, string> = {
+ '/teaching':'教学工作台','/assignment-create':'创建教学作业','/teaching-standard':'标准标注样例','/student-results':'学生结果总览','/student-compare':'作答比对与反馈',
   '/': '系统总览',
   '/admin-home': '管理工作台',
   '/audit': '入库与审计记录',
@@ -42,6 +44,7 @@ const titleMap: Record<string, string> = {
   '/expert/issues': '疑难问题说明文档'
 }
 const here = computed(() => {
+  if (route.path.startsWith('/student-annotate')) return '学生标注练习'
   if (route.path.startsWith('/final-review')) return '最终版本审查'
   if (route.path.startsWith('/annotations/')) return '提交标注'
   if (route.path.startsWith('/versions/')) return '完整标注版本'
