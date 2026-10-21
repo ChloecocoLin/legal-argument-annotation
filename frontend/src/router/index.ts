@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 // 成员B负责的页面路由。其余成员页面在联调阶段接入。
 const routes: RouteRecordRaw[] = [
+  {path:'/auto-annotate',component:()=>import('@/features/automation/AutomationCenter.vue'),meta:{title:'自动标注'}},
   {path:'/login',component:()=>import('@/features/auth/LoginView.vue'),meta:{title:'登录工作台',public:true}},
   {path:'/documents',component:()=>import('@/features/document/DocumentLibrary.vue'),meta:{title:'文书总库'}},
   {path:'/documents/:documentId',component:()=>import('@/features/document/DocumentDetail.vue'),meta:{title:'文书详情'}},

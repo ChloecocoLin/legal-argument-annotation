@@ -52,7 +52,7 @@ export const NAV: NavGroup[] = [
   {
     group: '自动化与导出',
     items: [
-      { id: 'auto-annotate', label: '自动标注', icon: 'cpu' },
+      { id: 'auto-annotate', label: '自动标注', icon: 'cpu', path: '/auto-annotate' },
       { id: 'export', label: '导出中心', icon: 'download', path: '/export' },
       { id: 'export-records', label: '导出记录', icon: 'archive', path: '/export-records' }
     ]

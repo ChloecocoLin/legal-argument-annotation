@@ -20,7 +20,7 @@ const navigation = computed(() => {
     'document-library':['admin','creator','annotator','arbiter'], 'task-list':['admin','creator','annotator','arbiter'],
     'task-create':['creator'], 'task-assign':['creator'], 'segmentation':['annotator','arbiter'],
     'conflict-resolve':['arbiter'], 'final-review':['arbiter'], 'expert-review':['expert'],
-    'expert-issues':['expert'], 'auto-annotate':['creator','arbiter'],
+    'expert-issues':['expert'], 'auto-annotate':['creator'],
     'export':['creator','arbiter'], 'export-records':['creator','arbiter']
   }
   return NAV.map(group => ({ ...group, items: group.items.filter(item => !allowed[item.id] || user.roles.some(role => allowed[item.id].includes(role))) })).filter(group => group.items.length)
@@ -32,6 +32,7 @@ const titleMap: Record<string, string> = {
   '/audit': '入库与审计记录',
   '/segmentation': '独立切割与统一关口',
   '/results': '已入库成果',
+  '/auto-annotate': '自动标注',
   '/export': '导出中心',
   '/export-records': '导出记录',
   '/guide': '指南管理',
