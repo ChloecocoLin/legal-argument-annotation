@@ -33,6 +33,7 @@ public class IdempotencySupport {
             if(taskId!=null){data.find("taskDocument","taskId",taskId).forEach(d->cases.add(d.path("id").asText()));for(String id:cases)versions.lockCase(id);for(String id:cases)data.lock("taskDocument",id);var task=data.lock("task",taskId);if(!actorId.equals(task.path("ownerUserId").asText()))throw new BusinessException(ErrorCode.FORBIDDEN,"只能管理本人创建的任务");}
             var command=mapper.valueToTree(body);String hash=VersionJson.canonicalHash(command);var cached=versions.receipt(actorId,operation,key,hash);
             if(cached!=null)return mapper.convertValue(cached,new com.fasterxml.jackson.core.type.TypeReference<T>(){});
+            if(taskId!=null&&!"T14".equals(code)&&"COMPLETED".equals(data.read("task",taskId).path("status").asText()))throw new BusinessException(ErrorCode.LOCKED_RESOURCE,"已完成任务永久只读；重新标注须创建新任务");
             T result=action.get();var node=(com.fasterxml.jackson.databind.node.ObjectNode)mapper.valueToTree(result);history.append(actorId,operation,command,node);versions.receipt(actorId,operation,key,hash,node,mapper.createObjectNode(),node,"");return result;
         });
     }

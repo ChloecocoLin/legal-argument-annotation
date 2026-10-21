@@ -4,6 +4,8 @@
       <h1>任务分配</h1>
       <p class="muted">先邀请成员加入任务，再为每案分配不同标注员与独立裁定者。</p>
     </div>
+    <div v-if="sourceTaskId && sourceFinalVersionId" class="note accent reannotation-lineage">重标任务：原任务 <router-link :to="`/tasks/${sourceTaskId}`">{{sourceTaskId}}</router-link><br>来源最终版：<span class="mono">{{sourceFinalVersionId}}</span>。已绑定同一文本及范围的新案例，原结果只读；人员和标注从本任务重新开始。</div>
+    <div v-if="taskStatus==='COMPLETED'" class="note">任务已完成，配置及人员只读；重新标注须从入库成果创建新任务。</div>
     <el-row :gutter="16">
       <el-col :span="12">
         <el-card>
@@ -21,7 +23,7 @@
                 <el-option label="专家" value="EXPERT" />
               </el-select>
             </el-form-item>
-            <el-button type="primary" @click="join">加入人员池</el-button>
+            <el-button type="primary" :disabled="taskStatus==='COMPLETED'" @click="join">加入人员池</el-button>
           </el-form>
           <el-table :data="members" size="small" style="margin-top: 12px">
             <el-table-column prop="displayName" label="姓名" />
@@ -51,10 +53,10 @@
                 :value="String(m.id)"
               />
             </el-select>
-            <el-button style="margin-top: 8px" @click="assign(doc)">保存分配</el-button>
+            <el-button style="margin-top: 8px" :disabled="!['DRAFT','ASSIGNING'].includes(taskStatus)" @click="assign(doc)">保存分配</el-button>
           </div>
-          <el-button type="primary" @click="publish">发布任务</el-button>
-          <el-button @click="start">启动任务</el-button>
+          <el-button type="primary" :disabled="taskStatus!=='DRAFT'" @click="publish">发布任务</el-button>
+          <el-button :disabled="!['DRAFT','ASSIGNING'].includes(taskStatus)" @click="start">启动任务</el-button>
         </el-card>
       </el-col>
     </el-row>
@@ -76,7 +78,7 @@ const docs = ref<Record<string, unknown>[]>([])
 const userId = ref('')
 const memberRole = ref('ANNOTATOR')
 const picked = reactive<Record<string, { annotators: string[]; arbiter: string }>>({})
-const taskVersion = ref(1)
+const taskVersion = ref(1),taskStatus=ref(''),sourceTaskId=ref(''),sourceFinalVersionId=ref('')
 
 const annotators = computed(() =>
   members.value.filter((m) => m.memberRole === 'ANNOTATOR' && m.status === 'ACTIVE')
@@ -87,6 +89,7 @@ async function reload() {
   loading.value = true
   try {
     const setup = await getTaskSetup(taskId.value)
+    taskStatus.value=String(setup.task.status);sourceTaskId.value=String(setup.task.sourceTaskId||'');sourceFinalVersionId.value=String(setup.task.sourceFinalVersionId||'')
     members.value = setup.members
     docs.value = setup.taskDocuments
     taskVersion.value = Number(setup.task.recordVersion)
@@ -136,6 +139,8 @@ onMounted(reload)
 </script>
 
 <style scoped>
+.reannotation-lineage{display:block;margin-bottom:16px;line-height:1.8;overflow-wrap:anywhere}
+
 .doc-block {
   margin-bottom: 16px;
   padding-bottom: 12px;

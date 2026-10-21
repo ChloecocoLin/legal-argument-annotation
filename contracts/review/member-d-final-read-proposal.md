@@ -41,3 +41,12 @@ canSubmit/canApprove 只是读取时提示，写入必须在事务中重新核�
 新的状态转换仍读取资源 recordVersion；FV03/FV04/FV05 可保持冻结短响应，成功后重读完整 FV02。历史快照按稳定 ID 可读但不可写。FV02 授权查看者的开放条件须与 C/A 明确；在入库/公开规则落定前仅授予负责案例的裁定者，不自动给任务创建者、管理员、标注员或专家整版读取权限。
 
 团队确认后同步 Markdown、两份 OpenAPI、完整 Mock，再更新 READY 哈希与生成物。最终草稿内容修订和重裁轮次另见 docs/member-d/06-commit-audit-and-revision-proposal.md；不通过本只读提案悄悄新增写入动作。
+
+
+## 第五批接入记录（2026-10-21，仍待团队评审）
+
+完整读取已移到 `GET /api/v1/integration/final-annotation-versions/{id}/workspace`，会话列表移到 `GET /api/v1/integration/adjudication-sessions/{id}/final-versions`。页面不再先读 FV02 摘要再回退到 local 版本工作区；两个组合读取仍只在 local/test 且非 prod 注册，维持负责案例裁定者的授权。FV02 公开摘要及冻结哈希、SDK 保持不变。本提案尚未转 READY。
+
+组合工作区增加只读 `graphView` 和 `quality.trialReady/canApproveTrial/trialEvidence`。试行证据的 proof 绑定内容、决定、指南及定义、文本/范围、关口与复算、固定输入/来源、统一映射及专家结论摘要。`formalReady` 继续为 false；`trialReady` 不能由请求或环境标志提供。
+
+试行批准/入库走明确的 `/api/local/member-d/final-review/versions/{id}/trial-approve`、`trial-commit`，只接受 `{confirmed:true}`、幂等键和资源版本号。正式 FV05/FV06 不消费 trialReady；试行结果在独立历史、凭证及审计中标记。第五批没有把此读取提案或试行生产模型自动批准。

@@ -160,3 +160,5 @@ M01–M04 管理持久化状态、模型版本与执行适配；核对 B 是否�
 第二批普通标注闭环已完成，见 [15-complete-annotation-loop-handoff.md](15-complete-annotation-loop-handoff.md)。第三批一对一命题自定义、真实候选及专家回流已接入并联验，见 [16-proposition-custom-expert-handoff.md](16-proposition-custom-expert-handoff.md)。J04/M13 仍按已授权试行及待评审门禁执行；下一批为第四批关系裁定、自定义/关系专家及正式最终图验证。
 
 第四批已接入真实关系比较、J06/J07/J08、单关系自定义、关系专家回流及只读冻结图验证，见 [17-relation-and-frozen-graph-handoff.md](17-relation-and-frozen-graph-handoff.md)。复杂拆分合并、复合自定义及生产批准继续保留明确门禁；下一批为最终审查/补正/入库与 T14。
+
+第五批已完成授权的真实数据试行审查、实质补正、新证据与原子入库、A 的实际 T14、新案例双来源及统计回验，见 [18-final-review-correction-and-reannotation-handoff.md](18-final-review-correction-and-reannotation-handoff.md)。FV02 公共完整模型与生产转正仍待评审，formalReady 未解锁；下一批为第六批结构化导出回验与图文件归档。

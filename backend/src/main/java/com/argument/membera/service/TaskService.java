@@ -18,11 +18,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
 
-    private final WorkflowStore store;
+    private final com.argument.integration.ReannotationSourceRecorder reannotation;private final WorkflowStore store;
     private final AccessService access;
     private final com.argument.integration.TaskResourceCatalog guideCatalog;
 
-    public TaskService(WorkflowStore store, AccessService access, com.argument.integration.TaskResourceCatalog guideCatalog) {
+    public TaskService(WorkflowStore store, AccessService access, com.argument.integration.TaskResourceCatalog guideCatalog,com.argument.integration.ReannotationSourceRecorder reannotation) {
+        this.reannotation=reannotation;
         this.store = store;
         this.access = access;
         this.guideCatalog = guideCatalog;
@@ -462,6 +463,8 @@ public class TaskService {
         }
         Map<String,Object> sourceDoc=store.taskDocuments.get(Records.str(fav,"taskDocumentId"));
         if(sourceDoc==null||!taskId.equals(Records.str(sourceDoc,"taskId")))throw new BusinessException(ErrorCode.FORBIDDEN,"最终版不属于指定源任务");
+        reannotation.verify(finalId,Records.str(sourceDoc,"id"));
+        if(!Records.str(source,"guideVersionId").equals(Records.str(fav,"guideVersionId")))throw new BusinessException(ErrorCode.SOURCE_INCOMPLETE,"源任务与最终版指南不一致");
         Map<String, Object> created =
                 create(
                         Map.of(
@@ -475,6 +478,8 @@ public class TaskService {
         Map<String, Object> neu = store.tasks.get(String.valueOf(created.get("id")));
         neu.put("sourceTaskId", taskId);
         neu.put("sourceFinalVersionId", finalId);
+        addDocument(String.valueOf(created.get("id")),Map.of("documentId",sourceDoc.get("documentId"),"documentTextVersionId",fav.get("documentTextVersionId"),"annotationScopeId",fav.get("annotationScopeId"),"requiredAnnotators",sourceDoc.get("requiredAnnotators")));
+        reannotation.record(String.valueOf(created.get("id")),taskId,finalId,user.userId());
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", created.get("id"));
         data.put("sourceTaskId", taskId);

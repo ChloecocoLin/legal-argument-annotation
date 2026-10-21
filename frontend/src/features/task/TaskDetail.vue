@@ -9,6 +9,7 @@
       <el-descriptions-item label="状态">{{ statusName(task.status) }}</el-descriptions-item>
       <el-descriptions-item label="创建者">{{ ownerName || task.ownerUserId }}</el-descriptions-item>
       <el-descriptions-item label="每案 N">{{ task.defaultRequiredAnnotators }}</el-descriptions-item>
+      <el-descriptions-item v-if="task.sourceTaskId" label="原任务"><router-link :to="`/tasks/${task.sourceTaskId}`">{{task.sourceTaskId}}</router-link></el-descriptions-item><el-descriptions-item v-if="task.sourceFinalVersionId" label="来源最终版">{{task.sourceFinalVersionId}}</el-descriptions-item>
     </el-descriptions>
     <el-card v-if="canManage && options" style="margin-top: 16px">
       <template #header>添加文书</template>
@@ -45,7 +46,7 @@ const user = useUserStore()
 const route = useRoute()
 const taskId = computed(() => String(route.params.taskId))
 const loading = ref(false)
-const task = ref<{ id: string; ownerUserId: string; status: string; defaultRequiredAnnotators: number } | null>(null)
+const task = ref<{ id: string; ownerUserId: string; status: string; defaultRequiredAnnotators: number;sourceTaskId?:string|null;sourceFinalVersionId?:string|null } | null>(null)
 const progress = ref<
   { taskDocumentId: string; submittedCount: number; requiredAnnotators: number; status: string }[]
 >([])
@@ -72,6 +73,7 @@ onMounted(async () => {
   try {
     task.value = await getTask(taskId.value)
     const setup = await getTaskSetup(taskId.value)
+    task.value.sourceTaskId=setup.task.sourceTaskId?String(setup.task.sourceTaskId):null;task.value.sourceFinalVersionId=setup.task.sourceFinalVersionId?String(setup.task.sourceFinalVersionId):null
     taskName.value = String(setup.task.name || '')
     ownerName.value = String(setup.members.find(m => m.userId === task.value?.ownerUserId)?.displayName || '')
     progress.value = (await getProgress(taskId.value)).items
