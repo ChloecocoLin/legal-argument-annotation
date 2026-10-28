@@ -29,6 +29,28 @@ export interface RefObject {
   id: string
 }
 
+// J09 返回的正文版本（页面至少依赖 normalizedText）。
+export interface DocumentTextVersionRef extends RefObject {
+  documentId: string
+  versionNumber: number
+  normalizedText: string
+  status?: string
+}
+
+// J09 返回的说理范围。offset 为相对于完整 normalizedText 的 UTF-16 半开区间。
+export interface AnnotationScopeRef extends RefObject {
+  documentTextVersionId: string
+  scopeType: 'REASONING'
+  startOffset: number
+  endOffset: number
+  status?: string
+}
+
+// J09 中源标注版本的页面所需最小字段。
+export interface AnnotationVersionRef extends RefObject {
+  displayCode?: string
+}
+
 // 裁定会话
 export interface AdjudicationSession extends EntityBase {
   taskDocumentId: string
@@ -60,6 +82,12 @@ export interface PropositionReviewItem {
   currentDecision: RefObject | null
 }
 
+// J03 响应：完整会话 + 命题项列表（不分页）
+export interface J03View {
+  session: AdjudicationSession
+  items: PropositionReviewItem[]
+}
+
 // 关系（J10 编排所需，C 维护完整语义）
 export interface CustomRelation extends EntityBase {
   ownerType: string
@@ -83,12 +111,12 @@ export interface CustomContext {
   session: AdjudicationSession
   itemKind: CustomItemKind
   item: PropositionAdjudicationItem | CustomRelation
-  sourceVersions: RefObject[]
+  sourceVersions: AnnotationVersionRef[]
   candidateElements: Element[]
   candidateRelations: CustomRelation[]
   candidateParticipants: RelationParticipant[]
-  documentTextVersion: RefObject
-  annotationScope: RefObject
+  documentTextVersion: DocumentTextVersionRef
+  annotationScope: AnnotationScopeRef
   guideVersion: GuideVersion
   allowedActions: string[]
 }

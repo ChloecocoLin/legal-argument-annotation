@@ -55,3 +55,62 @@ INSERT INTO relation_definition (id, guide_version_id, code, name, definition, d
 ('r12-j', 'v-g-12', 'J', '组合关系', NULL, FALSE, NULL, NULL, NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('r12-m', 'v-g-12', 'M', '匹配关系', NULL, TRUE,  NULL, NULL, NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0),
 ('r12-i', 'v-g-12', 'I', '同一关系', NULL, FALSE, NULL, NULL, NULL, 0, TIMESTAMP '2026-08-14 10:00:00', TIMESTAMP '2026-08-14 10:00:00', 0);
+
+-- M3 J09/J10 联调数据。依赖对象只读，写操作仅发生在 annotation_element 与 arbiter_custom_annotation。
+INSERT INTO document_text_version (id, document_id, version_number, normalized_text, content_sha256, status, record_version, created_at, updated_at) VALUES
+('86d2b05b-fa18-4d45-a451-edcaa83d673f', 'bfd699c7-e225-4263-b077-c247e4d59fbc', 1,
+ '本院认为，依法成立的合同，自成立时生效。当事人应当按照约定全面履行自己的义务。综上所述，依照法律规定，判决如下：驳回其他诉讼请求。',
+ '0905cc3f16fd346f363963570af18ea5cd3fbe01c3e667bb28f7c1f69cca35e1', 'PUBLISHED', 0,
+ TIMESTAMP '2026-10-10 08:00:00', TIMESTAMP '2026-10-10 08:00:00');
+
+INSERT INTO annotation_scope (id, document_text_version_id, scope_type, start_offset, end_offset, selection_method, status, record_version, created_at, updated_at) VALUES
+('4c3122b2-90e0-47b4-8e67-0986764897bc', '86d2b05b-fa18-4d45-a451-edcaa83d673f', 'REASONING', 5, 39, 'MANUAL', 'CONFIRMED', 0,
+ TIMESTAMP '2026-10-10 08:00:00', TIMESTAMP '2026-10-10 08:00:00');
+
+INSERT INTO annotation_version (id, display_code, document_text_version_id, annotation_scope_id, guide_version_id, status, record_version, created_at, updated_at) VALUES
+('402d8716-3ea0-46ac-9078-05545fe58071', 'V1', '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 'v-g-12', 'UNDER_ADJUDICATION', 0, TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('e4b02d3f-f041-48fa-bf91-7736a381eab9', 'V2', '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 'v-g-12', 'UNDER_ADJUDICATION', 0, TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+INSERT INTO adjudication_session (id, task_document_id, status, source_version_ids, proposition_completed_at, record_version, created_at, updated_at) VALUES
+('aba39933-394e-41e0-aa76-1cf8acc57ba7', '3cbb140f-0274-4871-8248-194271101a14', 'PROPOSITION_REVIEW',
+ '["402d8716-3ea0-46ac-9078-05545fe58071","e4b02d3f-f041-48fa-bf91-7736a381eab9"]', NULL, 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+INSERT INTO proposition_adjudication_item (id, session_id, conflict_type, candidate_element_ids, status, record_version, created_at, updated_at) VALUES
+('058fa5ba-c4a8-457a-96f9-1efd15df8e20', 'aba39933-394e-41e0-aa76-1cf8acc57ba7', 'LABEL',
+ '["007077eb-0059-41ed-bd82-bf5b90faf40f","a9564144-5a19-45e9-bb33-4d2758e68acf"]', 'PENDING', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+INSERT INTO annotation_element (id, owner_type, owner_id, client_key, document_text_version_id, annotation_scope_id, start_offset, end_offset, text, label_definition_id, label_code, is_proposition, display_no, source_element_ids, record_version, created_at, updated_at) VALUES
+('007077eb-0059-41ed-bd82-bf5b90faf40f', 'ANNOTATION_VERSION', '402d8716-3ea0-46ac-9078-05545fe58071', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 5, 20,
+ '依法成立的合同，自成立时生效。', 'l12-gml', 'GM-L', TRUE, 'P1', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('a9564144-5a19-45e9-bb33-4d2758e68acf', 'ANNOTATION_VERSION', 'e4b02d3f-f041-48fa-bf91-7736a381eab9', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 5, 20,
+ '依法成立的合同，自成立时生效。', 'l12-gmi', 'GM-I', TRUE, 'P1', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('b0123456-0000-4000-8000-000000000001', 'ANNOTATION_VERSION', '402d8716-3ea0-46ac-9078-05545fe58071', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 20, 38,
+ '当事人应当按照约定全面履行自己的义务。', 'l12-gmi', 'GM-I', TRUE, 'P3', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00'),
+('b0123456-0000-4000-8000-000000000002', 'ANNOTATION_VERSION', 'e4b02d3f-f041-48fa-bf91-7736a381eab9', NULL,
+ '86d2b05b-fa18-4d45-a451-edcaa83d673f', '4c3122b2-90e0-47b4-8e67-0986764897bc', 20, 38,
+ '当事人应当按照约定全面履行自己的义务。', 'l12-gmi', 'GM-I', TRUE, 'P3', '[]', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+INSERT INTO proposition_adjudication_item (id, session_id, conflict_type, candidate_element_ids, status, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000003', 'aba39933-394e-41e0-aa76-1cf8acc57ba7', 'AGREEMENT',
+ '["b0123456-0000-4000-8000-000000000001","b0123456-0000-4000-8000-000000000002"]', 'DECIDED', 0,
+ TIMESTAMP '2026-10-10 09:00:00', TIMESTAMP '2026-10-10 09:00:00');
+
+-- 专家复核：一张 REQUESTED 单 + 一个 OPEN 问题，供 X01->X02->X03->X04->X05 全链路演示。
+INSERT INTO expert_review (id, session_id, expert_task_member_id, requested_by_id, status, opened_at, confirmed_at, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000030', 'aba39933-394e-41e0-aa76-1cf8acc57ba7',
+ 'b0123456-0000-4000-8000-000000000010', 'b0123456-0000-4000-8000-000000000020', 'REQUESTED', NULL, NULL, 0,
+ TIMESTAMP '2026-10-10 10:00:00', TIMESTAMP '2026-10-10 10:00:00');
+
+INSERT INTO expert_issue (id, expert_review_id, item_kind, item_id, question, resolution, guide_basis, status, resolved_at, record_version, created_at, updated_at) VALUES
+('b0123456-0000-4000-8000-000000000040', 'b0123456-0000-4000-8000-000000000030',
+ 'GENERAL', NULL, '预置问题：请说明 GM-L 与 GM-I 的判定边界。', NULL, NULL, 'OPEN', NULL, 0,
+ TIMESTAMP '2026-10-10 10:00:00', TIMESTAMP '2026-10-10 10:00:00');

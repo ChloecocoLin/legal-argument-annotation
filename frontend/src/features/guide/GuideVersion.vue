@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Chip from '@/shared/Chip.vue'
+import ElementTypeSelector from '@/shared/ElementTypeSelector.vue'
+import { groupElementTypes } from '@/shared/elementTypeGroups'
 import StatusBadge from '@/shared/StatusBadge.vue'
 import BaseModal from '@/shared/BaseModal.vue'
 import { toast } from '@/shared/toast'
@@ -15,50 +17,49 @@ const gid = route.params.guideId as string
 const guide = ref<Guide>()
 const version = ref<GuideVersion>()
 const labels = ref<LabelDefinition[]>([])
+const labelsLoading = ref(false)
+const labelsError = ref<string | null>(null)
+const selectedLabelCode = ref<string | null>(null)
+
+async function loadLabels(): Promise<void> {
+  if (!version.value) return
+
+  labelsLoading.value = true
+  labelsError.value = null
+  try {
+    labels.value = await listLabels(version.value.id)
+    if (
+      selectedLabelCode.value &&
+      !labels.value.some((label) => label.code === selectedLabelCode.value)
+    ) {
+      selectedLabelCode.value = null
+    }
+  } catch {
+    labels.value = []
+    labelsError.value = '标签字典加载失败，请检查后端服务后重试。'
+  } finally {
+    labelsLoading.value = false
+  }
+}
 
 onMounted(async () => {
   const summary = await getGuide(gid)
   guide.value = summary.guide
   version.value = summary.versions[0]
-  if (version.value) {
-    labels.value = await listLabels(version.value.id)
-  }
+  await loadLabels()
 })
 
-function bySortOrder(a: LabelDefinition, b: LabelDefinition): number {
-  return a.sortOrder - b.sortOrder || a.code.localeCompare(b.code)
-}
-
-// 标签是否存在、属于哪一类，完全以当前指南版本的 G06 字典为准。
-const tagNl = computed(() =>
-  labels.value
-    .filter((label) => label.category === 'NON_PROPOSITION')
-    .slice()
-    .sort(bySortOrder)
+// 指南展示与共享选择器复用同一套 G06 分组、排序规则。
+const labelsByGroup = computed(() =>
+  new Map(groupElementTypes(labels.value).map((group) => [group.key, group.labels]))
 )
-const tagGm = computed(() =>
-  labels.value
-    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'GM')
-    .slice()
-    .sort(bySortOrder)
-)
-const tagSm = computed(() =>
-  labels.value
-    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'SM')
-    .slice()
-    .sort(bySortOrder)
-)
-const tagGf = computed(() =>
-  labels.value
-    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'GF')
-    .slice()
-    .sort(bySortOrder)
-)
-const tagSf = computed(() =>
-  labels.value
-    .filter((label) => label.category === 'PROPOSITION' && label.baseType === 'SF')
-    .slice()
-    .sort(bySortOrder)
+const tagNl = computed(() => labelsByGroup.value.get('NON_PROPOSITION') ?? [])
+const tagGm = computed(() => labelsByGroup.value.get('GM') ?? [])
+const tagSm = computed(() => labelsByGroup.value.get('SM') ?? [])
+const tagGf = computed(() => labelsByGroup.value.get('GF') ?? [])
+const tagSf = computed(() => labelsByGroup.value.get('SF') ?? [])
+const selectedLabel = computed(() =>
+  labels.value.find((label) => label.code === selectedLabelCode.value)
 )
 
 function fmtSize(bytes?: number | null): string {
@@ -211,6 +212,34 @@ const NEST_FIGS: [string, string][] = [
           </div>
         </div>
 
+        <!-- M2 共享组件预览：默认收起，不影响指南原型的主阅读流程。 -->
+        <details class="card selector-preview">
+          <summary class="card-head">
+            <span class="card-title"><span class="dot"></span>共享要素类型组件预览</span>
+            <span class="badge outline" style="margin-left: auto">G06 实时字典</span>
+          </summary>
+          <div class="card-body">
+            <p class="t-sm muted" style="margin-bottom: 12px">
+              此区域用于验证成员 B 的共享选择组件，当前选择仅保存在页面内，不会修改指南数据。
+            </p>
+            <ElementTypeSelector
+              v-model="selectedLabelCode"
+              :labels="labels"
+              :loading="labelsLoading"
+              :error="labelsError"
+              clearable
+              @retry="loadLabels"
+            />
+            <div class="panel t-sm" style="margin-top: 12px; padding: 10px 12px">
+              <template v-if="selectedLabel">
+                当前选择：<strong>{{ selectedLabel.code }} · {{ selectedLabel.name }}</strong>
+                <span class="muted">（再次点击可取消）</span>
+              </template>
+              <span v-else class="muted">当前未选择要素类型</span>
+            </div>
+          </div>
+        </details>
+
         <!-- 关系图元 -->
         <div class="card">
           <div class="card-head">
@@ -277,3 +306,18 @@ const NEST_FIGS: [string, string][] = [
     </BaseModal>
   </div>
 </template>
+
+<style scoped>
+.selector-preview > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.selector-preview > summary::-webkit-details-marker {
+  display: none;
+}
+
+.selector-preview:not([open]) > summary {
+  border-bottom: 0;
+}
+</style>

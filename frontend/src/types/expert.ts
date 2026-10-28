@@ -1,7 +1,6 @@
-// 专家复核 X 系列类型（X01–X05 均由成员B负责）。依据契约 6.5。
+// 专家复核 X 系列类型（X01–X05 均由成员B负责）。对齐后端实际返回。
 import type { EntityBase } from './common'
-import type { Element } from './element'
-import type { CustomRelation, RelationParticipant } from './adjudication'
+import type { PropositionAdjudicationItem } from './adjudication'
 
 // 复核单状态
 export type ExpertReviewStatus = 'REQUESTED' | 'IN_REVIEW' | 'CONFIRMED'
@@ -15,24 +14,25 @@ export type IssueItemKind = 'PROPOSITION' | 'RELATION' | 'GENERAL'
 // 专家复核单
 export interface ExpertReview extends EntityBase {
   sessionId: string
-  expertUserId: string
   expertTaskMemberId: string
   requestedById: string
   status: ExpertReviewStatus
+  openedAt: string | null
+  confirmedAt: string | null
+  recordVersion: number
 }
 
 // 专家问题
 export interface ExpertIssue extends EntityBase {
   expertReviewId: string
-  sessionId: string
   itemKind: IssueItemKind
   itemId: string | null
   question: string
   status: ExpertIssueStatus
   resolution: string | null
   guideBasis: string | null
-  resolvedById: string | null
   resolvedAt: string | null
+  recordVersion: number
 }
 
 // X01 摘要
@@ -42,42 +42,31 @@ export interface ExpertReviewSummary {
   taskName: string
   documentId: string
   documentTitle: string
-  guideVersionId: string
+  guideVersionId: string | null
   issueCount: number
   openIssueCount: number
 }
 
-// 文本摘录
-export interface TextExcerpt {
-  documentTextVersionId: string
-  annotationScopeId: string
-  startOffset: number
-  endOffset: number
-  text: string
-}
-
-// 候选分组
+// 候选分组（按源版本，演示返回文本数组）
 export interface ExpertCandidateGroup {
   versionId: string
   displayCode: string
-  elements: Element[]
-  relations: CustomRelation[]
-  participants: RelationParticipant[]
+  texts: string[]
 }
 
 // 问题上下文
 export interface ExpertIssueContext {
   issueId: string
   itemKind: IssueItemKind
-  item: unknown | null
-  textExcerpts: TextExcerpt[]
+  item: PropositionAdjudicationItem | null
+  textExcerpts: string[]
   candidateGroups: ExpertCandidateGroup[]
 }
 
 // X02 详情
 export interface ExpertReviewDetail {
   review: ExpertReview
-  guideVersionId: string
+  guideVersionId: string | null
   issues: ExpertIssue[]
   contexts: ExpertIssueContext[]
 }

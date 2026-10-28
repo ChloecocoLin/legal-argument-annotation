@@ -2,10 +2,10 @@
 // 成员B 后端负责：J03 / J09 / J10 / J12。
 // J01 / J02 / J05 / J11 后端归成员D，B 前端需要调用，故一并封装。
 import { get, post } from './request'
-import type { PageQuery, ListResult } from '@/types/common'
+import type { PageQuery } from '@/types/common'
 import type {
   AdjudicationSession,
-  PropositionReviewItem,
+  J03View,
   CustomContext,
   CustomAnnotationRequest,
   CustomAnnotationResult,
@@ -32,16 +32,12 @@ export function getAdjudicationSession(
   return get<AdjudicationSession>(`/adjudication-sessions/${sessionId}`)
 }
 
-// J03 列出命题项（含一致项、候选分组、当前决定）
-export async function listPropositionItems(
+// J03 列出命题项（含完整会话、按源版本分组的候选、当前决定）
+export function listPropositionItems(
   sessionId: string,
   params?: { status?: string; conflictType?: string }
-): Promise<PropositionReviewItem[]> {
-  const r = await get<ListResult<PropositionReviewItem>>(
-    `/adjudication-sessions/${sessionId}/proposition-items`,
-    params
-  )
-  return r.items
+): Promise<J03View> {
+  return get<J03View>(`/adjudication-sessions/${sessionId}/proposition-items`, params)
 }
 
 // J04 命题逐项决定：当前 PENDING_MODEL，未落就绪接口，暂不实现写操作。

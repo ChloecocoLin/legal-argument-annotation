@@ -2,20 +2,20 @@
 
 面向中文裁判文书说理部分的法律论证结构标注平台。系统围绕“标注指南管理—要素标注—命题裁定—专家复核—论证图展示”组织业务流程，为法律论证语料建设、冲突裁定和质量复核提供统一的前后端工程。
 
-> 当前版本：`0.1.0`　|　默认分支：`main`（B 的 M1）　|　成员 A 开发请走独立功能分支，不要直接推 `main`
+> 当前版本：`0.1.0`　|　开发分支：功能分支协作　|　当前阶段：M4 专家复核闭环已完成
 
 ## 项目功能
 
 | 模块 | 主要能力 | 当前状态 |
 | --- | --- | --- |
-| 标注指南管理 | 指南列表、版本详情、标签字典、版本创建/归档/审核/对比 | 已完成（成员 B · M1） |
-| 文书总库 | 文书列表/详情、规范化原文与文本哈希（只读 READY） | 已完成切片（成员 A） |
-| 任务与分配 | 创建任务、人员池、逐案分配、发布/启动 | 已完成切片（成员 A） |
-| 原文与命题边界 | 工作台选区、拆分/合并、切割提交与裁定者审核 | 已完成切片（成员 A） |
-| 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 待开发（成员 B） |
-| 要素标注 | 在已确认边界上设置类型（边界本身不是 Element） | 待开发（成员 B） |
-| 命题裁定 | 查看标注分歧、处理冲突、升级专家复核 | 页面与接口骨架 |
-| 专家复核 | 专家问题列表、复核详情、最终裁定 | 页面与接口骨架 |
+| 标注指南管理 | 指南列表、版本详情、标签字典、版本创建/归档/审核/对比 | 已完成 |
+| 文书题库 | 文书列表与详情、规范化原文与文本哈希校验 | 已完成（成员 A） |
+| 任务与分配 | 创建任务、人员池、逐案分配、发布与启动 | 已完成（成员 A） |
+| 原文与命题边界 | 工作台选区、拆分/合并、切割提交与裁定者审核 | 已完成（成员 A） |
+| 共享要素类型 | 非命题、GM、SM、GF、SF 等类型的统一选择与展示 | 已完成 |
+| 要素标注 | 文书片段选择、偏移量计算、要素类型标注、J09/G06 加载与 J10 保存 | 已完成 |
+| 命题裁定 | 查看标注分歧、处理冲突、自定义裁定、升级专家复核 | 已完成 |
+| 专家复核 | 待办列表、接受任务、提交结论与指南依据、确认完成、已确认问题文档 | 已完成 |
 | 论证图展示 | 支持、反对、组合等关系的图形化展示 | 资源与基础依赖已接入 |
 
 ## 技术栈
@@ -136,6 +136,9 @@ npm run build
 # 后端：编译
 cd ../backend
 mvn -DskipTests compile
+
+# 后端：运行 M3 集成测试
+mvn test
 ```
 
 ## 生产或联调环境
@@ -154,6 +157,22 @@ java -jar backend/target/argument-annotation-backend-0.1.0.jar --spring.profiles
 - 前端请求层会为 POST 请求补充 `Idempotency-Key`。
 - 标签的存在性和分组以指南标签字典接口返回的 `category`、`baseType`、`sortOrder` 为准。
 
+## 专家复核接口附录
+
+专家接口可通过请求头 `X-User-Id` 指定当前用户；不传时 `local` 环境回退到演示专家（尾号 0010）。X03/X04/X05 是状态写操作，必须携带 `If-Match`，值为当前 `recordVersion`；版本不匹配返回 `CONFLICT`，缺头按参数校验失败处理。
+
+| 编号 | 方法与路径 | 必需请求头 | 正常状态 | 关键错误码 |
+| --- | --- | --- | --- | --- |
+| J03 | GET `/api/v1/adjudication-sessions/{sessionId}/proposition-items` | — | 200 | `NOT_FOUND` |
+| J12 | POST `/api/v1/adjudication-sessions/{sessionId}/expert-reviews` | `Idempotency-Key`（POST 自动带） | 200 | `EXPERT_NOT_ASSIGNED` |
+| X01 | GET `/api/v1/expert-reviews` | `X-User-Id`（可选） | 200 | `FORBIDDEN` |
+| X02 | GET `/api/v1/expert-reviews/{reviewId}` | `X-User-Id` | 200 | `FORBIDDEN` / `NOT_FOUND` |
+| X03 | POST `/api/v1/expert-reviews/{reviewId}/transitions` | `If-Match` | 200 | `INVALID_REVIEW_STATE` / `CONFLICT` |
+| X04 | POST `/api/v1/expert-issues/{issueId}/resolutions` | `If-Match` | 200 | `GUIDE_BASIS_REQUIRED` / `INVALID_REVIEW_STATE` / `CONFLICT` |
+| X05 | POST `/api/v1/expert-reviews/{reviewId}/confirm` | `If-Match` | 200 | `OPEN_EXPERT_ISSUES` / `INVALID_REVIEW_STATE` / `CONFLICT` |
+
+状态口径：复核单 `REQUESTED → IN_REVIEW → CONFIRMED`，问题 `OPEN → RESOLVED`；仍有未解决问题时 X05 返回 `OPEN_EXPERT_ISSUES`。
+
 ## 标签口径
 
 正式 v1.2 使用 15 个标签：
@@ -165,15 +184,102 @@ java -jar backend/target/argument-annotation-backend-0.1.0.jar --spring.profiles
 
 合同及合同解释属于 `SM-C`，不启用早期原型中的 `GM-C`。
 
+## 共享要素类型组件
+
+`frontend/src/shared/ElementTypeSelector.vue` 是要素标注、命题裁定和专家复核页面共用的受控选择器。组件不维护业务字典，调用方应通过 G06 获取当前指南版本的 `LabelDefinition[]` 后传入。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import ElementTypeSelector from '@/shared/ElementTypeSelector.vue'
+import type { LabelDefinition } from '@/types/guide'
+
+const labels = ref<LabelDefinition[]>([])
+const selectedCode = ref<string | null>(null)
+</script>
+
+<template>
+  <ElementTypeSelector
+    v-model="selectedCode"
+    :labels="labels"
+    :loading="false"
+    clearable
+  />
+</template>
+```
+
+主要输入：
+
+- `labels`：G06 返回的标签定义数组。
+- `modelValue`：当前选中的标签代码，可通过 `v-model` 双向绑定。
+- `loading`、`error`：接口加载和失败状态。
+- `disabled`：禁用全部选项。
+- `clearable`：再次点击已选项时是否允许取消。
+
+组件发出 `update:modelValue`、`change` 和 `retry` 事件。标签按照接口返回的 `category`、`baseType`、`sortOrder` 动态分组和排序，未知命题基础类型会进入“其他命题要素”，不会被静默丢弃。
+
+## 要素标注工作台
+
+`frontend/src/features/adjudication/ArbiterAnnotate.vue` 按原型实现三栏工作台，并复用共享要素类型选择器：
+
+- 左侧选择裁判理由原文，按完整正文的 UTF-16 半开区间记录 `startOffset` 和 `endOffset`。
+- 中间创建、定位、重新编号、修改类型和删除要素，并阻止要素范围重叠。
+- 通过查询参数 `sessionId`、`itemKind`、`itemId` 调用 J09，再按上下文的指南版本调用 G06。
+- 提交前检查标签、正文切片、标注范围与重叠情况，并按 J10 组装 `customElements` 和 `sourceElementIds`。
+- 本地演示模式与真实接口模式明确分离，演示数据禁止提交到后端。
+
+访问真实上下文的 URL 格式：
+
+```text
+/adjudication/annotate?sessionId=...&itemKind=PROPOSITION&itemId=...
+```
+
+后端 `CustomAnnotationController` 已完成 M3 的 J09/J10：
+
+- J09 校验会话、裁定项、源版本、正文版本、标注范围和锁定指南版本的一致性，并返回候选要素与允许操作。
+- 相同边界的多版本候选在前端合并来源链，保留一个可编辑命题；边界不同且交叠的候选不会被静默提交。
+- J10 在服务端重新校验范围、重叠、标签、来源链和正文切片，生成自定义裁定快照及持久化要素。
+- `Idempotency-Key` 支持同键同请求安全重试；同一个键对应不同请求时返回 `CONFLICT`。
+- 当前 M3 仅开放 `PROPOSITION` 自定义裁定；关系自定义将在关系裁定阶段实现。
+
+本地联调数据：
+
+```text
+sessionId = aba39933-394e-41e0-aa76-1cf8acc57ba7
+itemKind = PROPOSITION
+itemId = 058fa5ba-c4a8-457a-96f9-1efd15df8e20
+```
+
+可直接访问：
+
+```text
+/adjudication/annotate?sessionId=aba39933-394e-41e0-aa76-1cf8acc57ba7&itemKind=PROPOSITION&itemId=058fa5ba-c4a8-457a-96f9-1efd15df8e20
+```
+
+## 专家复核
+
+成员 B 的 M4 闭环包含三个前端页面：
+
+- `/adjudication/conflict`：命题冲突解决列表，按 `status`、`conflictType` 筛选命题项。
+- `/expert`：专家复核工作台，左列表右详情；可接受任务、逐条提交结论与指南依据、全部解决后确认完成。
+- `/expert/issues`：已确认疑难问题的只读文档，平铺展示问题、专家结论和指南依据。
+
+演示数据（H2 每次重启重建）：
+
+- 预置一张 `REQUESTED` 复核单（尾号 0030）和一个 `OPEN` 问题（尾号 0040）。
+- 演示专家尾号 0010，已被指派到演示会话；页面顶部仅在开发环境显示“当前专家：演示专家（尾号 0010）”。
+
+演示动线：打开 `/expert` → 选中预置复核单 → 点“接受任务”→ 填写专家结论和指南依据后“提交结论”→ 所有问题 `RESOLVED` 后点“确认完成”→ 打开 `/expert/issues` 查看只读结论。复核单状态变为 `CONFIRMED`；重启后端即恢复干净种子数据。
+
 ## 开发进度
 
 - [x] M0：前后端工程骨架与接口契约层
-- [x] M1：标注指南管理（成员 B）
-- [x] 成员 A 可运行切片：文书只读、任务分配、原文/边界切割
-- [ ] M2：共享要素类型组件
-- [ ] M2.5：要素标注
-- [ ] M3：命题裁定
-- [ ] M4：专家复核
+- [x] M1：标注指南管理
+- [x] 成员 A 功能切片：文书只读、任务分配、原文与边界切割
+- [x] M2：共享要素类型组件
+- [x] M2.5：要素标注工作台前端与接口编排
+- [x] M3：自定义命题裁定（J09/J10 后端、数据结构、幂等与集成测试）
+- [x] M4：专家复核闭环（J03/J12/X01–X05 后端、专家工作台与问题文档前端）
 - [ ] M5：前后端联调与验收
 
 ### 成员 A 当前范围（本轮已接入）
