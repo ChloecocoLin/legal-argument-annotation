@@ -95,7 +95,7 @@ public class TaskController {
             @RequestHeader(value = "If-Match", required = false) Integer ifMatch,
             @RequestBody Map<String, Object> body) {
         return write(
-                "T08:" + memberId,
+                "T08:" + taskId + ":" + memberId,
                 idempotencyKey,
                 body,
                 () -> taskService.deactivateMember(taskId, memberId, body, ifMatch));
@@ -141,22 +141,12 @@ public class TaskController {
         return write("T12:" + taskId, idempotencyKey, body, () -> taskService.transition(taskId, body, ifMatch));
     }
 
-    @GetMapping("/tasks/{taskId}/progress")
-    public ApiResponse<Map<String, Object>> t13(@PathVariable String taskId) {
-        return ApiResponse.ok(taskService.progress(taskId));
-    }
-
     @PostMapping("/tasks/{taskId}/reannotation-tasks")
     public ApiResponse<Map<String, Object>> t14(
             @PathVariable String taskId,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody Map<String, Object> body) {
         return write("T14:" + taskId, idempotencyKey, body, () -> taskService.reannotate(taskId, body));
-    }
-
-    @GetMapping("/dev/a/task-setup")
-    public ApiResponse<Map<String, Object>> taskSetup(@RequestParam String taskId) {
-        return ApiResponse.ok(taskService.setup(taskId));
     }
 
     @GetMapping("/users")
@@ -173,12 +163,6 @@ public class TaskController {
     @SuppressWarnings("unchecked")
     private ApiResponse<Map<String, Object>> write(
             String op, String key, Object body, java.util.function.Supplier<Map<String, Object>> action) {
-        var ticket = idempotency.begin(AuthContext.require().userId(), op, key, body);
-        if (ticket.replay()) {
-            return ApiResponse.ok((Map<String, Object>) ticket.cached());
-        }
-        Map<String, Object> data = action.get();
-        idempotency.save(ticket, data);
-        return ApiResponse.ok(data);
+        return ApiResponse.ok(idempotency.execute(op, key, body, action));
     }
 }

@@ -1,44 +1,13 @@
 package com.argument.adjudication.controller;
-
-import com.argument.adjudication.dto.CustomAnnotationRequest;
-import com.argument.adjudication.dto.CustomAnnotationResult;
-import com.argument.adjudication.dto.CustomContextResponse;
-import com.argument.adjudication.service.CustomAnnotationService;
+import com.argument.adjudication.ReviewWorkflowService;
 import com.argument.common.response.ApiResponse;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import com.argument.version.port.VersionIdentity;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.web.bind.annotation.*;
-
-/**
- * 裁定者自定义接口（成员B 唯一负责编排）。M0 骨架，M3 实现。
- * J09 读取自定义上下文，J10 保存自定义快照。
- */
-@RestController
-@RequestMapping("/api/v1")
-@RequiredArgsConstructor
-@Validated
+@RestController @RequestMapping("/api/v1")
 public class CustomAnnotationController {
-
-    private final CustomAnnotationService service;
-
-    // J09 读取自定义编辑上下文
-    @GetMapping("/adjudication-sessions/{sessionId}/custom-context")
-    public ApiResponse<CustomContextResponse> getCustomContext(
-            @PathVariable String sessionId,
-            @RequestParam String itemKind,
-            @RequestParam String itemId) {
-        return ApiResponse.ok(service.getContext(sessionId, itemKind, itemId));
-    }
-
-    // J10 保存自定义命题/关系快照
-    @PostMapping("/adjudication-sessions/{sessionId}/custom-annotations")
-    public ApiResponse<CustomAnnotationResult> saveCustomAnnotation(
-            @PathVariable String sessionId,
-            @RequestHeader("Idempotency-Key") @NotBlank @Size(max = 100) String idempotencyKey,
-            @Valid @RequestBody CustomAnnotationRequest request) {
-        return ApiResponse.ok(service.save(sessionId, idempotencyKey, request));
-    }
+ private final ReviewWorkflowService service;private final VersionIdentity identity;
+ public CustomAnnotationController(ReviewWorkflowService service,VersionIdentity identity){this.service=service;this.identity=identity;}
+ @GetMapping("/adjudication-sessions/{id}/custom-context") public ApiResponse<ObjectNode> context(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestParam String itemKind,@RequestParam String itemId){return ApiResponse.ok(service.context(identity.authenticate(auth),id,itemKind,itemId));}
+ @PostMapping("/adjudication-sessions/{id}/custom-annotations") public ApiResponse<ObjectNode> save(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestBody ObjectNode body){return ApiResponse.ok(service.saveCustom(identity.authenticate(auth),id,key,body));}
 }

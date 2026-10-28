@@ -1,0 +1,160 @@
+{
+  "source": "contracts/openapi-ready.yaml",
+  "sha256": "813539491A53C0151C44BD426985F74A1DF4D5AD35A7DF1955D20C9CAE13B390",
+  "operations": [
+    {
+      "id": "U08",
+      "method": "GET",
+      "path": "/api/v1/dashboard/summary",
+      "status": "READY",
+      "summary": "管理首页聚合统计"
+    },
+    {
+      "id": "T13",
+      "method": "GET",
+      "path": "/api/v1/tasks/{taskId}/progress",
+      "status": "READY",
+      "summary": "查看任务和 X/N 进度"
+    },
+    {
+      "id": "A04",
+      "method": "POST",
+      "path": "/api/v1/annotation-drafts/{draftId}/submit",
+      "status": "READY",
+      "summary": "提交确认并产生完整 Vn"
+    },
+    {
+      "id": "A05",
+      "method": "POST",
+      "path": "/api/v1/annotation-versions/{versionId}/withdraw",
+      "status": "READY",
+      "summary": "撤回裁定前有效版本"
+    },
+    {
+      "id": "V01",
+      "method": "GET",
+      "path": "/api/v1/task-documents/{taskDocumentId}/annotation-versions",
+      "status": "READY",
+      "summary": "列出案例 V1…VN 与 X/N"
+    },
+    {
+      "id": "V02",
+      "method": "GET",
+      "path": "/api/v1/annotation-versions/{versionId}",
+      "status": "READY",
+      "summary": "查看一份不可变完整版本"
+    },
+    {
+      "id": "V03",
+      "method": "GET",
+      "path": "/api/v1/task-documents/{taskDocumentId}/annotation-diff",
+      "status": "READY",
+      "summary": "比较候选命题与关系差异"
+    },
+    {
+      "id": "J01",
+      "method": "POST",
+      "path": "/api/v1/task-documents/{taskDocumentId}/adjudication-sessions",
+      "status": "READY",
+      "summary": "读取或启动裁定会话"
+    },
+    {
+      "id": "J02",
+      "method": "GET",
+      "path": "/api/v1/adjudication-sessions/{sessionId}",
+      "status": "READY",
+      "summary": "读取会话状态与所有待办"
+    },
+    {
+      "id": "J11",
+      "method": "POST",
+      "path": "/api/v1/adjudication-sessions/{sessionId}/return",
+      "status": "READY",
+      "summary": "退回标注员补正"
+    },
+    {
+      "id": "J05",
+      "method": "POST",
+      "path": "/api/v1/adjudication-sessions/{sessionId}/propositions/complete",
+      "status": "READY",
+      "summary": "确认命题阶段完成"
+    },
+    {
+      "id": "J07",
+      "method": "POST",
+      "path": "/api/v1/relation-adjudication-items/{itemId}/decisions",
+      "status": "READY",
+      "summary": "对关系作采用/确认/删除等决定"
+    },
+    {
+      "id": "J08",
+      "method": "POST",
+      "path": "/api/v1/adjudication-sessions/{sessionId}/relations/complete",
+      "status": "READY",
+      "summary": "确认关系阶段完成"
+    },
+    {
+      "id": "FV01",
+      "method": "POST",
+      "path": "/api/v1/adjudication-sessions/{sessionId}/final-versions",
+      "status": "READY",
+      "summary": "生成待审最终快照"
+    },
+    {
+      "id": "FV02",
+      "method": "GET",
+      "path": "/api/v1/final-annotation-versions/{finalVersionId}",
+      "status": "READY",
+      "summary": "读取最终版、来源及质量检查"
+    },
+    {
+      "id": "FV03",
+      "method": "POST",
+      "path": "/api/v1/final-annotation-versions/{finalVersionId}/review",
+      "status": "READY",
+      "summary": "提交最终审查"
+    },
+    {
+      "id": "FV04",
+      "method": "POST",
+      "path": "/api/v1/final-annotation-versions/{finalVersionId}/return",
+      "status": "READY",
+      "summary": "退回最终版修改"
+    },
+    {
+      "id": "FV05",
+      "method": "POST",
+      "path": "/api/v1/final-annotation-versions/{finalVersionId}/approve",
+      "status": "READY",
+      "summary": "批准最终版本"
+    },
+    {
+      "id": "M01",
+      "method": "GET",
+      "path": "/api/v1/automation-tasks",
+      "status": "READY",
+      "summary": "列出自动任务及阶段进度"
+    },
+    {
+      "id": "M02",
+      "method": "POST",
+      "path": "/api/v1/task-documents/{taskDocumentId}/automation-tasks",
+      "status": "READY",
+      "summary": "创建自动预标注任务"
+    },
+    {
+      "id": "M03",
+      "method": "GET",
+      "path": "/api/v1/automation-tasks/{automationTaskId}",
+      "status": "READY",
+      "summary": "读取自动任务详情"
+    },
+    {
+      "id": "M04",
+      "method": "POST",
+      "path": "/api/v1/automation-tasks/{automationTaskId}/transitions",
+      "status": "READY",
+      "summary": "启动或取消自动任务"
+    }
+  ]
+}

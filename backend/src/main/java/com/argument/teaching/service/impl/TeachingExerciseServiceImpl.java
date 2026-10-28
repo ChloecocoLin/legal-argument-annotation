@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /** 教学练习服务实现。归成员 C。 */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class TeachingExerciseServiceImpl implements TeachingExerciseService {
 

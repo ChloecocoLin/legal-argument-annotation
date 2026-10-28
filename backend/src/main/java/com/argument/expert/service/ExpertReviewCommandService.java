@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 /**
  * J12 提交疑难问题；X03 接受复核；X05 确认完成。写操作都带 If-Match 乐观锁。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class ExpertReviewCommandService {
 
     private final ExpertReviewMapper reviewMapper;

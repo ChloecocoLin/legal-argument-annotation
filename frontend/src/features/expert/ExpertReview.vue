@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { formula } from '@/features/versions/formula'
 import { computed, onMounted, ref } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
+import { post } from '@/api/request'
+import { mutationAttempt, errorCode, errorMessage } from '@/features/versions/api'
+import { useUserStore } from '@/stores/user'
 import { toast } from '@/shared/toast'
 import {
   listMyExpertReviews,
-  getExpertReviewDetail,
-  startExpertReview,
-  submitIssueResolution,
-  confirmExpertReview
+  getExpertReviewDetail
 } from '@/api/expert'
 import type {
   ExpertReviewSummary,
@@ -14,7 +16,11 @@ import type {
   ExpertIssue
 } from '@/types/expert'
 
+const statusName=(value:string)=>({REQUESTED:'待接受',IN_REVIEW:'复核中',CONFIRMED:'已确认',RETURNED:'已退回',PROPOSITION:'命题问题',OPEN:'待解决',RESOLVED:'已解决'} as Record<string,string>)[value]||value
 const STATUS_OPTIONS = ['', 'REQUESTED', 'IN_REVIEW', 'CONFIRMED']
+const user=useUserStore(), pending=ref(false), busy=ref(false), commandError=ref('')
+const attempt=mutationAttempt<{url:string;body:object;actor:string}>()
+onBeforeRouteLeave(()=>!busy.value&&!pending.value)
 
 const loadingList = ref(true)
 const listError = ref(false)
@@ -40,10 +46,11 @@ async function loadList() {
   loadingList.value = true
   listError.value = false
   try {
-    const r = await listMyExpertReviews({
-      status: filterStatus.value || undefined
-    })
-    summaries.value = r.items
+    const all:ExpertReviewSummary[]=[]
+    for(let page=1;;page++){const r=await listMyExpertReviews({status:filterStatus.value||undefined,page,size:100});all.push(...r.items);if(all.length>=r.total)break}
+    const r={items:all}
+    summaries.value = all
+    if(!all.some(row=>row.review.id===selectedId.value)){selectedId.value='';detail.value=null}
     if (!selectedId.value && r.items.length) {
       selectedId.value = r.items[0].review.id
       await loadDetail()
@@ -81,55 +88,18 @@ async function select(id: string) {
   await loadDetail()
 }
 
-async function onAccept() {
-  if (!detail.value) return
-  accepting.value = true
-  try {
-    await startExpertReview(detail.value.review.id, detail.value.review.recordVersion)
-    await loadDetail()
-    toast('已接受复核申请')
-  } catch {
-    /* 错误已由拦截器提示 */
-  } finally {
-    accepting.value = false
-  }
+async function mutate(url:string,body:object,version:number) {
+  if(busy.value)return;busy.value=true;commandError.value=''
+  const a=attempt.get({url,body:JSON.parse(JSON.stringify(body)),actor:user.id},version);pending.value=true
+  if(a.body.actor!==user.id){attempt.reset();pending.value=false;busy.value=false;detail.value=null;return}
+  try{await post(a.body.url,a.body.body,{headers:{'Idempotency-Key':a.key,'If-Match':a.version}});attempt.reset();pending.value=false;await Promise.all([loadList(),loadDetail()]);toast('已保存专家复核操作')}
+  catch(e){commandError.value=errorMessage(e);if(errorCode(e)){attempt.reset();pending.value=false}}
+  finally{busy.value=false}
 }
-
-async function onResolve(issue: ExpertIssue) {
-  const draft = resolutionDraft.value[issue.id] || { resolution: '', guideBasis: '' }
-  if (!draft.resolution.trim() || !draft.guideBasis.trim()) {
-    toast('结论和指南依据都要填', 'err')
-    return
-  }
-  resolvingId.value = issue.id
-  try {
-    await submitIssueResolution(
-      issue.id,
-      { resolution: draft.resolution.trim(), guideBasis: draft.guideBasis.trim() },
-      issue.recordVersion
-    )
-    await loadDetail()
-    toast('已提交结论')
-  } catch {
-    /* 拦截器已提示 */
-  } finally {
-    resolvingId.value = ''
-  }
-}
-
-async function onConfirm() {
-  if (!detail.value) return
-  confirming.value = true
-  try {
-    await confirmExpertReview(detail.value.review.id, detail.value.review.recordVersion)
-    await Promise.all([loadList(), loadDetail()])
-    toast('复核已确认完成')
-  } catch {
-    /* 拦截器已提示 */
-  } finally {
-    confirming.value = false
-  }
-}
+function retry(){if(attempt.pending())mutate('',{},0)}
+async function onAccept(){if(detail.value)await mutate(`/expert-reviews/${detail.value.review.id}/transitions`,{action:'START'},detail.value.review.recordVersion)}
+async function onResolve(issue:ExpertIssue){const draft=resolutionDraft.value[issue.id];if(!draft?.resolution.trim()||!draft.guideBasis.trim()){toast('结论和指南依据都要填','err');return}await mutate(`/expert-issues/${issue.id}/resolutions`,{resolution:draft.resolution.trim(),guideBasis:draft.guideBasis.trim()},issue.recordVersion)}
+async function onConfirm(){if(detail.value)await mutate(`/expert-reviews/${detail.value.review.id}/confirm`,{confirmed:true},detail.value.review.recordVersion)}
 
 function contextFor(issueId: string) {
   if (!detail.value) return null
@@ -145,11 +115,13 @@ onMounted(loadList)
       <div>
         <h1 class="t-h1">专家复核工作台</h1>
         <div class="row" style="margin-top: 8px; gap: 8px">
-          <span class="badge outline">当前专家：演示专家（尾号 0010）</span>
+          <span class="badge outline">当前专家：{{ user.name }}</span>
         </div>
       </div>
     </div>
 
+    <p v-if="commandError" class="note danger">{{ commandError }}</p><p v-if="pending" class="note warn">上次操作结果未确认，重试将沿用原请求。<button class="btn btn-secondary" :disabled="busy" @click="retry">重试相同操作</button></p>
+    <fieldset :disabled="busy||pending" style="border:0;padding:0;margin:0">
     <!-- 状态过滤 -->
     <div class="card" style="margin: 16px 0">
       <div class="card-body">
@@ -160,8 +132,8 @@ onMounted(loadList)
             :key="s || 'all'"
             class="btn"
             :class="filterStatus === s ? 'btn-primary' : 'btn-secondary'"
-            @click="filterStatus = s"
-          >{{ s || '全部' }}</button>
+            @click="filterStatus = s; selectedId=''; loadList()"
+          >{{ s?statusName(s):'全部' }}</button>
         </div>
       </div>
     </div>
@@ -189,8 +161,8 @@ onMounted(loadList)
           >
             <div class="card-body">
               <div class="row between">
-                <span class="badge">{{ s.review.status }}</span>
-                <span class="t-xs muted">{{ s.review.id.slice(0, 8) }}</span>
+                <span class="badge">{{ statusName(s.review.status) }}</span>
+                <span class="t-xs muted">{{ s.taskName }}</span>
               </div>
               <p class="t-sm" style="margin: 8px 0 0">
                 问题 {{ s.issueCount }} · 未解决 {{ s.openIssueCount }}
@@ -218,10 +190,10 @@ onMounted(loadList)
           <div class="card">
             <div class="card-head">
               <div class="row" style="gap: 8px">
-                <span class="badge">{{ detail.review.status }}</span>
+                <span class="badge">{{ statusName(detail.review.status) }}</span>
                 <span class="t-xs muted">会话 {{ detail.review.sessionId.slice(0, 8) }}</span>
               </div>
-              <span class="t-xs muted">版本 v{{ detail.review.recordVersion }}</span>
+              <span class="t-xs muted">修订 {{ detail.review.recordVersion }}</span>
             </div>
             <div class="card-body" v-if="detail.review.status === 'REQUESTED'">
               <button class="btn btn-primary" :disabled="accepting" @click="onAccept">
@@ -233,8 +205,8 @@ onMounted(loadList)
           <div v-for="issue in detail.issues" :key="issue.id" class="card">
             <div class="card-head">
               <div class="row" style="gap: 8px">
-                <span class="badge outline">{{ issue.itemKind }}</span>
-                <span class="badge" :class="issue.status === 'OPEN' ? '' : 'success'">{{ issue.status }}</span>
+                <span class="badge outline">{{ statusName(issue.itemKind) }}</span>
+                <span class="badge" :class="issue.status === 'OPEN' ? '' : 'success'">{{ statusName(issue.status) }}</span>
               </div>
             </div>
             <div class="card-body">
@@ -249,8 +221,8 @@ onMounted(loadList)
                   style="margin-bottom: 8px"
                 >
                   <div class="card-body tight">
-                    <div class="section-label">源版本 {{ g.displayCode }}</div>
-                    <p v-for="(t, i) in g.texts" :key="i" class="t-sm" style="margin: 4px 0 0">{{ t }}</p>
+                    <div class="section-label">源版本 {{ g.displayCode }}</div><p v-for="r in g.relations" :key="r.id" class="mono t-sm">{{ formula(r,g.elements,g.relations,g.participants) }}</p>
+                    <p v-for="(t, i) in g.elements.map(e=>e.text)" :key="i" class="t-sm" style="margin: 4px 0 0">{{ t }}</p>
                   </div>
                 </div>
               </template>
@@ -264,20 +236,20 @@ onMounted(loadList)
               <!-- OPEN：填结论 -->
               <div v-else style="margin-top: 12px">
                 <input
-                  v-model="resolutionDraft[issue.id].resolution"
+                  v-model="resolutionDraft[issue.id].resolution" :disabled="detail.review.status!=='IN_REVIEW'"
                   class="input"
                   placeholder="专家结论"
                   style="width: 100%; margin-bottom: 8px; padding: 6px 8px"
                 />
                 <input
-                  v-model="resolutionDraft[issue.id].guideBasis"
+                  v-model="resolutionDraft[issue.id].guideBasis" :disabled="detail.review.status!=='IN_REVIEW'"
                   class="input"
                   placeholder="指南依据"
                   style="width: 100%; margin-bottom: 8px; padding: 6px 8px"
                 />
                 <button
                   class="btn btn-primary"
-                  :disabled="resolvingId === issue.id"
+                  :disabled="resolvingId === issue.id||detail.review.status!=='IN_REVIEW'"
                   @click="onResolve(issue)"
                 >{{ resolvingId === issue.id ? '提交中…' : '提交结论' }}</button>
               </div>
@@ -296,6 +268,7 @@ onMounted(loadList)
         </div>
       </div>
     </div>
+    </fieldset>
   </div>
 </template>
 

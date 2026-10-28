@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Member D TrialAuditEvent — pending team review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id","createdAt","createdById","updatedAt","updatedById","recordVersion","actorUserId","effectiveRole","permissionCode","requestId","operationCode","objectType","objectId","taskId","taskDocumentId","sessionId","occurredAt","beforeState","afterState","reason","sourceVersionIds","decisionIds","relatedObjectIds","transactionId","contentDigest"],
+  "properties": {
+    "id": {"$ref":"#/$defs/uuid"},
+    "createdAt": {"$ref":"#/$defs/time"},
+    "createdById": {"$ref":"#/$defs/uuid"},
+    "updatedAt": {"$ref":"#/$defs/time"},
+    "updatedById": {"$ref":"#/$defs/uuid"},
+    "recordVersion": {"const":1},
+    "actorUserId": {"$ref":"#/$defs/uuid"},
+    "effectiveRole": {"const":"ARBITER"},
+    "permissionCode": {"const":"FINAL_REVIEW"},
+    "requestId": {"$ref":"#/$defs/uuid"},
+    "operationCode": {"const":"FV06"},
+    "objectType": {"const":"FinalAnnotationVersion"},
+    "objectId": {"$ref":"#/$defs/uuid"},
+    "taskId": {"$ref":"#/$defs/uuid"},
+    "taskDocumentId": {"$ref":"#/$defs/uuid"},
+    "sessionId": {"$ref":"#/$defs/uuid"},
+    "occurredAt": {"$ref":"#/$defs/time"},
+    "beforeState": {"$ref":"#/$defs/states"},
+    "afterState": {"$ref":"#/$defs/states"},
+    "reason": {"type":"string","minLength":1},
+    "sourceVersionIds": {"type":"array","minItems":2,"uniqueItems":true,"items":{"$ref":"#/$defs/uuid"}},
+    "decisionIds": {"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/uuid"}},
+    "relatedObjectIds": {"type":"array","minItems":3,"uniqueItems":true,"items":{"$ref":"#/$defs/uuid"}},
+    "transactionId": {"$ref":"#/$defs/uuid"},
+    "contentDigest": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "uuid": {"type":"string","format":"uuid","pattern":"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"},
+    "time": {"type":"string","format":"date-time","pattern":"^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
+    "state": {
+      "type":"object","additionalProperties":false,"required":["id","status","recordVersion"],
+      "properties": {
+        "id":{"$ref":"#/$defs/uuid"},"status":{"type":"string"},"recordVersion":{"type":"integer","minimum":1},
+        "approvedAt":{"anyOf":[{"$ref":"#/$defs/time"},{"type":"null"}]},
+        "approvedById":{"anyOf":[{"$ref":"#/$defs/uuid"},{"type":"null"}]},
+        "committedAt":{"anyOf":[{"$ref":"#/$defs/time"},{"type":"null"}]}
+      }
+    },
+    "states": {
+      "type":"object","additionalProperties":false,"required":["finalVersion","taskDocument","session","task"],
+      "properties":{"finalVersion":{"$ref":"#/$defs/state"},"taskDocument":{"$ref":"#/$defs/state"},"session":{"$ref":"#/$defs/state"},"task":{"$ref":"#/$defs/state"}}
+    }
+  }
+}

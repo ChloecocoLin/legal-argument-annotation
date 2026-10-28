@@ -1,0 +1,52 @@
+{
+  "taskId": "19f6c864-39e4-4795-a96e-768572b5686f",
+  "caseId": "a2df3abc-3a36-4a64-8546-87251c1cb844",
+  "automationTaskId": "fa34762b-a478-48d9-8bdc-fd378dc1349f",
+  "cancelledTaskId": "b3076704-5440-4f02-8820-b2e5c213a28d",
+  "sharedCandidateReadOnly": true,
+  "sameAfterRestart": true,
+  "checkedAt": "2026-10-21",
+  "executionMode": "TEST_ADAPTER",
+  "realModelConnected": false,
+  "humanReviewConnected": false,
+  "tests": {
+    "total": 167,
+    "automation": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontendBuild": "PASS",
+  "frozenSchemas": [
+    "M01",
+    "M02",
+    "M03",
+    "M04"
+  ],
+  "readSchemasAfterRestart": [
+    "M01",
+    "M03"
+  ],
+  "status": "COMPLETED",
+  "inputDigest": "39c45fa3583d5723610b9c07dd189a9af58274a8a10b6b4a8419d94312de48d1",
+  "modelId": "member-d-test-adapter",
+  "modelVersion": "1.0",
+  "providerVersion": "deterministic-first-sentence-v1",
+  "suggestionCount": 1,
+  "candidateIds": [
+    "bbc0b136-6c5b-4c6b-8e18-12144ed76ba8"
+  ],
+  "sharedStatus": "PENDING_HUMAN_REVIEW",
+  "progress": {
+    "items": [
+      {
+        "taskDocumentId": "a2df3abc-3a36-4a64-8546-87251c1cb844",
+        "requiredAnnotators": 2,
+        "submittedCount": 0,
+        "status": "ANNOTATING"
+      }
+    ]
+  },
+  "oldResearchAndExportRegression": "PASS",
+  "browserCreatedTaskId": "bf5c9a5d-fdd5-4bbe-ae85-6b6dac7d99a4"
+}

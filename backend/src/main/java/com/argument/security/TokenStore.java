@@ -10,19 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Component;
 
 /**
- * 登录令牌的内存存储。归成员 C（分工.md §六）。
- *
- * <p>**不透明令牌 + 服务端会话**，不用 JWT：前端请求封装（{@code api/request.ts}）本来就把
- * {@code Authorization: Bearer <token>} 发出来，令牌长什么样由服务端决定；而本项目连数据库都是
- * H2 内存库（每次启动重新播种），把令牌签成自包含的 JWT 只是多一份密钥管理，换不来任何东西。
- * 反过来，不透明令牌天然支持「立刻登出」——JWT 要做到同样的事反而要额外维护一张黑名单。
- *
- * <p>进程内存储意味着**重启即全体登出**，与 H2 内存库的行为一致：重启后账号与令牌一起归零，
- * 不会出现「令牌有效但用户已不存在」的错位。若将来换成 MySQL 持久化，这里换成一张令牌表即可，
- * 对外接口（{@link #issue} / {@link #resolve} / {@link #revoke}）不用变。
- *
- * <p>令牌用 {@link SecureRandom} 生成 32 字节后 Base64URL 编码（256 位熵），不用 UUID：
- * UUID v4 只有 122 位，且是设计给标识符的，不该拿来当凭据。
+ * C 的不透明会话令牌：SecureRandom 32 字节，8 小时有效，登出即时撤销。
+ * 会话目前仅存进程内；服务重启后需重新登录，持久化账号和业务数据不受影响。
+ * 主体权限由 UnifiedVersionIdentity 每次从共享用户/角色重新读取。
+ * 后续多实例部署需替换为共享令牌存储，不改变 issue/resolve/revoke 协议。
  */
 @Component
 public class TokenStore {

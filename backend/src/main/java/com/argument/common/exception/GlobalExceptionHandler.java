@@ -104,6 +104,14 @@ public class GlobalExceptionHandler {
         return attrs == null ? null : attrs.getRequest();
     }
 
+    @ExceptionHandler(org.springframework.web.bind.ServletRequestBindingException.class)
+    public ResponseEntity<ApiResponse<Object>> missingBinding(Exception ex) { return ResponseEntity.badRequest().body(ApiResponse.fail(ErrorCode.VALIDATION_ERROR,"缺少必要的请求头或参数")); }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> resourceNotFound(Exception ex) {
+        return ResponseEntity.status(404).body(ApiResponse.fail(ErrorCode.NOT_FOUND, "请求的资源不存在"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneric(Exception ex) {
         log.error("未处理异常", ex);

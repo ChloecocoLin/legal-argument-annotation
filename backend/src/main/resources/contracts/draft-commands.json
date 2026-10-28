@@ -1,0 +1,110 @@
+{
+  "A02": {
+    "type": "object",
+    "properties": {
+      "assignmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "segmentationCheckpointId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "assignmentId"
+    ],
+    "description": "省略关口 ID 时由服务端确定当前唯一已确认关口。"
+  },
+  "A03": {
+    "type": "object",
+    "properties": {
+      "phase": {
+        "type": "string",
+        "enum": [
+          "SEGMENTATION",
+          "ELEMENTS",
+          "RELATIONS",
+          "GRAPH"
+        ]
+      },
+      "elementIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "relationIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "minProperties": 1,
+    "description": "PATCH：至少一项；不接收版本、审计或所有权字段。"
+  },
+  "E02": {
+    "type": "object",
+    "properties": {
+      "startOffset": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "endOffset": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "labelCode": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "startOffset",
+      "endOffset",
+      "labelCode"
+    ],
+    "description": "labelCode 必填：未分类边界不作为 Element 持久化，而由统一切割关口与草稿要素差集推导。禁止用 Non-O 冒充未分类。"
+  },
+  "E03": {
+    "type": "object",
+    "properties": {
+      "labelCode": {
+        "type": "string",
+        "minLength": 1
+      },
+      "startOffset": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "endOffset": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "additionalProperties": false,
+    "minProperties": 1,
+    "description": "PATCH 至少一项；合并当前值后再校验半开区间。"
+  },
+  "E04": {
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "reason"
+    ],
+    "additionalProperties": false
+  }
+}

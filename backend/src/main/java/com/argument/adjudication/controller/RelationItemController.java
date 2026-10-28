@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
  * <p>RBAC（分工.md §六）：整组限 admin / arbiter。关系裁定是裁定员的职责，
  * 标注员看到「各自标了什么、差在哪」会直接暴露另一侧标注员的答案（裁定要回避这件事）。
  */
-@RestController
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('admin','arbiter')")

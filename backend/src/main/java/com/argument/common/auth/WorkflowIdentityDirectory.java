@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
-@Component
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class WorkflowIdentityDirectory {
 
     private final WorkflowStore store;

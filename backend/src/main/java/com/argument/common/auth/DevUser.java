@@ -2,7 +2,7 @@ package com.argument.common.auth;
 
 import java.util.Set;
 
-/** 本地固定 Token 映射出的开发身份，不替代未冻结的 U01/U02。 */
+/** A 服务的兼容身份视图；来源统一为 SecurityContext 的已认证主体。 */
 public record DevUser(String userId, String username, String displayName, Set<String> roleCodes) {
 
     public boolean hasRole(String role) {

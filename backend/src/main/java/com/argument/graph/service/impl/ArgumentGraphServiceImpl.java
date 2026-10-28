@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>嵌套关系经关系节点串联，**不压平**；坐标变化绝不改变关系语义。</li>
  * </ul>
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class ArgumentGraphServiceImpl implements ArgumentGraphService {
 

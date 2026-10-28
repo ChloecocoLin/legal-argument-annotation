@@ -13,18 +13,22 @@ import org.springframework.stereotype.Service;
 public class AccessService {
 
     private final WorkflowStore store;
+    private final com.argument.version.VersionService versions;
+    private final com.argument.integration.UnifiedVersionIdentity identity;
 
-    public AccessService(WorkflowStore store) {
+    public AccessService(WorkflowStore store,com.argument.version.VersionService versions,com.argument.integration.UnifiedVersionIdentity identity) {
+        this.versions=versions;this.identity=identity;
         this.store = store;
     }
 
     public boolean canViewDocument(DevUser user, String documentId) {
         if (user.hasAnyRole("ADMIN", "TASK_CREATOR")) {
-            return true;
+            return identity.actor(user.userId()).permission("DOCUMENT_VIEW");
         }
         return store.assignments.values().stream()
                 .filter(row -> user.userId().equals(Records.str(row, "userId")))
                 .filter(row -> "ACTIVE".equals(Records.str(row, "status")))
+                .filter(row -> versions.hasAssignment(identity.actor(user.userId()),Records.str(row,"taskDocumentId"),Records.str(row,"assignmentRole")))
                 .map(row -> store.taskDocuments.get(Records.str(row, "taskDocumentId")))
                 .anyMatch(td -> td != null && documentId.equals(Records.str(td, "documentId")));
     }

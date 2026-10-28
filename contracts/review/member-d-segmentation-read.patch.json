@@ -1,0 +1,7 @@
+[
+  {
+    "op": "replace",
+    "path": "/components/schemas/S02Success/properties/data/properties/items/items/properties/reviewedAt/type",
+    "value": ["string", "null"]
+  }
+]

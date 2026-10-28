@@ -1,10 +1,5 @@
 <script setup lang="ts">
-// 登录页。归成员C（分工.md §六）。
-//
-// 与原型 login.html 的**关键差别**：原型让人「选择进入角色」，这里不选。
-// 「登录后自选角色」等于把 RBAC 做成摆设——角色是账号的属性（app_user_role），
-// 由后端按令牌判定，前端连猜都猜不到。所以右边换成**演示账号列表**：
-// 点一下填入账号，口令统一是 demo。演示时想切角色就换个账号登录，这才是真的换身份。
+// C 登录页面接统一身份；原型的角色入口改为已授权账号登录。
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/shared/Icon.vue'
@@ -20,24 +15,24 @@ interface DemoAccount {
   hint: string
 }
 
-// 与 backend/src/main/resources/data.sql 的 app_user 种子一一对应——**含姓名**。
-// 曾经在这里写过「李标注 / 张裁定」这种角色味的名字，登录后顶栏却显示种子里的「李铭 / 张宁」，
-// 同一个账号在两处叫不同名字，看着像串号。以种子为准。
-// 口令都是 {noop}demo：这是**演示环境**的占位，不是可以带进生产的口令策略。
+// 仅开发预览显示，由 LocalAccountLoader 绑定已有规范用户 ID 并保存 BCrypt 口令。
 const DEMO_PASSWORD = 'demo'
-const DEMO_ACCOUNTS: DemoAccount[] = [
-  { username: 'legal.researcher', displayName: '王慧', role: 'admin', hint: '全部功能，也是自查脚本用的账号' },
-  { username: 'ann.li', displayName: '李铭', role: 'annotator', hint: '关系标注、图示审查' },
-  { username: 'arb.zhang', displayName: '张宁', role: 'arbiter', hint: '关系裁定、图示审查' },
-  { username: 'stu.chen', displayName: '陈默', role: 'student', hint: '关系练习' },
-  { username: 'tea.wu', displayName: '吴敏', role: 'teacher', hint: '关系练习' }
-]
+const DEMO_ACCOUNTS: DemoAccount[] = import.meta.env.DEV ? [
+  {username:'creator.li',displayName:'李承志',role:'creator',hint:'任务、人员分配及导出'},
+  {username:'annotator.chen',displayName:'陈晓',role:'annotator',hint:'本人独立标注'},
+  {username:'annotator.liu',displayName:'刘一鸣',role:'annotator',hint:'另一名独立标注员'},
+  {username:'arbiter.zhao',displayName:'赵明远',role:'arbiter',hint:'裁定与最终审查'},
+  {username:'expert.qian',displayName:'钱学礼',role:'expert',hint:'被指派的专家复核'},
+  {username:'admin.wang',displayName:'王慧',role:'admin',hint:'管理与授权概览'},
+  {username:'teacher.sun',displayName:'孙立',role:'teacher',hint:'课程、教学作业与独立作答'},
+  {username:'student.zhou',displayName:'周雨桐',role:'student',hint:'课程、教学作业与独立作答'}
+] : []
 
 const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
 
-const form = ref({ username: 'legal.researcher', password: DEMO_PASSWORD })
+const form = ref({ username: '', password: '' })
 const submitting = ref(false)
 /** 错误就地显示在表单里，而不是只弹 toast：toast 2.6 秒就没了，用户回头看不到原因。 */
 const error = ref('')
@@ -158,7 +153,7 @@ function messageOf(e: unknown): string {
               class="input"
               type="password"
               autocomplete="current-password"
-              placeholder="演示环境统一为 demo"
+              placeholder="请输入口令"
             />
           </div>
 
@@ -173,10 +168,10 @@ function messageOf(e: unknown): string {
           </button>
         </form>
 
-        <div class="note info" style="margin-top: 20px">
+        <div v-if="DEMO_ACCOUNTS.length" class="note info" style="margin-top: 20px">
           <Icon name="info" />
           <div class="note-body">
-            这是课程演示环境，下列账号口令统一为 <b class="mono">demo</b>，点账号即可填入。
+            这是本地联调环境，下列账号口令统一为 <b class="mono">demo</b>，点账号即可填入。
             <b>角色不可自选</b>——它属于账号，登录后由后端按令牌判定。
           </div>
         </div>

@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
  *       进 {@code reAdjudicationItemIds}，会话不能进入 FINAL_REVIEW。</li>
  * </ol>
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class RelationAdjudicationSemantics {
 

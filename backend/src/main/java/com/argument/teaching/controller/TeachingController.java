@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * <p>RBAC（分工.md §六）：整组接口限 admin / student / teacher。做题人与出题人是这两类角色，
  * 标注员与裁定员没有理由看到题库——尤其题库详情虽不含标准答案，但题目构造本身就是教学资源。
  */
-@RestController
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequestMapping("/api/v1/teaching")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('admin','student','teacher')")

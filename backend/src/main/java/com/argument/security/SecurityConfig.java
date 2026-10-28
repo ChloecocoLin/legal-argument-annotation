@@ -64,6 +64,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final com.argument.version.port.VersionIdentity identity;
     private final TokenStore tokenStore;
     private final JsonAuthenticationEntryPoint authenticationEntryPoint;
     private final JsonAccessDeniedHandler accessDeniedHandler;
@@ -99,10 +100,10 @@ public class SecurityConfig {
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {        // 手工 new 而不是把过滤器声明成 @Component：Spring Boot 会把容器里的每个 Filter bean
         // 再注册到 servlet 容器一次，于是它会在 Spring Security 链路之外**再跑一遍**。
         // 这里只需要它在安全链路里工作，所以不进容器。
-        TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(tokenStore);
+        TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(identity,tokenStore);
 
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(org.springframework.security.config.Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -112,6 +113,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // 登出允许匿名：令牌已过期时也要能走完「清掉本地登录态」这一步
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/guide-versions/*/review-decisions").hasAuthority("GUIDE_REVIEW")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/guides", "/api/v1/guides/**", "/api/v1/guide-versions/**").hasAuthority("GUIDE_MANAGE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/guide-versions/**", "/api/v1/label-definitions/**", "/api/v1/relation-definitions/**").hasAuthority("GUIDE_MANAGE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/label-definitions/**", "/api/v1/relation-definitions/**").hasAuthority("GUIDE_MANAGE")
                         .requestMatchers(
                                 "/actuator/health",
                                 "/actuator/info",

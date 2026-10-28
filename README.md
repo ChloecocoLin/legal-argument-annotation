@@ -1,5 +1,8 @@
 # 法律论证结构标注系统
 
+> 团队集成（2026-10-28）：A/B/C/D 已在 `integration/team-merge` 集成。冲突处理、共享入口、迁移、验证及试行边界见 [团队集成记录](docs/team-merge-2026-10-28.md)。下文早期里程碑与各批次记录保留为历史。
+
+
 面向中文裁判文书说理部分的法律论证结构标注平台。系统围绕“标注指南管理—要素标注—命题裁定—专家复核—论证图展示”组织业务流程，为法律论证语料建设、冲突裁定和质量复核提供统一的前后端工程。
 
 > 当前版本：`0.1.0`　|　开发分支：功能分支协作　|　当前阶段：M4 专家复核闭环已完成
@@ -97,7 +100,7 @@ cd legal-argument-annotation
 
 ### 2. 启动后端
 
-默认启用 `local` profile，使用 H2 内存数据库，不需要提前安装 MySQL 或 Redis。
+默认启用 `local` profile，使用持久化 H2 文件数据库和 Flyway，不需要提前安装 MySQL 或 Redis；启动不会重建已有数据。
 
 ```powershell
 cd backend
@@ -316,6 +319,54 @@ git push -u origin feature/your-feature
 
 提交前至少执行前端构建和后端编译，且不要提交密码、IDE 配置、`node_modules` 或新的构建产物。
 
-## 说明
+## 成员 D 第 1–4 步
+
+已新增任务进度、版本列表/完整详情、提交确认与撤回页面，以及 T13、V01/V02、A04/A05 后端实现。使用数据库事务冻结完整快照，支持幂等、乐观锁、来源保留和盲标权限校验。
+
+访问 `/tasks`，在开发模式选择“本地联调身份”，可用陈晓/刘一鸣各自提交，然后以赵明远查看负责案例的版本。预置统一切割和 A/B/C 依赖不计为对应模块已实现；正式版本保存到数据库。生产必须由 A/B/C 提供正式适配器和认证。
+
+如果默认端口被原型或其他服务占用，可分别指定：
+
+```powershell
+# backend，已使用 JDK 17 打包后
+java -jar target/argument-annotation-backend-0.1.0.jar --server.port=18080
+# frontend，在另一个终端运行
+$env:VITE_API_TARGET='http://127.0.0.1:18080'
+npm run dev -- --host 127.0.0.1 --port 5174
+```
+
+后端检查：`mvn test`；前端检查：`npm run build`。D 的基线、接口评审补丁及适配边界见 [页面与契约基线](docs/member-d/01-page-and-contract-baseline.md)、[基础与接入](docs/member-d/02-foundation-and-integration.md)。共享 READY 契约文件未改动；V01/V02/A04/A05 按用户授权的修订版 Markdown 实现完整资源，OpenAPI 补丁单独待评审。
+
+本地 H2 数据位于 `backend/.local-data`，不提交到 Git。正式公共审计、统一切割确认、裁定和入库、教学、导出不在本批次。旧指南表的整体规范迁移仍需团队统一。
 
 本项目用于课程设计与团队协作开发。业务规则、标签定义及接口字段发生冲突时，以团队确认的最新指南和接口契约为准。
+
+## 成员 D：裁定阶段联调
+
+第 5 步的会话、阶段门禁、关系决定与指定退回，以及第 6 步模型提案见 [交接与验收](docs/member-d/05-adjudication-handoff.md) 和 [待评审模型](docs/member-d/04-segmentation-and-mapping-proposal.md)。前端入口 `/adjudication/conflict`，也可从任务详情进入；自定义页复用 `/adjudication/annotate`。
+
+当前按本地预置切割/命题映射验收，J04、B 的自定义保存/专家指派、C 的完整图编辑校验待接入。最终审查与入库尚未交付；本批 FINAL_REVIEW 仅表示两阶段裁定完成。冻结 SDK 输入不变，新的会话传输补丁单独待团队评审。
+
+## 成员 D：最终快照与审查
+
+本批实现 FV01–FV05 与 `/final-review` 页面，详情见 [最终审查交接](docs/member-d/07-final-review-handoff.md)。采用/一致/排除来源完整保留，原版内容不改写；送审、退回、批准使用乐观锁、幂等与永久流程历史。
+
+本地可验证生成、送审、退回和重建，正式批准因 A/B/C 正式验证依赖尚未齐全而被服务端禁止。批准路径通过服务端证据替身测试，APPROVED 不等于入库。正式图示、最终草稿内容修订、FV06 与公共审计模型仍待对接/确认；参见 [模型提案](docs/member-d/06-commit-audit-and-revision-proposal.md) 和 [FV02 读取提案](contracts/review/member-d-final-read-proposal.md)。本批公开接口保持冻结响应，完整页面读取仅使用显式 local/test 适配器。
+
+## 成员 D：管理统计与导出准备
+
+U08 已按冻结响应实现，入口 `/admin-home`；管理员查看全局数量，任务创建者仅查看本人任务范围。生产需提供 DashboardData 权威数据适配器，本地统计由显式 local/test 适配器读取依赖数据与已保存版本。
+
+`/export` 和 `/export-records` 沿用可运行原型布局；导出预览只读取已入库最终版。现有本地最终版尚未入库，因此范围为空；生成文件、查询导出记录与下载仍待模型确认，页面不展示虚假成功。详情与统计口径见 [本批交接](docs/member-d/08-dashboard-and-export-preparation.md)，文件/导出/下载实体与传输缺口见 [待评审方案](contracts/review/member-d-export-model-proposal.md)。复核可运行 `python scripts/verify-member-d-dashboard.py`，全程只读。第 8、9 步仍需先确认 FV06/L/EX/F 模型，再实现完整入库与文件流程。
+
+## 成员 D：入库与审计试行
+
+用户已授权按现有提案在 D 分支试行，团队评审标记保留。FV06、L01 与最终版 L02/L03 仅在 local/test 且 !prod 开放；迁移位于 trial 目录。入库与永久审计、状态锁定、证据及幂等结果同事务保存，同案例唯一；任务仅在全部案例入库后完成。最终审查增加试行入库与只读状态，`/audit` 提供授权查询。正式验证门禁未绕过，现有本地 F2 仍未批准。
+
+详情、验证与待接入边界见 [试行交接](docs/member-d/09-commit-audit-trial-handoff.md)。下一步继续已获授权的文件/导出/下载试行，不视为共享契约已经冻结或生产联合验收完成。
+
+## 成员 D 第 1–3 批试行（2026-10-20）
+
+文件/JSON/XLSX/下载、真实切割一致性关口、独立补正轮次及已入库成果查询已在 D 分支试行。所有新增业务服务和 V7–V9 迁移仅 local/test，待公共模型评审与 A/B/C 正式联调。
+
+页面 `/export`、`/export-records`、`/segmentation`、`/final-review`、`/results`；运行库没有因页面验收被强制入库。具体实现、身份、格式、94 项回归及剩余依赖见 [第 1–3 批交接](docs/member-d/10-batches-1-3-handoff.md)。

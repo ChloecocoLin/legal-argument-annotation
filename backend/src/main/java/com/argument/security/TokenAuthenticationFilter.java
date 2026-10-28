@@ -25,10 +25,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER = "Bearer ";
 
-    private final TokenStore tokenStore;
+    private final com.argument.version.port.VersionIdentity identity;
+    private final TokenStore tokens;
 
-    public TokenAuthenticationFilter(TokenStore tokenStore) {
-        this.tokenStore = tokenStore;
+    public TokenAuthenticationFilter(com.argument.version.port.VersionIdentity identity,TokenStore tokens) {
+        this.tokens=tokens;
+        this.identity = identity;
     }
 
     @Override
@@ -38,14 +40,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith(BEARER)) {
             String token = header.substring(BEARER.length()).trim();
-            tokenStore.resolve(token).ifPresent(principal -> {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                principal, null, principal.getAuthorities());
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
+            try {
+                var actor=identity.authenticate(header);
+                var principal=new AppUserPrincipal(actor.id(),tokens.resolve(token).map(AppUserPrincipal::getUsername).orElse(actor.id()),actor.name(),actor.roles().stream().map(com.argument.integration.UnifiedVersionIdentity::uiRole).sorted().toList());
+                var authorities=new java.util.ArrayList<org.springframework.security.core.GrantedAuthority>(principal.getAuthorities());
+                actor.permissions().forEach(permission->authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(permission)));
+                var authentication=new UsernamePasswordAuthenticationToken(principal,null,authorities);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            } catch(com.argument.common.exception.BusinessException ignored) {
+                // Anonymous requests are rejected by the security entry point; no demo fallback for real tokens.
+            }
         }
         chain.doFilter(request, response);
     }

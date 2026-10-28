@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-head">
       <h1>文书总库</h1>
-      <p class="muted">D01 只读检索。上传/新文本版本（D02/D04）仍为 PENDING_MODEL，使用预置文书。</p>
+      <p class="muted">检索现有裁判文书，查看规范化原文及文本版本。</p>
     </div>
     <el-form inline @submit.prevent="load">
       <el-input v-model="q" placeholder="检索法院 / 案由" clearable style="width: 240px" />

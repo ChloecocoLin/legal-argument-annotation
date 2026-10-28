@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * </ol>
  * 会话与决定不写库（写侧归 D 的 J05/J07/J08），本服务只读会话的阶段字段做门禁。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class RelationAdjudicationServiceImpl implements RelationAdjudicationService {
 

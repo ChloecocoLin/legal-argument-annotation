@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 /**
  * X04 专家提交问题结论与指南依据。OPEN -> RESOLVED，带 If-Match 乐观锁。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class ExpertIssueCommandService {
 
     private final ExpertIssueMapper issueMapper;

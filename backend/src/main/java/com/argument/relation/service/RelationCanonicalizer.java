@@ -103,8 +103,7 @@ public class RelationCanonicalizer {
                 displayNos.addAll(inner.leafDisplayNos());
                 unmapped.addAll(inner.unmappedIds());
                 // 内层用「内层代码 + 内层叶命题」的结构键，避免把关系 ID 当成业务外键。
-                token = "R:" + inner.code() + "["
-                        + String.join(",", new TreeSet<>(inner.leafUnifiedIds())) + "]";
+                token = "R:" + inner.structureKey();
             } else {
                 String unifiedId = unifiedIdOf.apply(participant.targetId());
                 if (unifiedId == null) {
@@ -140,8 +139,8 @@ public class RelationCanonicalizer {
                 relation.expression(),
                 leaves.stream().distinct().sorted().collect(Collectors.toList()),
                 displayNos,
-                relation.relationCode() + "(" + String.join(";", ordered) + ")",
-                relation.relationCode() + "(" + String.join(";", sortedWithRole) + ")",
+                relation.relationCode() + "(" + String.join(";", Boolean.TRUE.equals(relation.directed()) ? ordered : sortedRoleless) + ")",
+                relation.relationCode() + "(" + String.join(";", Boolean.TRUE.equals(relation.directed()) ? sortedWithRole : sortedRoleless) + ")",
                 "(" + String.join(";", sortedRoleless) + ")",
                 maxDepth, nested,
                 unmapped.stream().distinct().collect(Collectors.toList()));

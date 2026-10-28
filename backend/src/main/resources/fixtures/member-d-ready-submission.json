@@ -1,0 +1,1451 @@
+{
+  "scenario": "ready-submission",
+  "contractStatus": "LOCAL_TEST_FIXTURE",
+  "limitations": [
+    "Confirmed segmentation is preloaded; S04 is not implemented.",
+    "A/B/C task, draft and graph data use a local dependency adapter.",
+    "Drafts are isolated ACTIVE pre-submission projections; no adjudication or final records are loaded."
+  ],
+  "records": [
+    {
+      "kind": "user",
+      "value": {
+        "id": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "username": "admin.wang",
+        "displayName": "王慧",
+        "roleIds": [
+          "76233b76-9e9f-45e0-bb15-458821815a9a"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "username": "creator.li",
+        "displayName": "李承志",
+        "roleIds": [
+          "0db02658-691f-4b3d-86db-4c5e069f85e1"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "username": "annotator.chen",
+        "displayName": "陈晓",
+        "roleIds": [
+          "2c1969cb-de58-4e3a-be24-298ee128897c"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "username": "annotator.liu",
+        "displayName": "刘一鸣",
+        "roleIds": [
+          "2c1969cb-de58-4e3a-be24-298ee128897c"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "username": "arbiter.zhao",
+        "displayName": "赵明远",
+        "roleIds": [
+          "950e4a39-5f25-48c4-bf24-9478f3cb9335"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "2901c453-e8c4-4cfa-948c-7dedb4f2ab8a",
+        "username": "teacher.sun",
+        "displayName": "孙立",
+        "roleIds": [
+          "b36ccbb6-b3c1-4b8e-b5cf-3cdee283a120"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "52b8374c-4ad4-4aca-bed8-1b7bc6687577",
+        "username": "student.zhou",
+        "displayName": "周雨桐",
+        "roleIds": [
+          "508550e3-f67f-4c8d-847d-5afbd186a685"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "user",
+      "value": {
+        "id": "4809fe74-569e-4906-a453-423c290b0525",
+        "username": "expert.qian",
+        "displayName": "钱学礼",
+        "roleIds": [
+          "d9d073f0-da96-442f-826d-a1a689cada11"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "76233b76-9e9f-45e0-bb15-458821815a9a",
+        "code": "ADMIN",
+        "name": "系统管理员",
+        "permissionCodes": [
+          "USER_MANAGE",
+          "ROLE_MANAGE",
+          "AUDIT_VIEW",
+          "GUIDE_VIEW",
+          "GUIDE_MANAGE",
+          "GUIDE_REVIEW",
+          "DOCUMENT_VIEW",
+          "DOCUMENT_MANAGE",
+          "TASK_OVERVIEW",
+          "EXPORT_CREATE",
+          "EXPORT_RECORD_VIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "0db02658-691f-4b3d-86db-4c5e069f85e1",
+        "code": "TASK_CREATOR",
+        "name": "任务创建者",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "DOCUMENT_VIEW",
+          "DOCUMENT_SUBMIT",
+          "TASK_OVERVIEW",
+          "TASK_CREATE",
+          "TASK_ASSIGN",
+          "TASK_VIEW",
+          "PILOT_MANAGE",
+          "AUTO_TASK_MANAGE",
+          "EXPORT_CREATE",
+          "EXPORT_RECORD_VIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "2c1969cb-de58-4e3a-be24-298ee128897c",
+        "code": "ANNOTATOR",
+        "name": "标注员",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "ASSIGNED_DOCUMENT_VIEW",
+          "TASK_VIEW",
+          "ANNOTATION_WORK",
+          "ANNOTATION_SUBMIT",
+          "TRAINING_CONFIRM",
+          "AUTO_SUGGESTION_REVIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "950e4a39-5f25-48c4-bf24-9478f3cb9335",
+        "code": "ARBITER",
+        "name": "裁定者",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "ASSIGNED_DOCUMENT_VIEW",
+          "TASK_VIEW",
+          "ADJUDICATION_WORK",
+          "FINAL_REVIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "b36ccbb6-b3c1-4b8e-b5cf-3cdee283a120",
+        "code": "TEACHER",
+        "name": "教师",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "COURSE_DOCUMENT_VIEW",
+          "COURSE_MANAGE",
+          "ASSIGNMENT_MANAGE",
+          "STANDARD_ANSWER_MANAGE",
+          "STUDENT_RESULT_VIEW",
+          "GRADE_EXPORT"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "508550e3-f67f-4c8d-847d-5afbd186a685",
+        "code": "STUDENT",
+        "name": "学生",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "COURSE_DOCUMENT_VIEW",
+          "STUDENT_ANSWER_WORK",
+          "OWN_RESULT_VIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "role",
+      "value": {
+        "id": "d9d073f0-da96-442f-826d-a1a689cada11",
+        "code": "EXPERT",
+        "name": "专家",
+        "permissionCodes": [
+          "GUIDE_VIEW",
+          "ASSIGNED_DOCUMENT_VIEW",
+          "EXPERT_REVIEW",
+          "EXPERT_ISSUE_VIEW"
+        ],
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": null,
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": null,
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "task",
+      "value": {
+        "id": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "name": "劳务合同纠纷裁判理由标注",
+        "taskType": "FORMAL_RESEARCH",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "defaultRequiredAnnotators": 2,
+        "annotatorPoolUserIds": [
+          "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "17e46666-aec6-4ed2-8e48-c044014f94a1"
+        ],
+        "assignmentMode": "MANUAL",
+        "dueAt": "2026-10-30T15:59:00Z",
+        "status": "IN_PROGRESS",
+        "sourceTaskId": null,
+        "sourceFinalVersionId": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1,
+        "description": "按指南 v1.2 完成双人独立科研标注。",
+        "ownerUserId": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "autoPreannotationEnabled": true,
+        "expertConfirmationRequired": false,
+        "adjudicationReasonRequired": true
+      }
+    },
+    {
+      "kind": "taskDocument",
+      "value": {
+        "id": "3cbb140f-0274-4871-8248-194271101a14",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "documentId": "bfd699c7-e225-4263-b077-c247e4d59fbc",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "requiredAnnotators": 2,
+        "status": "ANNOTATING",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "assignment",
+      "value": {
+        "id": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "userId": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "assignmentRole": "ANNOTATOR",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-10T08:00:00Z",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1,
+        "taskMemberId": "132ebcf3-04b5-4d54-b14b-e77ad4429ad4"
+      }
+    },
+    {
+      "kind": "assignment",
+      "value": {
+        "id": "23cf6498-c282-45b5-aec6-d0e08b219286",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "userId": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "assignmentRole": "ANNOTATOR",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-10T08:00:00Z",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1,
+        "taskMemberId": "4a316312-9e36-4457-8f47-eeffe6f4329c"
+      }
+    },
+    {
+      "kind": "assignment",
+      "value": {
+        "id": "a8dc6007-3767-4a6f-971d-663300e2b09c",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "userId": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "assignmentRole": "ARBITER",
+        "status": "ACTIVE",
+        "assignedAt": "2026-10-10T08:00:00Z",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1,
+        "taskMemberId": "9786f2c3-9c32-4079-b1f3-165952dd685f"
+      }
+    },
+    {
+      "kind": "member",
+      "value": {
+        "id": "189295a2-7eb9-43cc-85d9-341bdd4343e8",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "userId": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "memberRole": "OWNER",
+        "status": "ACTIVE",
+        "joinedAt": "2026-10-10T08:00:00Z",
+        "deactivatedAt": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "member",
+      "value": {
+        "id": "132ebcf3-04b5-4d54-b14b-e77ad4429ad4",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "userId": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "memberRole": "ANNOTATOR",
+        "status": "ACTIVE",
+        "joinedAt": "2026-10-10T08:00:00Z",
+        "deactivatedAt": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "member",
+      "value": {
+        "id": "4a316312-9e36-4457-8f47-eeffe6f4329c",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "userId": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "memberRole": "ANNOTATOR",
+        "status": "ACTIVE",
+        "joinedAt": "2026-10-10T08:00:00Z",
+        "deactivatedAt": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "member",
+      "value": {
+        "id": "9786f2c3-9c32-4079-b1f3-165952dd685f",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "userId": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "memberRole": "ARBITER",
+        "status": "ACTIVE",
+        "joinedAt": "2026-10-10T08:00:00Z",
+        "deactivatedAt": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "member",
+      "value": {
+        "id": "3dfd0224-1316-429d-8ab0-09ea64be5fca",
+        "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+        "userId": "4809fe74-569e-4906-a453-423c290b0525",
+        "memberRole": "EXPERT",
+        "status": "ACTIVE",
+        "joinedAt": "2026-10-10T08:00:00Z",
+        "deactivatedAt": null,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "document",
+      "value": {
+        "id": "bfd699c7-e225-4263-b077-c247e4d59fbc",
+        "title": "余某、徐某劳务合同纠纷民事一审民事判决书",
+        "sourceType": "ORDINARY_JUDGMENT",
+        "caseType": "CIVIL",
+        "caseNumber": "(2023)苏0106民初18909号",
+        "currentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "status": "ACTIVE",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "courtName": "江苏省南京市鼓楼区人民法院",
+        "courtLevel": "BASIC",
+        "causeOfAction": "劳务合同纠纷",
+        "trialInstance": "FIRST_INSTANCE",
+        "judgmentDate": "2023-12-28",
+        "sourceReference": "中国裁判文书网：(2023)苏0106民初18909号",
+        "originalFileId": "826a54dd-c644-4e1d-a460-66b9586b1cb7"
+      }
+    },
+    {
+      "kind": "text",
+      "value": {
+        "id": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "documentId": "bfd699c7-e225-4263-b077-c247e4d59fbc",
+        "versionNumber": 1,
+        "normalizedText": "本院认为，依法成立的合同，自成立时生效。当事人应当按照约定全面履行自己的义务。综上所述，依照法律规定，判决如下：驳回其他诉讼请求。",
+        "contentSha256": "0905cc3f16fd346f363963570af18ea5cd3fbe01c3e667bb28f7c1f69cca35e1",
+        "status": "PUBLISHED",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "scope",
+      "value": {
+        "id": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "scopeType": "REASONING",
+        "startOffset": 5,
+        "endOffset": 39,
+        "selectionMethod": "MANUAL",
+        "status": "CONFIRMED",
+        "confirmedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "guideVersion",
+      "value": {
+        "id": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "guideId": "d283b806-9be3-47dd-aea0-5214a271320a",
+        "versionCode": "v1.2",
+        "status": "PUBLISHED",
+        "publishedAt": "2026-10-10T08:00:00Z",
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "attachmentFileId": "578473fe-5f9d-412a-ae6e-51b36d8319a7"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "f4d094fc-c85b-4b2f-ae0e-dc3801b8f37b",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "IS",
+        "name": "争议焦点",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 1,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法院概括本案争议的问题，而非任一方的主张或意见。",
+        "recognitionRules": [
+          "须由法院概括争议；当事人主张本身不标 IS。"
+        ],
+        "signalPhrases": [
+          "本案争议焦点为",
+          "关于……"
+        ],
+        "examples": [
+          "本案的争议焦点为：是否构成侵权。"
+        ],
+        "notes": "范围按非命题切割规则处理。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "0e2d7f43-caa0-4bc4-adb5-3e2f99b09f37",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "AS",
+        "name": "态度声明",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 2,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法院对相关主张表示采纳或否定的态度。",
+        "recognitionRules": [
+          "只表达态度而未形成可判断的法律评价时用 AS；结合上下文区别 SM。"
+        ],
+        "signalPhrases": [
+          "本院不予采纳",
+          "本院予以认可"
+        ],
+        "examples": [
+          "本院不予采纳。"
+        ],
+        "notes": "同一短语在具体语境下可能构成 SM，不能仅凭词语匹配。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "78a23eea-3582-44bd-b26c-1ed7e8dc643b",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "SS",
+        "name": "总结性陈述",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 3,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法院在说理末尾对整体论证所作的总结性陈述。",
+        "recognitionRules": [
+          "识别整体收束功能；不把每个段落结论都归为 SS。"
+        ],
+        "signalPhrases": [
+          "综上",
+          "综上所述"
+        ],
+        "examples": [
+          "综上所述，谢某的再审申请不符合规定。"
+        ],
+        "notes": "依裁判理由实际边界判断是否属于标注范围。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "46eaa5ba-d89c-46cc-a15c-3941ae6ede2b",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "JG",
+        "name": "判决依据",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 4,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法院在总结性陈述后列明作出裁判的依据。",
+        "recognitionRules": [
+          "与论证过程中直接使用的 GM-L 区分；关注总结之后的判决依据位置。"
+        ],
+        "signalPhrases": [
+          "依照……规定",
+          "依据……"
+        ],
+        "examples": [
+          "依照《中华人民共和国民法典》第五百零二条规定，"
+        ],
+        "notes": "属非命题要素；不参与论证关系。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "3e3c395f-f40b-421a-a862-801c527d4a4d",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "JD",
+        "name": "判决结果",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 5,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法院最终作出的裁判决定。",
+        "recognitionRules": [
+          "确认是最终裁判结果，而非论证过程中的个别规范判断。"
+        ],
+        "signalPhrases": [
+          "判决如下",
+          "裁定如下",
+          "判处"
+        ],
+        "examples": [
+          "裁定如下：驳回再审申请。"
+        ],
+        "notes": "通常位于说理范围之后，按范围规则处理。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "5a6d65d3-6ae9-4703-bf65-57086e8774bc",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "Non-O",
+        "name": "其他非论证成分",
+        "category": "NON_PROPOSITION",
+        "baseType": null,
+        "sortOrder": 6,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "不能归入其他非命题类型的非论证成分。",
+        "recognitionRules": [
+          "先排除 IS、AS、SS、JG、JD；只对确在标注范围内的文本使用。"
+        ],
+        "signalPhrases": [
+          "本判决为终审判决"
+        ],
+        "examples": [
+          "本判决为终审判决。"
+        ],
+        "notes": "不可作为命题参与论证关系。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "c00bf012-a35e-449b-ad39-b274a114a493",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "SF",
+        "name": "个别事实判断",
+        "category": "PROPOSITION",
+        "baseType": "SF",
+        "sortOrder": 7,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "对本案中个别对象作出的事实判断。",
+        "recognitionRules": [
+          "判断正确性依赖个案事实；不含实体或程序法律评价。"
+        ],
+        "signalPhrases": [
+          "本案中",
+          "经查明"
+        ],
+        "examples": [
+          "原告已依约提供劳务。"
+        ],
+        "notes": "标志性表述仅是提示，不自动决定标签。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "a1701db9-f391-4c58-adff-6d3629704058",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GF",
+        "name": "一般事实判断",
+        "category": "PROPOSITION",
+        "baseType": "GF",
+        "sortOrder": 8,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "可在不同个案重复适用、提供经验或背景支撑的一般事实判断，不含法律领域的规范判断。",
+        "recognitionRules": [
+          "须具有一般性；社会常识、经验法则、行业知识或科学规律可归入。"
+        ],
+        "signalPhrases": [
+          "通常",
+          "一般而言"
+        ],
+        "examples": [
+          "网络直播平台通常需要投入较多前期成本。"
+        ],
+        "notes": "不得把一般规范判断误作 GF。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "64614bc5-10fd-4b49-9c0e-4844c80bd66d",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "SM",
+        "name": "普通个别规范判断",
+        "category": "PROPOSITION",
+        "baseType": "SM",
+        "sortOrder": 9,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "相关主体对本案作出的具有法律意义的个别评价判断。",
+        "recognitionRules": [
+          "识别实体法构成要件或法效果、程序法与证据评价、合法违法等判断；合同特殊类型用 SM-C。"
+        ],
+        "signalPhrases": [
+          "构成违约",
+          "应当支付",
+          "缺乏事实与法律依据"
+        ],
+        "examples": [
+          "被告应向原告支付该11000元。"
+        ],
+        "notes": "短句如“本院不予支持”需结合上下文与 AS 区分。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "701f3e61-336e-4e8c-b63d-59a04460cf0d",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "SM-C",
+        "name": "合同及合同解释",
+        "category": "PROPOSITION",
+        "baseType": "SM",
+        "sortOrder": 10,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "合同条款或其规范性解释形成的特殊个别规范判断。",
+        "recognitionRules": [
+          "规范来源是当事人合同；不误归入 GM 的子类型。"
+        ],
+        "signalPhrases": [
+          "双方在合同中约定",
+          "根据合同约定",
+          "该条款应理解为"
+        ],
+        "examples": [
+          "《电子公交卡服务协议》明确告知用户可申请退卡。"
+        ],
+        "notes": "v1.2 正文将合同及合同解释列在 SM 子类型。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GM-L",
+        "name": "法律条文",
+        "category": "PROPOSITION",
+        "baseType": "GM",
+        "sortOrder": 11,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "法源中权威性规范性文件内容的直接引用或完全转述。",
+        "recognitionRules": [
+          "包括司法解释作为规范文本；引用或转述若加入理解性改动，改用 GM-I。"
+        ],
+        "signalPhrases": [
+          "依照《××法》第×条规定",
+          "根据法律规定"
+        ],
+        "examples": [
+          "依法成立的合同，自成立时生效。"
+        ],
+        "notes": "法律条文须与规范内容一致，不能凭背景推测来源。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "bf69de41-5062-4adc-918a-8cc5039bc792",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GM-I",
+        "name": "法律解释",
+        "category": "PROPOSITION",
+        "baseType": "GM",
+        "sortOrder": 12,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "对法律条文含义、适用范围或条件作出的解释性判断。",
+        "recognitionRules": [
+          "只要加入对法条的理解性改动，即与 GM-L 区分；司法解释文本本身按 GM-L 考查。"
+        ],
+        "signalPhrases": [
+          "应当理解为",
+          "该条规定的本意在于"
+        ],
+        "examples": [
+          "该条规定的本意在于防止买方利用中介房源信息跳单。"
+        ],
+        "notes": "以文书显性解释为准。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "01b90bc1-2997-4241-874c-eba9b228ee6f",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GM-U",
+        "name": "习惯与行业惯例",
+        "category": "PROPOSITION",
+        "baseType": "GM",
+        "sortOrder": 13,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "来自社会习惯、交易习惯或行业通行规则的一般规范判断。",
+        "recognitionRules": [
+          "识别规范来源为习惯或行业惯例；不得与纯经验事实 GF 混同。"
+        ],
+        "signalPhrases": [
+          "按照交易习惯",
+          "行业通常做法是"
+        ],
+        "examples": [
+          "按照交易习惯，双方应在交付后结算价款。"
+        ],
+        "notes": "示例为标签提示，不替代指南正文。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "f66c1a75-480d-4515-b240-98cf52c28f75",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GM-M",
+        "name": "道德与价值观念",
+        "category": "PROPOSITION",
+        "baseType": "GM",
+        "sortOrder": 14,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "基于道德、价值观念、公序良俗或基本原则的一般规范判断。",
+        "recognitionRules": [
+          "优先识别文本明示的价值或原则依据；勿根据个人评价补充未写明的来源。"
+        ],
+        "signalPhrases": [
+          "违反公序良俗",
+          "有悖公平原则",
+          "诚实信用原则"
+        ],
+        "examples": [
+          "民事主体在民事活动中应当恪守诚信。"
+        ],
+        "notes": "与 GM-L 的直接法条引用按具体表达区分。"
+      }
+    },
+    {
+      "kind": "label",
+      "value": {
+        "id": "f204be9b-ffb7-417d-b964-d38c9c9d6c25",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "GM-O",
+        "name": "其他规范判断",
+        "category": "PROPOSITION",
+        "baseType": "GM",
+        "sortOrder": 15,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "无法稳定归入其他 GM 子类型的规范判断，包括非法源性质的规范性文件。",
+        "recognitionRules": [
+          "先尝试 GM-L、GM-I、GM-U、GM-M；不能明确归入时才使用。"
+        ],
+        "signalPhrases": [
+          "根据相关政策精神",
+          "依照管理规定"
+        ],
+        "examples": [
+          "根据有关政策规定，相关业务活动不得开展。"
+        ],
+        "notes": "同一规范判断只选一个子类型。"
+      }
+    },
+    {
+      "kind": "relationDefinition",
+      "value": {
+        "id": "99352f86-0ecd-4ea8-9b52-57831a6b3e3f",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "S",
+        "name": "支持关系",
+        "directed": true,
+        "minParticipants": 2,
+        "maxParticipants": 2,
+        "sortOrder": 1,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "一个命题或命题组为另一命题成立提供直接理由。",
+        "directionRule": "从支持者指向被支持命题。",
+        "expressionTemplate": "S(x, y)",
+        "participantRule": "二元有序；x 可为命题或 J/M 等关系整体，y 为目标命题。只标直接支持，不自动补传递边。",
+        "diagramRule": "矩形命题节点之间经实心圆关系节点形成有向边，箭头指向被支持命题。"
+      }
+    },
+    {
+      "kind": "relationDefinition",
+      "value": {
+        "id": "51b75706-a73f-43db-9e69-10891bba300b",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "A",
+        "name": "反对关系",
+        "directed": true,
+        "minParticipants": 2,
+        "maxParticipants": 2,
+        "sortOrder": 2,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "一个命题反对另一命题或否定某支持关系的效力。",
+        "directionRule": "从反对者指向被反对的命题或关系节点。",
+        "expressionTemplate": "A(x, y)",
+        "participantRule": "二元有序；典型为命题对命题，允许 A(po,S(pi,pj))。反对须真实表达否定，转折词本身不足以成立。",
+        "diagramRule": "使用空心圆关系节点和有向边；攻击支持关系时箭头指向该支持关系节点。"
+      }
+    },
+    {
+      "kind": "relationDefinition",
+      "value": {
+        "id": "4536bccd-4ddb-49fb-a070-44c65e20530e",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "J",
+        "name": "组合关系",
+        "directed": false,
+        "minParticipants": 2,
+        "maxParticipants": null,
+        "sortOrder": 3,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "多个成员缺一不可地合取，作为共同理由。",
+        "directionRule": "无方向；成员按展示序号从小到大排列。",
+        "expressionTemplate": "J(x1, x2, ..., xn)",
+        "participantRule": "至少两个命题或已成立的关系整体；每个成员均不能单独承担共同支持。区别于多个独立 S。",
+        "diagramRule": "带“+”圆节点连接各成员，连线无箭头；嵌套按指南从内到外构造。"
+      }
+    },
+    {
+      "kind": "relationDefinition",
+      "value": {
+        "id": "e073dcc0-d315-4cfd-8bb1-3b5aeb9ac919",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "M",
+        "name": "匹配关系",
+        "directed": true,
+        "minParticipants": 2,
+        "maxParticipants": 2,
+        "sortOrder": 4,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "个别判断与一般判断之间的对应，是组合的一种特殊形态。",
+        "directionRule": "从个别判断或其组合指向一般判断。",
+        "expressionTemplate": "M(individual, general)",
+        "participantRule": "二元有序；左侧可为个别命题或 J(多个个别判断)，右侧为一般判断；必要时整体嵌入 S 或 J。",
+        "diagramRule": "带“+”圆节点的有向结构，箭头指向被匹配的一般判断；M(J(...),...) 按指南特例图示。"
+      }
+    },
+    {
+      "kind": "relationDefinition",
+      "value": {
+        "id": "d38d3511-9353-48b9-963b-9bbabffd1f18",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "code": "I",
+        "name": "同一关系",
+        "directed": false,
+        "minParticipants": 2,
+        "maxParticipants": null,
+        "sortOrder": 5,
+        "createdAt": "2026-10-10T08:00:00Z",
+        "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "updatedAt": "2026-10-10T08:00:00Z",
+        "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+        "recordVersion": 1,
+        "definition": "多个命题表达几乎相同的语义判断，不含一命题对另一命题的具体化。",
+        "directionRule": "无方向；成员按展示序号排列。",
+        "expressionTemplate": "I(p1, p2, ..., pn)",
+        "participantRule": "至少两个命题；同类型优先审查，关系确认后用最大序号命题继续关系标注。",
+        "diagramRule": "在同一矩形框中用“/”分隔命题编号，不另画圆形关系节点。"
+      }
+    },
+    {
+      "kind": "checkpoint",
+      "value": {
+        "id": "8e48abef-998c-4384-892f-bbdbbd9eac7f",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "sourceSubmissionIds": [
+          "bff96e2c-988b-42e2-886e-86e5759343e4",
+          "990b49a3-91d4-4045-96cc-1be76f0b86e6"
+        ],
+        "agreementScore": 1.0,
+        "requiredThreshold": 0.8,
+        "unifiedBoundaries": [
+          {
+            "startOffset": 5,
+            "endOffset": 20
+          },
+          {
+            "startOffset": 20,
+            "endOffset": 39
+          }
+        ],
+        "boundaryHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+        "status": "CONFIRMED",
+        "confirmedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "confirmedAt": "2026-10-10T08:45:00Z",
+        "createdAt": "2026-10-10T08:30:00Z",
+        "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "updatedAt": "2026-10-10T08:45:00Z",
+        "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "recordVersion": 2
+      }
+    },
+    {
+      "kind": "draft",
+      "value": {
+        "id": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "assignmentId": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "status": "ACTIVE",
+        "phase": "GRAPH",
+        "lastSavedAt": "2026-10-10T09:00:00Z",
+        "revision": 3,
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1,
+        "elementIds": [
+          "8d7166f8-2633-4d45-84df-d0acf3867b03",
+          "d16dda93-eac1-461f-ae05-ee596d6f6a9e"
+        ],
+        "relationIds": [
+          "c062c5d0-7371-42a1-a03f-dd0973f81120"
+        ],
+        "graphId": "4d17a7db-982d-4019-a8cf-3a0c0d78319a",
+        "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+      }
+    },
+    {
+      "kind": "draft",
+      "value": {
+        "id": "ef21c243-05a2-4837-92b4-d56f3fb77639",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "assignmentId": "23cf6498-c282-45b5-aec6-d0e08b219286",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "status": "ACTIVE",
+        "phase": "GRAPH",
+        "lastSavedAt": "2026-10-10T09:00:00Z",
+        "revision": 3,
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "recordVersion": 1,
+        "elementIds": [
+          "48328b47-472e-42bc-90c1-d2aa3c8d778f",
+          "f4b3e65d-5b4b-4d14-a2c0-389025e12073"
+        ],
+        "relationIds": [],
+        "graphId": "434a446f-44e9-409d-9087-445b6f4e57e7",
+        "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+      }
+    },
+    {
+      "kind": "element",
+      "value": {
+        "id": "8d7166f8-2633-4d45-84df-d0acf3867b03",
+        "ownerType": "DRAFT",
+        "ownerId": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "startOffset": 5,
+        "endOffset": 20,
+        "text": "依法成立的合同，自成立时生效。",
+        "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+        "labelCode": "GM-L",
+        "isProposition": true,
+        "displayNo": "P1",
+        "sourceElementIds": [],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "element",
+      "value": {
+        "id": "d16dda93-eac1-461f-ae05-ee596d6f6a9e",
+        "ownerType": "DRAFT",
+        "ownerId": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "startOffset": 20,
+        "endOffset": 39,
+        "text": "当事人应当按照约定全面履行自己的义务。",
+        "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+        "labelCode": "GM-L",
+        "isProposition": true,
+        "displayNo": "P2",
+        "sourceElementIds": [],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "element",
+      "value": {
+        "id": "48328b47-472e-42bc-90c1-d2aa3c8d778f",
+        "ownerType": "DRAFT",
+        "ownerId": "ef21c243-05a2-4837-92b4-d56f3fb77639",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "startOffset": 5,
+        "endOffset": 20,
+        "text": "依法成立的合同，自成立时生效。",
+        "labelDefinitionId": "bf69de41-5062-4adc-918a-8cc5039bc792",
+        "labelCode": "GM-I",
+        "isProposition": true,
+        "displayNo": "P1",
+        "sourceElementIds": [],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "element",
+      "value": {
+        "id": "f4b3e65d-5b4b-4d14-a2c0-389025e12073",
+        "ownerType": "DRAFT",
+        "ownerId": "ef21c243-05a2-4837-92b4-d56f3fb77639",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "startOffset": 20,
+        "endOffset": 39,
+        "text": "当事人应当按照约定全面履行自己的义务。",
+        "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+        "labelCode": "GM-L",
+        "isProposition": true,
+        "displayNo": "P2",
+        "sourceElementIds": [],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "relation",
+      "value": {
+        "id": "c062c5d0-7371-42a1-a03f-dd0973f81120",
+        "ownerType": "DRAFT",
+        "ownerId": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "relationDefinitionId": "99352f86-0ecd-4ea8-9b52-57831a6b3e3f",
+        "relationCode": "S",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "participant",
+      "value": {
+        "id": "c40f8ca6-ce27-4c47-b2eb-d9212112f9f7",
+        "relationId": "c062c5d0-7371-42a1-a03f-dd0973f81120",
+        "ordinal": 1,
+        "role": "SOURCE",
+        "targetKind": "ELEMENT",
+        "targetId": "d16dda93-eac1-461f-ae05-ee596d6f6a9e",
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "participant",
+      "value": {
+        "id": "9a383753-2496-4ec7-a5d2-d1dfc13f6583",
+        "relationId": "c062c5d0-7371-42a1-a03f-dd0973f81120",
+        "ordinal": 2,
+        "role": "TARGET",
+        "targetKind": "ELEMENT",
+        "targetId": "8d7166f8-2633-4d45-84df-d0acf3867b03",
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "graph",
+      "value": {
+        "id": "4d17a7db-982d-4019-a8cf-3a0c0d78319a",
+        "ownerType": "DRAFT",
+        "ownerId": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "elementIds": [
+          "8d7166f8-2633-4d45-84df-d0acf3867b03",
+          "d16dda93-eac1-461f-ae05-ee596d6f6a9e"
+        ],
+        "relationIds": [
+          "c062c5d0-7371-42a1-a03f-dd0973f81120"
+        ],
+        "status": "VALID",
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "graph",
+      "value": {
+        "id": "434a446f-44e9-409d-9087-445b6f4e57e7",
+        "ownerType": "DRAFT",
+        "ownerId": "ef21c243-05a2-4837-92b4-d56f3fb77639",
+        "elementIds": [
+          "48328b47-472e-42bc-90c1-d2aa3c8d778f",
+          "f4b3e65d-5b4b-4d14-a2c0-389025e12073"
+        ],
+        "relationIds": [],
+        "status": "VALID",
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "layout",
+      "value": {
+        "id": "e24976b1-1c74-43d2-a3e4-fecac7d8b588",
+        "graphId": "4d17a7db-982d-4019-a8cf-3a0c0d78319a",
+        "layoutVersion": 1,
+        "canvasWidth": 800,
+        "canvasHeight": 480,
+        "nodePositions": [
+          {
+            "targetKind": "ELEMENT",
+            "targetId": "8d7166f8-2633-4d45-84df-d0acf3867b03",
+            "x": 160,
+            "y": 160
+          },
+          {
+            "targetKind": "ELEMENT",
+            "targetId": "d16dda93-eac1-461f-ae05-ee596d6f6a9e",
+            "x": 520,
+            "y": 160
+          },
+          {
+            "targetKind": "RELATION",
+            "targetId": "c062c5d0-7371-42a1-a03f-dd0973f81120",
+            "x": 340,
+            "y": 160
+          }
+        ],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "recordVersion": 1
+      }
+    },
+    {
+      "kind": "layout",
+      "value": {
+        "id": "1ab59109-04bb-427c-ba98-9410b0ede5c9",
+        "graphId": "434a446f-44e9-409d-9087-445b6f4e57e7",
+        "layoutVersion": 1,
+        "canvasWidth": 800,
+        "canvasHeight": 480,
+        "nodePositions": [
+          {
+            "targetKind": "ELEMENT",
+            "targetId": "48328b47-472e-42bc-90c1-d2aa3c8d778f",
+            "x": 160,
+            "y": 160
+          },
+          {
+            "targetKind": "ELEMENT",
+            "targetId": "f4b3e65d-5b4b-4d14-a2c0-389025e12073",
+            "x": 520,
+            "y": 160
+          }
+        ],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+        "recordVersion": 1
+      }
+    }
+  ]
+}

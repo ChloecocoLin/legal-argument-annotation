@@ -1,0 +1,225 @@
+{
+  "J10": {
+    "type": "object",
+    "properties": {
+      "itemKind": {
+        "type": "string",
+        "enum": [
+          "PROPOSITION",
+          "RELATION"
+        ]
+      },
+      "itemId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "customElements": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "clientKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "startOffset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "endOffset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "labelCode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceElementIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "clientKey",
+            "startOffset",
+            "endOffset",
+            "labelCode",
+            "sourceElementIds"
+          ]
+        }
+      },
+      "customRelations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "clientKey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "relationCode": {
+              "type": "string",
+              "enum": [
+                "S",
+                "A",
+                "J",
+                "M",
+                "I"
+              ]
+            },
+            "sourceRelationIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "participants": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ordinal": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "SOURCE",
+                      "TARGET",
+                      "MEMBER"
+                    ]
+                  },
+                  "targetKind": {
+                    "type": "string",
+                    "enum": [
+                      "ELEMENT",
+                      "RELATION"
+                    ]
+                  },
+                  "targetClientKey": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "ordinal",
+                  "role",
+                  "targetKind",
+                  "targetClientKey"
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "clientKey",
+            "relationCode",
+            "sourceRelationIds",
+            "participants"
+          ]
+        }
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "itemKind",
+      "itemId",
+      "customElements",
+      "customRelations",
+      "reason"
+    ],
+    "description": "clientKey 是请求内临时引用，不是正式 UUID。命题分支 customRelations 必须为 []。"
+  },
+  "J12": {
+    "type": "object",
+    "properties": {
+      "expertUserId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "itemKind": {
+        "type": "string",
+        "enum": [
+          "PROPOSITION",
+          "RELATION",
+          "GENERAL"
+        ]
+      },
+      "itemId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "question": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "expertUserId",
+      "itemKind",
+      "itemId",
+      "question"
+    ],
+    "description": "itemKind=GENERAL 时 itemId 必须显式为 null；其他类型必须给出本会话有效项 ID。"
+  },
+  "X03": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "const": "START"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "action"
+    ],
+    "description": "本轮仅接受 START。传入 RETURN 返回 400 VALIDATION_ERROR。"
+  },
+  "X04": {
+    "type": "object",
+    "properties": {
+      "resolution": {
+        "type": "string",
+        "minLength": 1
+      },
+      "guideBasis": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "resolution",
+      "guideBasis"
+    ],
+    "description": "基础文本结论。不得发送未建模的 adoptedVersionId 等结构化字段。"
+  },
+  "X05": {
+    "type": "object",
+    "properties": {
+      "confirmed": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "confirmed"
+    ],
+    "additionalProperties": false
+  }
+}

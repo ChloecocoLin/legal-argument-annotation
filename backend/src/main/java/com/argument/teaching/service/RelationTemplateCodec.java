@@ -17,7 +17,7 @@ import com.argument.teaching.dto.TemplateParticipant;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
 
 /**
  * 答题模板 → 领域对象的编解码器。归成员 C（教学评分）。
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  * 这里唯一自带的判断是模板自身的形状问题（ref 重复、ref 悬空、两个端点字段都填/都没填），
  * 因为那是模板这一层才有的概念，落库关系里不存在。
  */
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class RelationTemplateCodec {
 

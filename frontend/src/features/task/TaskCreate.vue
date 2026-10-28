@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-head">
       <h1>创建任务</h1>
-      <p class="muted">T02 创建；T05 绑定已确认范围的文书。正式科研 N≥2。</p>
+      <p class="muted">选择已发布指南创建任务，再添加文书并分配人员。正式科研任务每案至少两名标注员。</p>
     </div>
     <el-form label-width="160px" style="max-width: 720px">
       <el-form-item label="任务名称">
@@ -10,8 +10,7 @@
       </el-form-item>
       <el-form-item label="指南版本">
         <el-select v-model="form.guideVersionId" style="width: 100%">
-          <el-option label="B 模块已发布 v1.2（v-g-12）" value="v-g-12" />
-          <el-option label="契约 Mock UUID" value="a9055ff9-34b0-4083-9db7-91f82dbe5fc4" />
+          <el-option v-for="guide in guides" :key="guide.id" :label="guide.versionCode" :value="guide.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="任务类型">
@@ -30,51 +29,40 @@
         <el-checkbox v-model="form.adjudicationReasonRequired">裁定理由必填</el-checkbox>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" :loading="saving" @click="submit">创建并绑定预置文书</el-button>
+        <el-button type="primary" :loading="saving" @click="submit">创建任务</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { addTaskDocument, createTask, updateTask, getTaskSetup } from '@/api/memberA'
+import { createTask, getTaskOptions } from '@/api/memberA'
 
 const router = useRouter()
 const saving = ref(false)
 const form = reactive({
-  name: '劳务合同纠纷裁判理由标注',
-  guideVersionId: 'v-g-12',
+  name: '',
+  guideVersionId: '',
   taskType: 'FORMAL_RESEARCH',
   defaultRequiredAnnotators: 2,
-  autoPreannotationEnabled: true,
+  autoPreannotationEnabled: false,
   expertConfirmationRequired: false,
   adjudicationReasonRequired: true
 })
 
+const guides = ref<{ id: string; versionCode: string }[]>([])
+onMounted(async () => { guides.value = (await getTaskOptions()).guides })
+
 async function submit() {
+  if (!form.name.trim() || !form.guideVersionId) { ElMessage.warning('请填写名称并选择已发布指南'); return }
   saving.value = true
   try {
     const created = await createTask({ ...form })
-    const setup = await getTaskSetup(created.id)
-    await updateTask(
-      created.id,
-      {
-        description: '按指南 v1.2 完成双人独立科研标注。',
-        dueAt: '2026-10-30T15:59:00Z'
-      },
-      Number(setup.task.recordVersion)
-    )
-    await addTaskDocument(created.id, {
-      documentId: 'bfd699c7-e225-4263-b077-c247e4d59fbc',
-      documentTextVersionId: '86d2b05b-fa18-4d45-a451-edcaa83d673f',
-      annotationScopeId: '4c3122b2-90e0-47b4-8e67-0986764897bc',
-      requiredAnnotators: form.defaultRequiredAnnotators
-    })
-    ElMessage.success('已创建任务并绑定预置文书')
-    router.push(`/tasks/${created.id}/assign`)
+    ElMessage.success('已创建任务')
+    router.push(`/tasks/${created.id}`)
   } finally {
     saving.value = false
   }

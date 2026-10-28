@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * 能真校验「非命题不能参与关系」「同一快照」「I 仅命题」等规则。A 的文书范围与 B 的
  * 要素/命题接口（E01…）就绪后，前端只改 {@code api/relation.ts} 里的单个函数即可切走。
  */
-@RestController
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class MockPropositionController {

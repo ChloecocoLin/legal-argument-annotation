@@ -1,0 +1,23 @@
+[
+  {
+    "op": "replace",
+    "path": "/components/schemas/J01Success/properties/data",
+    "value": {
+      "$ref": "#/components/schemas/AdjudicationSession"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/components/schemas/J02Success/properties/data",
+    "value": {
+      "$ref": "#/components/schemas/AdjudicationSession"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/components/schemas/J06Success/properties/data/properties/items/items",
+    "value": {
+      "$ref": "#/components/schemas/RelationAdjudicationItem"
+    }
+  }
+]

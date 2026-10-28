@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * <p>RBAC（分工.md §六）：**写**操作（R02–R04）限 admin / annotator，读（R01）登录即可。
  * 读放开是有意的：裁定员与专家都要查看他人标注的关系，把读也锁在标注员上会让裁定做不下去。
  */
-@RestController
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class RelationController {

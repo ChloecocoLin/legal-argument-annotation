@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class CustomAnnotationServiceImpl implements CustomAnnotationService {
 

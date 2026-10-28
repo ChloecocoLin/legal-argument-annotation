@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>同时实现 {@link RelationLookup}，把自身作为校验器的读取出口，
  * 使校验器不必注入 Mapper、可在单测里用 Map 桩替换。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class RelationServiceImpl implements RelationService, RelationLookup {
 

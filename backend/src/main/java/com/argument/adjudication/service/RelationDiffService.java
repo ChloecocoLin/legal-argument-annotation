@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * 共用同一份判据。本类只负责裁定特有的部分——绑定源版本、取命题映射、把配对结果翻译成
  * 契约的 {@code conflictType} 与中文理由。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class RelationDiffService {
 

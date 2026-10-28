@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
  * 当前专家身份。优先读请求头 X-User-Id；local 环境未传时回退到演示专家。
  * 后续接入登录系统时，只替换这里的取值来源。
  */
-@Component
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class CurrentUserProvider {
 
     public static final String DEMO_EXPERT_ID = "b0123456-0000-4000-8000-000000000010";

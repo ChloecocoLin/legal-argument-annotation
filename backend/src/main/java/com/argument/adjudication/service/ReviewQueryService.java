@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 /**
  * J03 命题裁定项只读查询。按源标注版本组织候选要素。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class ReviewQueryService {
 
     private final AdjudicationSessionMapper sessionMapper;

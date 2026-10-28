@@ -17,7 +17,9 @@ async function load() {
   loading.value = true
   error.value = false
   try {
-    const r = await listMyExpertReviews({ status: 'CONFIRMED' })
+    const all:ExpertReviewSummary[]=[]
+    for(let page=1;;page++){const r=await listMyExpertReviews({status:'CONFIRMED',page,size:100});all.push(...r.items);if(all.length>=r.total)break}
+    const r={items:all}
     // 先建条目，再并行拉每张的详情；单张失败不影响整页。
     entries.value = r.items.map((s) => ({ summary: s, detail: null, failed: false }))
     await Promise.allSettled(

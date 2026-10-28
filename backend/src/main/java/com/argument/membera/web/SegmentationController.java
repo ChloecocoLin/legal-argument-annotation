@@ -1,108 +1,42 @@
 package com.argument.membera.web;
 
-import com.argument.common.auth.AuthContext;
-import com.argument.common.exception.BusinessException;
-import com.argument.common.exception.ErrorCode;
-import com.argument.common.response.ApiResponse;
-import com.argument.membera.service.DocumentService;
+import com.argument.common.exception.*;
+import com.argument.common.response.*;
 import com.argument.membera.service.SegmentationService;
-import com.argument.membera.support.IdempotencySupport;
-import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.argument.version.port.VersionIdentity;
+import com.argument.adjudication.AdjudicationController;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+import org.springframework.web.bind.annotation.*;
+import static com.argument.adjudication.AdjudicationService.require;
 
-@RestController
-@RequestMapping("/api/v1")
+/** Frozen S01–S03 responses; full records are an explicit scoped internal projection. */
+@RestController @RequestMapping("/api/v1")
 public class SegmentationController {
-
-    private final SegmentationService segmentationService;
-    private final IdempotencySupport idempotency;
-
-    public SegmentationController(SegmentationService segmentationService, IdempotencySupport idempotency) {
-        this.segmentationService = segmentationService;
-        this.idempotency = idempotency;
+    private final SegmentationService service;private final VersionIdentity identity;
+    public SegmentationController(SegmentationService service,VersionIdentity identity){this.service=service;this.identity=identity;}
+    @PostMapping("/task-documents/{caseId}/segmentation-submissions")
+    public ApiResponse<ObjectNode> submit(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String caseId,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestBody ObjectNode body){
+        var actor=identity.authenticate(auth);fields(body,Set.of("assignmentId","boundaries"),Set.of("supersedesSubmissionId"));
+        require(body.path("assignmentId").isTextual()&&(!body.has("supersedesSubmissionId")||body.path("supersedesSubmissionId").isNull()||body.path("supersedesSubmissionId").isTextual()),ErrorCode.VALIDATION_ERROR,"切割提交字段类型错误");
+        if(body.hasNonNull("supersedesSubmissionId"))com.argument.version.VersionJson.uuid(body.path("supersedesSubmissionId").asText());
+        return ApiResponse.ok(service.submit(actor,caseId,key,body));
     }
-
-    @PostMapping("/task-documents/{taskDocumentId}/segmentation-submissions")
-    public ApiResponse<Map<String, Object>> s01(
-            @PathVariable String taskDocumentId,
-            @RequestHeader("Idempotency-Key") String idempotencyKey,
-            @RequestBody Map<String, Object> body) {
-        return write("S01:" + taskDocumentId, idempotencyKey, body, () -> segmentationService.submit(taskDocumentId, body));
+    @GetMapping("/task-documents/{caseId}/segmentation-submissions")
+    public ApiResponse<Map<String,Object>> list(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String caseId,@RequestParam Map<String,String> query){
+        var actor=identity.authenticate(auth);require(Set.of("assignmentId","page","size").containsAll(query.keySet()),ErrorCode.VALIDATION_ERROR,"未知切割查询字段");
+        int page=number(query.getOrDefault("page","1")),size=number(query.getOrDefault("size","20"));require(size<=100,ErrorCode.VALIDATION_ERROR,"分页大小不得超过 100");
+        var records=service.records(actor,caseId,query.get("assignmentId"));var items=new ArrayList<Map<String,Object>>();
+        records.stream().skip((long)(page-1)*size).limit(size).forEach(row->{var item=new LinkedHashMap<String,Object>();for(String field:List.of("attemptNumber","status","reviewedAt"))item.put(field,row.path(field).isNull()?null:field.equals("attemptNumber")?row.path(field).asInt():row.path(field).asText());items.add(item);});
+        return ApiResponse.ok(Map.of("items",items),new PageMeta(page,size,records.size()));
     }
-
-    @GetMapping("/task-documents/{taskDocumentId}/segmentation-submissions")
-    public ApiResponse<Map<String, Object>> s02(
-            @PathVariable String taskDocumentId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        DocumentService.Result result = segmentationService.list(taskDocumentId, page, size);
-        return ApiResponse.ok(result.data(), result.meta());
+    @PostMapping("/segmentation-submissions/{id}/reviews")
+    public ApiResponse<ObjectNode> review(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String id,@RequestHeader(value="Idempotency-Key",required=false)String key,@RequestHeader(value="If-Match",required=false)String match,@RequestBody ObjectNode body){
+        var actor=identity.authenticate(auth);fields(body,Set.of("action","reviewReason"),Set.of());require(body.path("action").isTextual()&&body.path("reviewReason").isTextual(),ErrorCode.VALIDATION_ERROR,"审核字段类型错误");
+        return ApiResponse.ok(service.review(actor,id,key,AdjudicationController.integer(match),body));
     }
-
-    @PostMapping("/segmentation-submissions/{submissionId}/reviews")
-    public ApiResponse<Map<String, Object>> s03(
-            @PathVariable String submissionId,
-            @RequestHeader("Idempotency-Key") String idempotencyKey,
-            @RequestHeader(value = "If-Match", required = false) Integer ifMatch,
-            @RequestBody Map<String, Object> body) {
-        return write(
-                "S03:" + submissionId,
-                idempotencyKey,
-                body,
-                () -> segmentationService.review(submissionId, body, ifMatch));
-    }
-
-    @GetMapping("/task-documents/{taskDocumentId}/segmentation-checkpoints")
-    public ApiResponse<Map<String, Object>> presetCheckpoint(@PathVariable String taskDocumentId) {
-        return ApiResponse.ok(segmentationService.presetCheckpoint(taskDocumentId));
-    }
-
-    @PostMapping("/task-documents/{taskDocumentId}/segmentation-checkpoints")
-    public ApiResponse<Map<String, Object>> s04Pending() {
-        throw new BusinessException(ErrorCode.PENDING_MODEL, "S04 属 D 且 PENDING_MODEL，请读取预置已确认关口，不要当作已实现确认写入");
-    }
-
-    @GetMapping("/task-documents/{taskDocumentId}/segmentation-agreement")
-    public ApiResponse<Map<String, Object>> s05Mock(@PathVariable String taskDocumentId) {
-        Map<String, Object> checkpoint = segmentationService.presetCheckpoint(taskDocumentId);
-        return ApiResponse.ok(
-                Map.of(
-                        "agreementScore", checkpoint.getOrDefault("agreementScore", 1.0),
-                        "threshold", checkpoint.getOrDefault("requiredThreshold", 0.8),
-                        "submissionCount", 2));
-    }
-
-    @GetMapping("/dev/a/segmentation-records")
-    public ApiResponse<Map<String, Object>> records(@RequestParam String taskDocumentId) {
-        return ApiResponse.ok(Map.of("items", segmentationService.records(taskDocumentId)));
-    }
-
-    @GetMapping("/dev/a/workbench")
-    public ApiResponse<Map<String, Object>> workbench(@RequestParam String taskId) {
-        return ApiResponse.ok(segmentationService.workbench(taskId));
-    }
-
-    @GetMapping("/dev/a/boundary-diff")
-    public ApiResponse<Map<String, Object>> boundaryDiff(@RequestParam String taskDocumentId) {
-        return ApiResponse.ok(segmentationService.compare(taskDocumentId));
-    }
-
-    @SuppressWarnings("unchecked")
-    private ApiResponse<Map<String, Object>> write(
-            String op, String key, Object body, java.util.function.Supplier<Map<String, Object>> action) {
-        var ticket = idempotency.begin(AuthContext.require().userId(), op, key, body);
-        if (ticket.replay()) {
-            return ApiResponse.ok((Map<String, Object>) ticket.cached());
-        }
-        Map<String, Object> data = action.get();
-        idempotency.save(ticket, data);
-        return ApiResponse.ok(data);
-    }
+    @GetMapping("/integration/cases/{caseId}/segmentation")
+    public ApiResponse<ObjectNode> workspace(@RequestHeader(value="Authorization",required=false)String auth,@PathVariable String caseId){return ApiResponse.ok(service.workspace(identity.authenticate(auth),caseId));}
+    private static int number(String value){return AdjudicationController.integer(value);}
+    private static void fields(ObjectNode body,Set<String> required,Set<String> optional){var names=new HashSet<String>();body.fieldNames().forEachRemaining(names::add);var allowed=new HashSet<>(required);allowed.addAll(optional);require(names.containsAll(required)&&allowed.containsAll(names),ErrorCode.VALIDATION_ERROR,"字段不符合独立切割接口约定");}
 }

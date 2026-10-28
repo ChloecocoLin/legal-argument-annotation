@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * 图示审查（§四.6）是裁定员要用的（看的是定稿图与裁定图），而 GR02 正是那页的判据入口；
  * 只读的 GR01 登录即可。
  */
-@RestController
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ArgumentGraphController {

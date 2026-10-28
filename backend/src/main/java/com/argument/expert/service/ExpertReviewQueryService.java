@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
 /**
  * X01 专家待办分页；X02 复核单详情（含 issues 与 contexts）。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 public class ExpertReviewQueryService {
 
     private final ExpertReviewMapper reviewMapper;

@@ -4,8 +4,6 @@ import com.argument.common.auth.AuthContext;
 import com.argument.common.auth.DevUser;
 import com.argument.common.exception.BusinessException;
 import com.argument.common.exception.ErrorCode;
-import com.argument.guide.entity.GuideVersion;
-import com.argument.guide.mapper.GuideVersionMapper;
 import com.argument.membera.store.Records;
 import com.argument.membera.store.WorkflowStore;
 import java.util.ArrayList;
@@ -20,17 +18,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
 
-    private static final Set<String> MOCK_PUBLISHED_GUIDES =
-            Set.of("a9055ff9-34b0-4083-9db7-91f82dbe5fc4", "v-g-12");
-
-    private final WorkflowStore store;
+    private final com.argument.integration.ReannotationSourceRecorder reannotation;private final WorkflowStore store;
     private final AccessService access;
-    private final GuideVersionMapper guideVersionMapper;
+    private final com.argument.integration.TaskResourceCatalog guideCatalog;
 
-    public TaskService(WorkflowStore store, AccessService access, GuideVersionMapper guideVersionMapper) {
+    public TaskService(WorkflowStore store, AccessService access, com.argument.integration.TaskResourceCatalog guideCatalog,com.argument.integration.ReannotationSourceRecorder reannotation) {
+        this.reannotation=reannotation;
         this.store = store;
         this.access = access;
-        this.guideVersionMapper = guideVersionMapper;
+        this.guideCatalog = guideCatalog;
     }
 
     public DocumentService.Result list(String q, String status, String taskType, int page, int size) {
@@ -64,12 +60,14 @@ public class TaskService {
 
     public Map<String, Object> create(Map<String, Object> body) {
         DevUser user = AuthContext.requireAnyRole("TASK_CREATOR", "ADMIN");
+        if(body.get("name")==null||String.valueOf(body.get("name")).isBlank())throw new BusinessException(ErrorCode.VALIDATION_ERROR,"任务名称不能为空");
         String guideVersionId = String.valueOf(body.get("guideVersionId"));
         if (!isPublishedGuide(guideVersionId)) {
             throw new BusinessException(ErrorCode.GUIDE_NOT_PUBLISHED, "只能绑定已发布指南版本");
         }
         String taskType = String.valueOf(body.get("taskType"));
         int n = ((Number) body.get("defaultRequiredAnnotators")).intValue();
+        if(n<1)throw new BusinessException(ErrorCode.VALIDATION_ERROR,"标注人数必须为正整数");
         if ("FORMAL_RESEARCH".equals(taskType) && n < 2) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "正式科研任务每案 N≥2");
         }
@@ -142,6 +140,7 @@ public class TaskService {
         String textVersionId = String.valueOf(body.get("documentTextVersionId"));
         String scopeId = String.valueOf(body.get("annotationScopeId"));
         int required = ((Number) body.get("requiredAnnotators")).intValue();
+        if(required<1)throw new BusinessException(ErrorCode.VALIDATION_ERROR,"标注人数必须为正整数");
         if ("FORMAL_RESEARCH".equals(Records.str(task, "taskType")) && required < 2) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "正式科研任务每案 N≥2");
         }
@@ -220,7 +219,7 @@ public class TaskService {
         String memberUserId = String.valueOf(body.get("userId"));
         String memberRole = String.valueOf(body.get("memberRole"));
         Map<String, Object> target = store.users.get(memberUserId);
-        if (target == null) {
+        if (target == null || !"ACTIVE".equals(target.get("status"))) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "用户不存在");
         }
         Set<String> roleCodes = roleCodesOf(memberUserId);
@@ -328,9 +327,11 @@ public class TaskService {
             annotators.add(requirePoolMember(Records.str(td, "taskId"), memberId, "ANNOTATOR"));
         }
         Map<String, Object> arbiter = requirePoolMember(Records.str(td, "taskId"), arbiterMemberId, "ARBITER");
-        store.assignments
-                .entrySet()
-                .removeIf(e -> taskDocumentId.equals(Records.str(e.getValue(), "taskDocumentId")));
+        var users=new HashSet<String>();
+        for(var annotator:annotators)if(!users.add(Records.str(annotator,"userId")))throw new BusinessException(ErrorCode.INSUFFICIENT_ANNOTATORS,"标注员必须为不同账号");
+        if(users.contains(Records.str(arbiter,"userId")))throw new BusinessException(ErrorCode.ROLE_MISMATCH,"裁定者必须为独立账号");
+        if (!Set.of("DRAFT", "ASSIGNING").contains(Records.str(task,"status"))) throw new BusinessException(ErrorCode.LOCKED_RESOURCE,"任务启动后不能替换逐案分配");
+        for (var existing:store.assignments.values()) if(taskDocumentId.equals(Records.str(existing,"taskDocumentId"))&&"ACTIVE".equals(Records.str(existing,"status"))){existing.put("status","INACTIVE");Records.touch(existing,user.userId());}
         for (Map<String, Object> annotator : annotators) {
             putAssignment(taskDocumentId, annotator, "ANNOTATOR", user.userId());
         }
@@ -460,6 +461,10 @@ public class TaskService {
         if (fav == null || !"IN_DATABASE".equals(Records.str(fav, "status"))) {
             throw new BusinessException(ErrorCode.FINAL_NOT_IN_DATABASE, "来源最终版尚未入库");
         }
+        Map<String,Object> sourceDoc=store.taskDocuments.get(Records.str(fav,"taskDocumentId"));
+        if(sourceDoc==null||!taskId.equals(Records.str(sourceDoc,"taskId")))throw new BusinessException(ErrorCode.FORBIDDEN,"最终版不属于指定源任务");
+        reannotation.verify(finalId,Records.str(sourceDoc,"id"));
+        if(!Records.str(source,"guideVersionId").equals(Records.str(fav,"guideVersionId")))throw new BusinessException(ErrorCode.SOURCE_INCOMPLETE,"源任务与最终版指南不一致");
         Map<String, Object> created =
                 create(
                         Map.of(
@@ -473,7 +478,10 @@ public class TaskService {
         Map<String, Object> neu = store.tasks.get(String.valueOf(created.get("id")));
         neu.put("sourceTaskId", taskId);
         neu.put("sourceFinalVersionId", finalId);
+        addDocument(String.valueOf(created.get("id")),Map.of("documentId",sourceDoc.get("documentId"),"documentTextVersionId",fav.get("documentTextVersionId"),"annotationScopeId",fav.get("annotationScopeId"),"requiredAnnotators",sourceDoc.get("requiredAnnotators")));
+        reannotation.record(String.valueOf(created.get("id")),taskId,finalId,user.userId());
         Map<String, Object> data = new LinkedHashMap<>();
+        data.put("id", created.get("id"));
         data.put("sourceTaskId", taskId);
         data.put("sourceFinalVersionId", finalId);
         data.put("status", "DRAFT");
@@ -494,12 +502,12 @@ public class TaskService {
             Map<String, Object> item = Records.copy(member);
             Map<String, Object> u = store.users.get(Records.str(member, "userId"));
             item.put("displayName", u == null ? member.get("userId") : u.get("displayName"));
-            members.add(item);
+            if(user.hasAnyRole("ADMIN","TASK_CREATOR","ARBITER")||user.userId().equals(Records.str(member,"userId")))members.add(item);
         }
         List<Map<String, Object>> documents = new ArrayList<>();
         for (Map<String, Object> td : store.taskDocuments.values()) {
             if (taskId.equals(Records.str(td, "taskId"))) {
-                documents.add(Records.copy(td));
+                if(user.hasAnyRole("ADMIN","TASK_CREATOR")||store.assignments.values().stream().anyMatch(a->Records.str(td,"id").equals(Records.str(a,"taskDocumentId"))&&user.userId().equals(Records.str(a,"userId"))&&"ACTIVE".equals(Records.str(a,"status"))))documents.add(Records.copy(td));
             }
         }
         Map<String, Object> data = new LinkedHashMap<>();
@@ -573,6 +581,8 @@ public class TaskService {
         if (!role.equals(Records.str(member, "memberRole"))) {
             throw new BusinessException(ErrorCode.ROLE_MISMATCH, "成员角色不匹配");
         }
+        var target=store.users.get(Records.str(member,"userId"));
+        if(target==null||!"ACTIVE".equals(target.get("status"))||!roleCodesOf(Records.str(member,"userId")).contains(role))throw new BusinessException(ErrorCode.ROLE_MISMATCH,"成员账号或角色已失效");
         return member;
     }
 
@@ -624,17 +634,13 @@ public class TaskService {
         for (String roleId : Records.stringList(user, "roleIds")) {
             Map<String, Object> role = store.roles.get(roleId);
             if (role != null) {
-                codes.add(Records.str(role, "code"));
+                if("ACTIVE".equals(role.get("status")))codes.add(Records.str(role, "code"));
             }
         }
         return codes;
     }
 
     private boolean isPublishedGuide(String guideVersionId) {
-        if (MOCK_PUBLISHED_GUIDES.contains(guideVersionId)) {
-            return true;
-        }
-        GuideVersion version = guideVersionMapper.selectById(guideVersionId);
-        return version != null && "PUBLISHED".equals(version.getStatus());
+        return guideCatalog.isPublished(guideVersionId);
     }
 }

@@ -31,6 +31,9 @@ public final class Utf16Offsets {
             if (start < scopeStart || end > scopeEnd || start >= end) {
                 throw new BusinessException(ErrorCode.OFFSET_INVALID, "边界必须落在标注范围内且为半开区间");
             }
+            if (splitsSurrogate(normalizedText,start) || splitsSurrogate(normalizedText,end)) {
+                throw new BusinessException(ErrorCode.OFFSET_INVALID,"边界不能切开 UTF-16 代理对");
+            }
             ranges.add(new int[] {start, end});
         }
         ranges.sort(Comparator.comparingInt(a -> a[0]));
@@ -52,6 +55,8 @@ public final class Utf16Offsets {
     public static String slice(String text, int start, int end) {
         return text.substring(start, end);
     }
+
+    private static boolean splitsSurrogate(String text,int at){return at>0&&at<text.length()&&Character.isHighSurrogate(text.charAt(at-1))&&Character.isLowSurrogate(text.charAt(at));}
 
     public static List<int[]> suggest(String text, int scopeStart, int scopeEnd) {
         List<int[]> out = new ArrayList<>();

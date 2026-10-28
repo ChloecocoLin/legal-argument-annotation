@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
  * 由参与项**递归**生成，关系节点经关系节点串联，**嵌套不压平**。
  * 契约明令关系实体不存文本表达式，故本服务只读不写，结果永不落库。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class RelationExpressionService {
 

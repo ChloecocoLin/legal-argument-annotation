@@ -19,7 +19,7 @@ import com.argument.teaching.service.RelationTemplateCodec.Parsed;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
 
 /**
  * 教学评分器。归成员 C（分工.md §四-7「C 负责关系、图评分」）。**纯计算，不落库**。
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
  * 例外是有意为之的一种——嵌套的标准关系完全没被配对时，它既是一条遗漏（关系配对维度），
  * 也是一次「被压平成多条直接关系」（嵌套维度），两条反馈说的是不同的事。
  */
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class TeachingScorer {
 

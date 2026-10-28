@@ -8,11 +8,12 @@
 // stores/user.ts 仍 re-export 这个名字，既有引用不会断。
 
 /** 角色码。与后端种子 app_role.code 一一对应，缺一个就会有人登录后什么都点不开。 */
-export type UserRole = 'admin' | 'annotator' | 'arbiter' | 'expert' | 'student' | 'teacher'
+export type UserRole = 'admin' | 'creator' | 'annotator' | 'arbiter' | 'expert' | 'student' | 'teacher'
 
 /** 角色码 → 中文名。用于顶栏与登录页的展示，不做权限判断（权限在后端）。 */
 export const ROLE_LABEL: Record<UserRole, string> = {
   admin: '管理员',
+  creator: '任务创建者',
   annotator: '标注员',
   arbiter: '裁定员',
   expert: '专家',

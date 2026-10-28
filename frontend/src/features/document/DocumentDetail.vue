@@ -2,11 +2,11 @@
   <div class="page" v-loading="loading">
     <div class="page-head">
       <h1>文书详情</h1>
-      <p class="muted">D03 案件与文本版本；D05 规范化原文。范围绑定任务后不可覆盖。</p>
+      <p class="muted">查看裁判文书及规范化原文。范围绑定任务后不可覆盖。</p>
     </div>
     <el-descriptions :column="1" border v-if="detail">
       <el-descriptions-item label="文书 ID">{{ detail.id }}</el-descriptions-item>
-      <el-descriptions-item label="原件 FileAsset">{{ detail.originalFileId }}</el-descriptions-item>
+      <el-descriptions-item label="原件编号">{{ detail.originalFileId }}</el-descriptions-item>
       <el-descriptions-item label="文本版本">{{ detail.textVersionIds.join(', ') }}</el-descriptions-item>
     </el-descriptions>
     <el-card v-if="text" style="margin-top: 16px">

@@ -1,0 +1,23 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 21MB
+  datasource:
+    url: jdbc:h2:mem:annotation-test;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  flyway:
+    locations: classpath:db/migration/h2,classpath:db/migration/common,classpath:db/migration/dev,classpath:db/migration/trial
+    out-of-order: true
+management:
+  health:
+    redis:
+      enabled: false
+app:
+  cors:
+    allowed-origins: http://127.0.0.1:5174
+member-d:
+  files:
+    root: ./target/member-d-test-files

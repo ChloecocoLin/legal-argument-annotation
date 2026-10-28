@@ -6,6 +6,7 @@ frontend/*.tsbuildinfo
 
 # Backend build output
 backend/target/
+**/.local-data/
 
 # Local environment and logs
 .env

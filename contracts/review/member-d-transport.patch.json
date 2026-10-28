@@ -1,0 +1,289 @@
+[
+  {
+    "op": "replace",
+    "path": "/components/schemas/A04Success/properties/data",
+    "value": {
+      "$ref": "#/components/schemas/AnnotationVersion"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/components/schemas/A05Success/properties/data",
+    "value": {
+      "$ref": "#/components/schemas/AnnotationVersion"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/components/schemas/V01Success/properties/data/properties/items/items",
+    "value": {
+      "$ref": "#/components/schemas/AnnotationVersion"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/components/schemas/V02Success/properties/data",
+    "value": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/components/schemas/AnnotationVersion"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Element"
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Relation"
+          }
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RelationParticipant"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "elements",
+        "relations",
+        "participants"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/paths/~1api~1v1~1annotation-drafts~1{draftId}~1submit/post/responses/200/content/application~1json/example/data",
+    "value": {
+      "id": "402d8716-3ea0-46ac-9078-05545fe58071",
+      "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+      "assignmentId": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+      "sourceDraftId": "f67848e1-a06d-4600-8454-19055e720d2c",
+      "versionNumber": 1,
+      "displayCode": "V1",
+      "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+      "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+      "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+      "segmentationBasisHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+      "status": "SUBMITTED",
+      "submittedAt": "2026-10-10T09:00:00Z",
+      "submittedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+      "elementIds": [
+        "007077eb-0059-41ed-bd82-bf5b90faf40f",
+        "408ef925-f0f5-4627-8356-9ae49322b22f"
+      ],
+      "relationIds": [
+        "5a8a91cf-66fb-469f-b41c-b731f1210372"
+      ],
+      "createdAt": "2026-10-10T09:00:00Z",
+      "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+      "updatedAt": "2026-10-10T09:00:00Z",
+      "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "recordVersion": 1,
+      "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/paths/~1api~1v1~1annotation-versions~1{versionId}~1withdraw/post/responses/200/content/application~1json/example/data",
+    "value": {
+      "id": "402d8716-3ea0-46ac-9078-05545fe58071",
+      "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+      "assignmentId": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+      "sourceDraftId": "f67848e1-a06d-4600-8454-19055e720d2c",
+      "versionNumber": 1,
+      "displayCode": "V1",
+      "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+      "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+      "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+      "segmentationBasisHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+      "status": "WITHDRAWN",
+      "submittedAt": "2026-10-10T09:00:00Z",
+      "submittedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+      "elementIds": [
+        "007077eb-0059-41ed-bd82-bf5b90faf40f",
+        "408ef925-f0f5-4627-8356-9ae49322b22f"
+      ],
+      "relationIds": [
+        "5a8a91cf-66fb-469f-b41c-b731f1210372"
+      ],
+      "createdAt": "2026-10-10T09:00:00Z",
+      "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+      "updatedAt": "2026-10-10T09:00:00Z",
+      "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "recordVersion": 2,
+      "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/paths/~1api~1v1~1task-documents~1{taskDocumentId}~1annotation-versions/get/responses/200/content/application~1json/example/data",
+    "value": {
+      "items": [
+        {
+          "id": "402d8716-3ea0-46ac-9078-05545fe58071",
+          "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+          "assignmentId": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+          "sourceDraftId": "f67848e1-a06d-4600-8454-19055e720d2c",
+          "versionNumber": 1,
+          "displayCode": "V1",
+          "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+          "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+          "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+          "segmentationBasisHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+          "status": "SUBMITTED",
+          "submittedAt": "2026-10-10T09:00:00Z",
+          "submittedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "elementIds": [
+            "007077eb-0059-41ed-bd82-bf5b90faf40f",
+            "408ef925-f0f5-4627-8356-9ae49322b22f"
+          ],
+          "relationIds": [
+            "5a8a91cf-66fb-469f-b41c-b731f1210372"
+          ],
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+          "recordVersion": 1,
+          "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+        }
+      ],
+      "submittedCount": 1,
+      "requiredAnnotators": 2
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/paths/~1api~1v1~1annotation-versions~1{versionId}/get/responses/200/content/application~1json/example/data",
+    "value": {
+      "version": {
+        "id": "402d8716-3ea0-46ac-9078-05545fe58071",
+        "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+        "assignmentId": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+        "sourceDraftId": "f67848e1-a06d-4600-8454-19055e720d2c",
+        "versionNumber": 1,
+        "displayCode": "V1",
+        "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+        "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+        "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+        "segmentationBasisHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+        "status": "SUBMITTED",
+        "submittedAt": "2026-10-10T09:00:00Z",
+        "submittedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "elementIds": [
+          "007077eb-0059-41ed-bd82-bf5b90faf40f",
+          "408ef925-f0f5-4627-8356-9ae49322b22f"
+        ],
+        "relationIds": [
+          "5a8a91cf-66fb-469f-b41c-b731f1210372"
+        ],
+        "createdAt": "2026-10-10T09:00:00Z",
+        "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+        "updatedAt": "2026-10-10T09:00:00Z",
+        "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+        "recordVersion": 1,
+        "segmentationCheckpointId": "8e48abef-998c-4384-892f-bbdbbd9eac7f"
+      },
+      "elements": [
+        {
+          "id": "007077eb-0059-41ed-bd82-bf5b90faf40f",
+          "ownerType": "ANNOTATION_VERSION",
+          "ownerId": "402d8716-3ea0-46ac-9078-05545fe58071",
+          "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+          "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+          "startOffset": 5,
+          "endOffset": 20,
+          "text": "依法成立的合同，自成立时生效。",
+          "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+          "labelCode": "GM-L",
+          "isProposition": true,
+          "displayNo": "P1",
+          "sourceElementIds": [
+            "8d7166f8-2633-4d45-84df-d0acf3867b03"
+          ],
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "recordVersion": 1
+        },
+        {
+          "id": "408ef925-f0f5-4627-8356-9ae49322b22f",
+          "ownerType": "ANNOTATION_VERSION",
+          "ownerId": "402d8716-3ea0-46ac-9078-05545fe58071",
+          "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+          "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+          "startOffset": 20,
+          "endOffset": 39,
+          "text": "当事人应当按照约定全面履行自己的义务。",
+          "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+          "labelCode": "GM-L",
+          "isProposition": true,
+          "displayNo": "P2",
+          "sourceElementIds": [
+            "d16dda93-eac1-461f-ae05-ee596d6f6a9e"
+          ],
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "recordVersion": 1
+        }
+      ],
+      "relations": [
+        {
+          "id": "5a8a91cf-66fb-469f-b41c-b731f1210372",
+          "ownerType": "ANNOTATION_VERSION",
+          "ownerId": "402d8716-3ea0-46ac-9078-05545fe58071",
+          "relationDefinitionId": "99352f86-0ecd-4ea8-9b52-57831a6b3e3f",
+          "relationCode": "S",
+          "directed": true,
+          "status": "ACTIVE",
+          "sourceRelationIds": [
+            "c062c5d0-7371-42a1-a03f-dd0973f81120"
+          ],
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "recordVersion": 1
+        }
+      ],
+      "participants": [
+        {
+          "id": "38564fce-bbf7-4145-8619-e153e2809d20",
+          "relationId": "5a8a91cf-66fb-469f-b41c-b731f1210372",
+          "ordinal": 1,
+          "role": "SOURCE",
+          "targetKind": "ELEMENT",
+          "targetId": "408ef925-f0f5-4627-8356-9ae49322b22f",
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "recordVersion": 1
+        },
+        {
+          "id": "11c47000-a907-439a-87e6-9f064c087810",
+          "relationId": "5a8a91cf-66fb-469f-b41c-b731f1210372",
+          "ordinal": 2,
+          "role": "TARGET",
+          "targetKind": "ELEMENT",
+          "targetId": "007077eb-0059-41ed-bd82-bf5b90faf40f",
+          "createdAt": "2026-10-10T09:00:00Z",
+          "createdById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "updatedAt": "2026-10-10T09:00:00Z",
+          "updatedById": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+          "recordVersion": 1
+        }
+      ]
+    }
+  }
+]

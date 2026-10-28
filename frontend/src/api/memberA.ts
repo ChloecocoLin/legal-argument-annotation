@@ -105,7 +105,7 @@ export function submitSegmentation(taskDocumentId: string, body: Record<string, 
 }
 
 export function listSegmentations(taskDocumentId: string) {
-  return getPage<{ attemptNumber: number; status: string; reviewedAt: string }>(
+  return getPage<{ attemptNumber: number; status: string; reviewedAt: string | null }>(
     `/task-documents/${taskDocumentId}/segmentation-submissions`
   )
 }
@@ -135,7 +135,11 @@ export function getTaskSetup(taskId: string) {
     task: Record<string, unknown>
     members: Record<string, unknown>[]
     taskDocuments: Record<string, unknown>[]
-  }>(`/dev/a/task-setup`, { taskId })
+  }>(`/integration/tasks/${taskId}/setup`)
+}
+
+export function getTaskOptions() {
+  return get<{ guides: { id: string; versionCode: string }[]; documents: { documentId: string; documentTextVersionId: string; annotationScopeId: string; label: string }[] }>('/integration/task-options')
 }
 
 export function listUsers(params: Record<string, unknown>) {

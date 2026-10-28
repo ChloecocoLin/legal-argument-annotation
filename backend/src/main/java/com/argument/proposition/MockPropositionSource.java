@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * <p>正式 Element 表就绪后新增 {@code ElementPropositionSource} 并替换注入即可，
  * 校验器与页面不动。排序键固定为 (startOffset, endOffset, id)，与契约的 displayNo 生成规则一致。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class MockPropositionSource implements PropositionSource {
 

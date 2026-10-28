@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * <p>它**不是**真实的命题裁定：真正决定「V2 的 P3 是否并入统一命题集合的 P3」的是 B 的裁定项。
  * 因此本类只做对齐、不做合并、不改写任何源数据；B 的裁定项就绪后换实现即可（见分工.md §七）。
  */
-@Service
+// Standalone adapter superseded by the shared workflow; not component-scanned.
 @RequiredArgsConstructor
 public class MockPropositionMapping implements PropositionMappingSource {
 
