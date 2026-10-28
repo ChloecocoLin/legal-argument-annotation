@@ -24,6 +24,18 @@ public class RelationDefinition {
 
     private Boolean directed;
 
+    /** 方向规则（G07 契约字段）。 */
+    private String directionRule;
+
+    /** 最少参与项数，当前五类均为 2。 */
+    private Integer minParticipants;
+
+    /** 最多参与项数；S/A/M 为 2，J/I 不设上限（null）。 */
+    private Integer maxParticipants;
+
+    /** 展示顺序，S/A/J/M/I 依次为 1..5。 */
+    private Integer sortOrder;
+
     private String expressionTemplate;
 
     private String participantRule;

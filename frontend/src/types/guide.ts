@@ -115,7 +115,22 @@ export interface RelationDefinition extends EntityBase {
   expressionTemplate: string
   participantRule: string
   diagramRule: string
+  // 以下四项为 G07 契约字段，由成员C于关系定义扩列时补齐（S/A/M 二元有向，J/I 无向 ≥2）
+  directionRule: string
+  minParticipants: number
+  maxParticipants: number | null
+  sortOrder: number
   recordVersion?: number
+}
+
+// 新增/更新关系定义（G15/G16，由成员C维护）。六项文本字段，更新时全部可选。
+export interface RelationDefinitionUpsert {
+  code?: RelationType
+  definition?: string
+  directionRule?: string
+  expressionTemplate?: string
+  participantRule?: string
+  diagramRule?: string
 }
 
 // 定义变更（G11 版本对比）

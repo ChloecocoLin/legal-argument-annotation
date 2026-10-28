@@ -34,6 +34,7 @@ export const ICON_PATHS: Record<string, string> = {
   upload: '<path d="M12 16V5M8 9l4-4 4 4M5 20h14"/>',
   link: '<path d="M9 12a3 3 0 0 1 3-3h2a3 3 0 0 1 0 6h-1"/><path d="M15 12a3 3 0 0 1-3 3h-2a3 3 0 0 1 0-6h1"/>',
   lock: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  logout: '<path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4M6 12h9"/>',
   alert: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
   file: '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/>',

@@ -12,6 +12,7 @@ import com.argument.guide.mapper.GuideVersionMapper;
 import com.argument.guide.mapper.LabelDefinitionMapper;
 import com.argument.guide.mapper.RelationDefinitionMapper;
 import com.argument.guide.service.GuideService;
+import com.argument.relation.rules.RelationRules;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -274,6 +275,125 @@ public class GuideServiceImpl implements GuideService {
         label.setSignalPhrases(request.signalPhrases());
         label.setExamples(request.examples());
         label.setNotes(request.notes());
+    }
+
+    // ── 关系定义 G07/G15/G16（成员 C）────────────────────────────────────
+
+    @Override
+    public List<RelationDefinition> listRelationDefinitions(String versionId, String code) {
+        getVersion(versionId);
+        LambdaQueryWrapper<RelationDefinition> wrapper = new LambdaQueryWrapper<RelationDefinition>()
+                .eq(RelationDefinition::getGuideVersionId, versionId)
+                .orderByAsc(RelationDefinition::getSortOrder);
+        if (StringUtils.isNotBlank(code)) {
+            wrapper.eq(RelationDefinition::getCode, code);
+        }
+        return relationMapper.selectList(wrapper);
+    }
+
+    @Override
+    public RelationDefinition createRelationDefinition(
+            String versionId, RelationDefinitionUpsertRequest request) {
+        GuideVersion version = getVersion(versionId);
+        requireDraftForRelation(version, "新增关系定义");
+        if (StringUtils.isBlank(request.code()) || !RelationRules.isKnownCode(request.code())) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "关系代码必须是 S/A/J/M/I 之一");
+        }
+        requireRelationText(request.definition(), "definition");
+        requireRelationText(request.directionRule(), "directionRule");
+        requireRelationText(request.expressionTemplate(), "expressionTemplate");
+        requireRelationText(request.participantRule(), "participantRule");
+        requireRelationText(request.diagramRule(), "diagramRule");
+
+        Long count = relationMapper.selectCount(
+                new LambdaQueryWrapper<RelationDefinition>()
+                        .eq(RelationDefinition::getGuideVersionId, versionId)
+                        .eq(RelationDefinition::getCode, request.code()));
+        if (count != null && count > 0) {
+            throw new BusinessException(ErrorCode.CONFLICT,
+                    "该指南版本已存在关系定义：" + request.code());
+        }
+
+        RelationRules.RelationRule rule = RelationRules.rule(request.code());
+        RelationDefinition def = new RelationDefinition();
+        def.setGuideVersionId(versionId);
+        def.setCode(request.code());
+        // name 不属 G15 请求字段：缺省时按代码派生，保持与契约 RelationDefinition 一致。
+        def.setName(StringUtils.isNotBlank(request.name()) ? request.name() : rule.name());
+        // directed / 参与项上下限 / 排序由规则字典决定，不接受请求覆盖。
+        def.setDirected(rule.directed());
+        def.setMinParticipants(rule.minParticipants());
+        def.setMaxParticipants(rule.maxParticipants());
+        def.setSortOrder(RelationRules.sortOrderOf(request.code()));
+        applyRelationFields(def, request);
+        def.setRecordVersion(0);
+        relationMapper.insert(def);
+        return def;
+    }
+
+    @Override
+    public RelationDefinition updateRelationDefinition(
+            String relationDefinitionId, RelationDefinitionUpsertRequest request) {
+        RelationDefinition def = relationMapper.selectById(relationDefinitionId);
+        if (def == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "关系定义不存在");
+        }
+        GuideVersion version = getVersion(def.getGuideVersionId());
+        requireDraftForRelation(version, "修改关系定义");
+
+        // G16 为局部更新：只取非 null 字段，且不允许改 code。
+        boolean touched = false;
+        if (request.name() != null) {
+            def.setName(request.name());
+            touched = true;
+        }
+        if (request.definition() != null) {
+            def.setDefinition(request.definition());
+            touched = true;
+        }
+        if (request.directionRule() != null) {
+            def.setDirectionRule(request.directionRule());
+            touched = true;
+        }
+        if (request.expressionTemplate() != null) {
+            def.setExpressionTemplate(request.expressionTemplate());
+            touched = true;
+        }
+        if (request.participantRule() != null) {
+            def.setParticipantRule(request.participantRule());
+            touched = true;
+        }
+        if (request.diagramRule() != null) {
+            def.setDiagramRule(request.diagramRule());
+            touched = true;
+        }
+        if (!touched) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "至少提供一项要修改的字段");
+        }
+        relationMapper.updateById(def);
+        return def;
+    }
+
+    private void requireDraftForRelation(GuideVersion version, String action) {
+        if (!"DRAFT".equals(version.getStatus())) {
+            throw new BusinessException(ErrorCode.GUIDE_VERSION_LOCKED,
+                    "当前版本状态为 " + version.getStatus() + "，仅草稿版本可" + action);
+        }
+    }
+
+    private void requireRelationText(String value, String field) {
+        if (StringUtils.isBlank(value)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, field + " 不能为空");
+        }
+    }
+
+    private void applyRelationFields(
+            RelationDefinition def, RelationDefinitionUpsertRequest request) {
+        def.setDefinition(request.definition());
+        def.setDirectionRule(request.directionRule());
+        def.setExpressionTemplate(request.expressionTemplate());
+        def.setParticipantRule(request.participantRule());
+        def.setDiagramRule(request.diagramRule());
     }
 
     @Override

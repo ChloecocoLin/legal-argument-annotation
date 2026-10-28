@@ -2,16 +2,22 @@ package com.argument.common.exception;
 
 import com.argument.common.response.ApiResponse;
 import com.argument.common.response.FieldRule;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 全局异常处理。统一输出失败信封。
@@ -52,6 +58,50 @@ public class GlobalExceptionHandler {
         ApiResponse<Object> body =
                 ApiResponse.fail(ErrorCode.VALIDATION_ERROR, "参数校验失败", details);
         return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatus()).body(body);
+    }
+
+    /**
+     * 方法级鉴权失败（{@code @PreAuthorize} 不通过）。
+     *
+     * <p>这一条**必须显式写**，否则会被下面的 {@link Exception} 兜底吃掉，变成 500 INTERNAL_ERROR：
+     * 控制器上的 {@code @PreAuthorize} 是在 DispatcherServlet 内部抛 {@link AccessDeniedException} 的，
+     * 而带 {@code @RestControllerAdvice} 的处理器在 Servlet 链路里比
+     * {@code ExceptionTranslationFilter} 更靠内，异常根本走不到 Spring Security 的
+     * {@code AccessDeniedHandler}。表现出来就是「没权限的请求返回 500」——前端只会说「服务器错误」，
+     * 排查时会一路怀疑业务代码。（URL 级拒绝仍由 jsonAccessDeniedHandler 处理，两者输出同一个信封。）
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException ex) {
+        // 记 WARN 且不带堆栈：403 是正常的业务结果（角色不对），不是程序错误。
+        // 堆栈留下来只会让日志像崩了，真正需要的是「谁、以什么身份、想访问什么」。
+        log.warn(
+                "鉴权拒绝：user={} {} {}",
+                currentUsername(),
+                requestMethod(),
+                requestUri());
+        ApiResponse<Object> body = ApiResponse.fail(ErrorCode.FORBIDDEN, "没有操作权限");
+        return ResponseEntity.status(ErrorCode.FORBIDDEN.getStatus()).body(body);
+    }
+
+    private String currentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth == null || !auth.isAuthenticated() ? "(未登录)" : auth.getName();
+    }
+
+    private String requestMethod() {
+        HttpServletRequest request = currentRequest();
+        return request == null ? "-" : request.getMethod();
+    }
+
+    private String requestUri() {
+        HttpServletRequest request = currentRequest();
+        return request == null ? "-" : request.getRequestURI();
+    }
+
+    private HttpServletRequest currentRequest() {
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attrs == null ? null : attrs.getRequest();
     }
 
     @ExceptionHandler(Exception.class)

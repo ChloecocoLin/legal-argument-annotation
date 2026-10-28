@@ -1,0 +1,1334 @@
+{
+  "_note": "成员 C 关系裁定页的 mock fixture。由 backend/scripts/smoke-adjudication.py --fixture 生成，非契约数据；B 的命题裁定（J03/J04）与 D 的裁定记录（J05/J07/J08）就绪后作废。",
+  "session": {
+    "id": "ses-1",
+    "status": "RELATION_REVIEW",
+    "sourceVersionIds": [
+      "av-1",
+      "av-2"
+    ],
+    "unifiedSnapshotId": "us-1",
+    "propositionCompletedAt": "2026-08-16T10:00:00"
+  },
+  "sourceVersions": [
+    {
+      "id": "av-1",
+      "label": "V1"
+    },
+    {
+      "id": "av-2",
+      "label": "V2"
+    }
+  ],
+  "unifiedPropositions": [
+    {
+      "id": "us-p1",
+      "snapshotId": "us-1",
+      "labelCode": "GM-L",
+      "displayNo": "P1",
+      "proposition": true,
+      "text": "依法成立的合同，自成立时生效。"
+    },
+    {
+      "id": "us-p2",
+      "snapshotId": "us-1",
+      "labelCode": "SF",
+      "displayNo": "P2",
+      "proposition": true,
+      "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+    },
+    {
+      "id": "us-p3",
+      "snapshotId": "us-1",
+      "labelCode": "SF",
+      "displayNo": "P3",
+      "proposition": true,
+      "text": "原告已按约定完成全部劳务工作。"
+    },
+    {
+      "id": "us-p4",
+      "snapshotId": "us-1",
+      "labelCode": "SF",
+      "displayNo": "P4",
+      "proposition": true,
+      "text": "被告仅支付5400元。"
+    },
+    {
+      "id": "us-p5",
+      "snapshotId": "us-1",
+      "labelCode": "SM",
+      "displayNo": "P5",
+      "proposition": true,
+      "text": "被告应当支付剩余600元报酬。"
+    },
+    {
+      "id": "us-p6",
+      "snapshotId": "us-1",
+      "labelCode": "GF",
+      "displayNo": "P6",
+      "proposition": true,
+      "text": "当事人对自己提出的主张应当提供证据。"
+    },
+    {
+      "id": "us-p7",
+      "snapshotId": "us-1",
+      "labelCode": "SF",
+      "displayNo": "P7",
+      "proposition": true,
+      "text": "原告主张另有劳务报酬600元。"
+    },
+    {
+      "id": "us-p8",
+      "snapshotId": "us-1",
+      "labelCode": "SF",
+      "displayNo": "P8",
+      "proposition": true,
+      "text": "但其提供的证据不足以证明其主张。"
+    }
+  ],
+  "items": [
+    {
+      "id": "66d2f8ad373385725e49d99e5033bdb1",
+      "sessionId": "ses-1",
+      "conflictType": "PARTICIPANTS",
+      "dimension": "组合成员",
+      "reason": "组合成员不同：V1 为 J(P2,P3)，V2 为 J(P2,P3,P4)。",
+      "candidateRelationIds": [
+        "v1-j1",
+        "v2-j1"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-j1",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "J",
+          "expression": "J(P2,P3)",
+          "participants": [
+            {
+              "id": "v1-rp-1-1",
+              "ordinal": 1,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p2",
+              "displayNo": "P2",
+              "labelCode": "SF",
+              "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+            },
+            {
+              "id": "v1-rp-1-2",
+              "ordinal": 2,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p3",
+              "displayNo": "P3",
+              "labelCode": "SF",
+              "text": "原告已按约定完成全部劳务工作。"
+            }
+          ],
+          "unmapped": false
+        },
+        {
+          "relationId": "v2-j1",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "J",
+          "expression": "J(P2,P3,P4)",
+          "participants": [
+            {
+              "id": "v2-rp-7-1",
+              "ordinal": 1,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p2",
+              "displayNo": "P2",
+              "labelCode": "SF",
+              "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+            },
+            {
+              "id": "v2-rp-7-2",
+              "ordinal": 2,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p3",
+              "displayNo": "P3",
+              "labelCode": "SF",
+              "text": "原告已按约定完成全部劳务工作。"
+            },
+            {
+              "id": "v2-rp-7-3",
+              "ordinal": 3,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p4",
+              "displayNo": "P4",
+              "labelCode": "SF",
+              "text": "被告仅支付5400元。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "a21e3693a0630831765e0a3af87c3a9d",
+      "sessionId": "ses-1",
+      "conflictType": "PARTICIPANTS",
+      "dimension": "嵌套层级",
+      "reason": "嵌套层级不同：V1 为 S(J(P2,P3),P5)，V2 为 S(P2,P5)；一版以组合整体（关系节点）为端点，另一版直接以命题为端点，需先裁定内层关系再裁外层。",
+      "candidateRelationIds": [
+        "v1-s1",
+        "v2-s1"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-s1",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "S",
+          "expression": "S(J(P2,P3),P5)",
+          "participants": [
+            {
+              "id": "v1-rp-2-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "RELATION",
+              "targetId": "v1-j1",
+              "displayNo": null,
+              "labelCode": null,
+              "text": null
+            },
+            {
+              "id": "v1-rp-2-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p5",
+              "displayNo": "P5",
+              "labelCode": "SM",
+              "text": "被告应当支付剩余600元报酬。"
+            }
+          ],
+          "unmapped": false
+        },
+        {
+          "relationId": "v2-s1",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "S",
+          "expression": "S(P2,P5)",
+          "participants": [
+            {
+              "id": "v2-rp-1-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p2",
+              "displayNo": "P2",
+              "labelCode": "SF",
+              "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+            },
+            {
+              "id": "v2-rp-1-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p5",
+              "displayNo": "P5",
+              "labelCode": "SM",
+              "text": "被告应当支付剩余600元报酬。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": true
+    },
+    {
+      "id": "97263b87f152e3daa3131d1862eacc35",
+      "sessionId": "ses-1",
+      "conflictType": "DIRECTION",
+      "dimension": "方向",
+      "reason": "方向相反：V1 为 S(P2,P3)，V2 为 S(P3,P2)；有向关系的 SOURCE 与 TARGET 必须二选一。",
+      "candidateRelationIds": [
+        "v1-s2",
+        "v2-s2"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-s2",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "S",
+          "expression": "S(P2,P3)",
+          "participants": [
+            {
+              "id": "v1-rp-3-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p2",
+              "displayNo": "P2",
+              "labelCode": "SF",
+              "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+            },
+            {
+              "id": "v1-rp-3-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p3",
+              "displayNo": "P3",
+              "labelCode": "SF",
+              "text": "原告已按约定完成全部劳务工作。"
+            }
+          ],
+          "unmapped": false
+        },
+        {
+          "relationId": "v2-s2",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "S",
+          "expression": "S(P3,P2)",
+          "participants": [
+            {
+              "id": "v2-rp-2-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p3",
+              "displayNo": "P3",
+              "labelCode": "SF",
+              "text": "原告已按约定完成全部劳务工作。"
+            },
+            {
+              "id": "v2-rp-2-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p2",
+              "displayNo": "P2",
+              "labelCode": "SF",
+              "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "990292383727e0c8e2f93118ec525a57",
+      "sessionId": "ses-1",
+      "conflictType": "AGREEMENT",
+      "dimension": "一致项",
+      "reason": "两版一致：M(P7,P6)。",
+      "candidateRelationIds": [
+        "v1-m1",
+        "v2-m1"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-m1",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "M",
+          "expression": "M(P7,P6)",
+          "participants": [
+            {
+              "id": "v1-rp-6-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p7",
+              "displayNo": "P7",
+              "labelCode": "SF",
+              "text": "原告主张另有劳务报酬600元。"
+            },
+            {
+              "id": "v1-rp-6-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p6",
+              "displayNo": "P6",
+              "labelCode": "GF",
+              "text": "当事人对自己提出的主张应当提供证据。"
+            }
+          ],
+          "unmapped": false
+        },
+        {
+          "relationId": "v2-m1",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "M",
+          "expression": "M(P7,P6)",
+          "participants": [
+            {
+              "id": "v2-rp-6-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p7",
+              "displayNo": "P7",
+              "labelCode": "SF",
+              "text": "原告主张另有劳务报酬600元。"
+            },
+            {
+              "id": "v2-rp-6-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p6",
+              "displayNo": "P6",
+              "labelCode": "GF",
+              "text": "当事人对自己提出的主张应当提供证据。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "be04b18975049e8bee113bc02d272642",
+      "sessionId": "ses-1",
+      "conflictType": "TYPE",
+      "dimension": "关系类型",
+      "reason": "关系类型不同：V1 为 J(P6,P8)（J），V2 为 S(P6,P8)（S）。",
+      "candidateRelationIds": [
+        "v1-j2",
+        "v2-s4"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-j2",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "J",
+          "expression": "J(P6,P8)",
+          "participants": [
+            {
+              "id": "v1-rp-5-1",
+              "ordinal": 1,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p6",
+              "displayNo": "P6",
+              "labelCode": "GF",
+              "text": "当事人对自己提出的主张应当提供证据。"
+            },
+            {
+              "id": "v1-rp-5-2",
+              "ordinal": 2,
+              "role": "MEMBER",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p8",
+              "displayNo": "P8",
+              "labelCode": "SF",
+              "text": "但其提供的证据不足以证明其主张。"
+            }
+          ],
+          "unmapped": false
+        },
+        {
+          "relationId": "v2-s4",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "S",
+          "expression": "S(P6,P8)",
+          "participants": [
+            {
+              "id": "v2-rp-4-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p6",
+              "displayNo": "P6",
+              "labelCode": "GF",
+              "text": "当事人对自己提出的主张应当提供证据。"
+            },
+            {
+              "id": "v2-rp-4-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p8",
+              "displayNo": "P8",
+              "labelCode": "SF",
+              "text": "但其提供的证据不足以证明其主张。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "4ef26cd0cf5a89b9e7f973ea3d5fb3d4",
+      "sessionId": "ses-1",
+      "conflictType": "EXISTENCE",
+      "dimension": "一方新增",
+      "reason": "仅 V2 建立：S(P3,P5)；V1 未标注，属一方新增。",
+      "candidateRelationIds": [
+        "v2-s3"
+      ],
+      "candidates": [
+        {
+          "relationId": "v2-s3",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "S",
+          "expression": "S(P3,P5)",
+          "participants": [
+            {
+              "id": "v2-rp-3-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p3",
+              "displayNo": "P3",
+              "labelCode": "SF",
+              "text": "原告已按约定完成全部劳务工作。"
+            },
+            {
+              "id": "v2-rp-3-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p5",
+              "displayNo": "P5",
+              "labelCode": "SM",
+              "text": "被告应当支付剩余600元报酬。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "8223ec18f07358a02facb3608e216cf5",
+      "sessionId": "ses-1",
+      "conflictType": "EXISTENCE",
+      "dimension": "一方遗漏",
+      "reason": "仅 V1 建立：S(P1,P5)；V2 未标注同一关系，属一方遗漏。",
+      "candidateRelationIds": [
+        "v1-s3"
+      ],
+      "candidates": [
+        {
+          "relationId": "v1-s3",
+          "versionId": "av-1",
+          "versionLabel": "V1",
+          "relationCode": "S",
+          "expression": "S(P1,P5)",
+          "participants": [
+            {
+              "id": "v1-rp-4-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p1",
+              "displayNo": "P1",
+              "labelCode": "GM-L",
+              "text": "依法成立的合同，自成立时生效。"
+            },
+            {
+              "id": "v1-rp-4-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v1-p5",
+              "displayNo": "P5",
+              "labelCode": "SM",
+              "text": "被告应当支付剩余600元报酬。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    },
+    {
+      "id": "6b3b7da047a034803ef2be56a5507299",
+      "sessionId": "ses-1",
+      "conflictType": "EXISTENCE",
+      "dimension": "一方新增",
+      "reason": "仅 V2 建立：A(P8,P7)；V1 未标注，属一方新增。",
+      "candidateRelationIds": [
+        "v2-a1"
+      ],
+      "candidates": [
+        {
+          "relationId": "v2-a1",
+          "versionId": "av-2",
+          "versionLabel": "V2",
+          "relationCode": "A",
+          "expression": "A(P8,P7)",
+          "participants": [
+            {
+              "id": "v2-rp-5-1",
+              "ordinal": 1,
+              "role": "SOURCE",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p8",
+              "displayNo": "P8",
+              "labelCode": "SF",
+              "text": "但其提供的证据不足以证明其主张。"
+            },
+            {
+              "id": "v2-rp-5-2",
+              "ordinal": 2,
+              "role": "TARGET",
+              "targetKind": "ELEMENT",
+              "targetId": "v2-p7",
+              "displayNo": "P7",
+              "labelCode": "SF",
+              "text": "原告主张另有劳务报酬600元。"
+            }
+          ],
+          "unmapped": false
+        }
+      ],
+      "status": "OPEN",
+      "decisionId": null,
+      "nestedFirst": false
+    }
+  ],
+  "sampleDecisions": [
+    {
+      "itemId": "66d2f8ad373385725e49d99e5033bdb1",
+      "action": "ADOPT_VERSION",
+      "sourceObjectId": "v2-j1",
+      "reason": "V2 多列的 P4 有依据"
+    },
+    {
+      "itemId": "a21e3693a0630831765e0a3af87c3a9d",
+      "action": "ADOPT_VERSION",
+      "sourceObjectId": "v1-s1",
+      "reason": "整体作为支持来源更贴合原文"
+    },
+    {
+      "itemId": "97263b87f152e3daa3131d1862eacc35",
+      "action": "ADOPT_VERSION",
+      "sourceVersionId": "av-2",
+      "reason": "P3 才是被支持项"
+    },
+    {
+      "itemId": "990292383727e0c8e2f93118ec525a57",
+      "action": "CONFIRM_AGREEMENT",
+      "sourceObjectId": "v2-m1"
+    },
+    {
+      "itemId": "be04b18975049e8bee113bc02d272642",
+      "action": "CUSTOM",
+      "reason": "按 S 支持处理",
+      "customRelation": {
+        "relationCode": "S",
+        "participants": [
+          {
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p6"
+          },
+          {
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p8"
+          }
+        ]
+      }
+    },
+    {
+      "itemId": "8223ec18f07358a02facb3608e216cf5",
+      "action": "ADOPT_VERSION",
+      "sourceObjectId": "v1-s3"
+    },
+    {
+      "itemId": "4ef26cd0cf5a89b9e7f973ea3d5fb3d4",
+      "action": "DELETE",
+      "reason": "两条规范并列，未形成直接支持关系。"
+    },
+    {
+      "itemId": "6b3b7da047a034803ef2be56a5507299",
+      "action": "ADOPT_VERSION",
+      "sourceObjectId": "v2-a1",
+      "reason": "V2 的攻击关系成立"
+    }
+  ],
+  "sampleResult": {
+    "sessionId": "ses-1",
+    "unifiedSnapshotId": "us-1",
+    "status": "COMPLETE",
+    "conflictCount": 7,
+    "agreementCount": 1,
+    "decidedCount": 8,
+    "pendingItemIds": [],
+    "reAdjudicationItemIds": [],
+    "relations": [
+      {
+        "id": "res-1",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-j",
+        "relationCode": "J",
+        "name": "组合关系",
+        "directed": false,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v2-j1"
+        ],
+        "participants": [
+          {
+            "id": "res-p-1-1",
+            "ordinal": 1,
+            "role": "MEMBER",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p2",
+            "displayNo": "P2",
+            "labelCode": "SF",
+            "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+          },
+          {
+            "id": "res-p-1-2",
+            "ordinal": 2,
+            "role": "MEMBER",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p3",
+            "displayNo": "P3",
+            "labelCode": "SF",
+            "text": "原告已按约定完成全部劳务工作。"
+          },
+          {
+            "id": "res-p-1-3",
+            "ordinal": 3,
+            "role": "MEMBER",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p4",
+            "displayNo": "P4",
+            "labelCode": "SF",
+            "text": "被告仅支付5400元。"
+          }
+        ],
+        "expression": "J(P2,P3,P4)"
+      },
+      {
+        "id": "res-2",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-s",
+        "relationCode": "S",
+        "name": "支持关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v2-s2"
+        ],
+        "participants": [
+          {
+            "id": "res-p-2-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p3",
+            "displayNo": "P3",
+            "labelCode": "SF",
+            "text": "原告已按约定完成全部劳务工作。"
+          },
+          {
+            "id": "res-p-2-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p2",
+            "displayNo": "P2",
+            "labelCode": "SF",
+            "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+          }
+        ],
+        "expression": "S(P3,P2)"
+      },
+      {
+        "id": "res-3",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-m",
+        "relationCode": "M",
+        "name": "匹配关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v2-m1"
+        ],
+        "participants": [
+          {
+            "id": "res-p-3-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p7",
+            "displayNo": "P7",
+            "labelCode": "SF",
+            "text": "原告主张另有劳务报酬600元。"
+          },
+          {
+            "id": "res-p-3-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p6",
+            "displayNo": "P6",
+            "labelCode": "GF",
+            "text": "当事人对自己提出的主张应当提供证据。"
+          }
+        ],
+        "expression": "M(P7,P6)"
+      },
+      {
+        "id": "res-4",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": null,
+        "relationCode": "S",
+        "name": "支持关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [],
+        "participants": [
+          {
+            "id": "res-p-4-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p6",
+            "displayNo": "P6",
+            "labelCode": "GF",
+            "text": "当事人对自己提出的主张应当提供证据。"
+          },
+          {
+            "id": "res-p-4-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p8",
+            "displayNo": "P8",
+            "labelCode": "SF",
+            "text": "但其提供的证据不足以证明其主张。"
+          }
+        ],
+        "expression": "S(P6,P8)"
+      },
+      {
+        "id": "res-5",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-s",
+        "relationCode": "S",
+        "name": "支持关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v1-s3"
+        ],
+        "participants": [
+          {
+            "id": "res-p-5-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p1",
+            "displayNo": "P1",
+            "labelCode": "GM-L",
+            "text": "依法成立的合同，自成立时生效。"
+          },
+          {
+            "id": "res-p-5-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p5",
+            "displayNo": "P5",
+            "labelCode": "SM",
+            "text": "被告应当支付剩余600元报酬。"
+          }
+        ],
+        "expression": "S(P1,P5)"
+      },
+      {
+        "id": "res-6",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-a",
+        "relationCode": "A",
+        "name": "反对关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v2-a1"
+        ],
+        "participants": [
+          {
+            "id": "res-p-6-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p8",
+            "displayNo": "P8",
+            "labelCode": "SF",
+            "text": "但其提供的证据不足以证明其主张。"
+          },
+          {
+            "id": "res-p-6-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p7",
+            "displayNo": "P7",
+            "labelCode": "SF",
+            "text": "原告主张另有劳务报酬600元。"
+          }
+        ],
+        "expression": "A(P8,P7)"
+      },
+      {
+        "id": "res-7",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-j",
+        "relationCode": "J",
+        "name": "组合关系",
+        "directed": false,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v1-j1"
+        ],
+        "participants": [
+          {
+            "id": "res-p-7-1",
+            "ordinal": 1,
+            "role": "MEMBER",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p2",
+            "displayNo": "P2",
+            "labelCode": "SF",
+            "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。"
+          },
+          {
+            "id": "res-p-7-2",
+            "ordinal": 2,
+            "role": "MEMBER",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p3",
+            "displayNo": "P3",
+            "labelCode": "SF",
+            "text": "原告已按约定完成全部劳务工作。"
+          }
+        ],
+        "expression": "J(P2,P3)"
+      },
+      {
+        "id": "res-8",
+        "ownerType": "FINAL_VERSION",
+        "ownerId": "us-1",
+        "relationDefinitionId": "r12-s",
+        "relationCode": "S",
+        "name": "支持关系",
+        "directed": true,
+        "status": "ACTIVE",
+        "sourceRelationIds": [
+          "v1-s1"
+        ],
+        "participants": [
+          {
+            "id": "res-p-8-1",
+            "ordinal": 1,
+            "role": "SOURCE",
+            "targetKind": "RELATION",
+            "targetId": "res-7",
+            "displayNo": null,
+            "labelCode": null,
+            "text": null
+          },
+          {
+            "id": "res-p-8-2",
+            "ordinal": 2,
+            "role": "TARGET",
+            "targetKind": "ELEMENT",
+            "targetId": "us-p5",
+            "displayNo": "P5",
+            "labelCode": "SM",
+            "text": "被告应当支付剩余600元报酬。"
+          }
+        ],
+        "expression": "S(J(P2,P3),P5)"
+      }
+    ],
+    "issues": [],
+    "graph": {
+      "graphId": "session:ses-1",
+      "ownerType": "FINAL_VERSION",
+      "ownerId": "us-1",
+      "status": "VALID",
+      "layoutVersion": 0,
+      "canvasWidth": null,
+      "canvasHeight": null,
+      "positions": [],
+      "nodes": [
+        {
+          "id": "us-p1",
+          "kind": "ELEMENT",
+          "displayNo": "P1",
+          "labelCode": "GM-L",
+          "text": "依法成立的合同，自成立时生效。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p2",
+          "kind": "ELEMENT",
+          "displayNo": "P2",
+          "labelCode": "SF",
+          "text": "原告与被告于2025年3月签订劳务合同，约定报酬为6000元。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p3",
+          "kind": "ELEMENT",
+          "displayNo": "P3",
+          "labelCode": "SF",
+          "text": "原告已按约定完成全部劳务工作。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p4",
+          "kind": "ELEMENT",
+          "displayNo": "P4",
+          "labelCode": "SF",
+          "text": "被告仅支付5400元。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p5",
+          "kind": "ELEMENT",
+          "displayNo": "P5",
+          "labelCode": "SM",
+          "text": "被告应当支付剩余600元报酬。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p6",
+          "kind": "ELEMENT",
+          "displayNo": "P6",
+          "labelCode": "GF",
+          "text": "当事人对自己提出的主张应当提供证据。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p7",
+          "kind": "ELEMENT",
+          "displayNo": "P7",
+          "labelCode": "SF",
+          "text": "原告主张另有劳务报酬600元。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "us-p8",
+          "kind": "ELEMENT",
+          "displayNo": "P8",
+          "labelCode": "SF",
+          "text": "但其提供的证据不足以证明其主张。",
+          "relationCode": null,
+          "directed": null,
+          "expression": null,
+          "representativeId": null
+        },
+        {
+          "id": "res-1",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "J",
+          "directed": false,
+          "expression": "J(P2,P3,P4)",
+          "representativeId": null
+        },
+        {
+          "id": "res-2",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "S",
+          "directed": true,
+          "expression": "S(P3,P2)",
+          "representativeId": null
+        },
+        {
+          "id": "res-3",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "M",
+          "directed": true,
+          "expression": "M(P7,P6)",
+          "representativeId": null
+        },
+        {
+          "id": "res-4",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "S",
+          "directed": true,
+          "expression": "S(P6,P8)",
+          "representativeId": null
+        },
+        {
+          "id": "res-5",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "S",
+          "directed": true,
+          "expression": "S(P1,P5)",
+          "representativeId": null
+        },
+        {
+          "id": "res-6",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "A",
+          "directed": true,
+          "expression": "A(P8,P7)",
+          "representativeId": null
+        },
+        {
+          "id": "res-7",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "J",
+          "directed": false,
+          "expression": "J(P2,P3)",
+          "representativeId": null
+        },
+        {
+          "id": "res-8",
+          "kind": "RELATION",
+          "displayNo": null,
+          "labelCode": null,
+          "text": null,
+          "relationCode": "S",
+          "directed": true,
+          "expression": "S(J(P2,P3),P5)",
+          "representativeId": null
+        }
+      ],
+      "edges": [
+        {
+          "id": "us-p2->res-1",
+          "source": "us-p2",
+          "target": "res-1",
+          "relationCode": "J",
+          "arrow": false,
+          "dashed": false,
+          "relationId": "res-1"
+        },
+        {
+          "id": "us-p3->res-1",
+          "source": "us-p3",
+          "target": "res-1",
+          "relationCode": "J",
+          "arrow": false,
+          "dashed": false,
+          "relationId": "res-1"
+        },
+        {
+          "id": "us-p4->res-1",
+          "source": "us-p4",
+          "target": "res-1",
+          "relationCode": "J",
+          "arrow": false,
+          "dashed": false,
+          "relationId": "res-1"
+        },
+        {
+          "id": "us-p3->res-2",
+          "source": "us-p3",
+          "target": "res-2",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-2"
+        },
+        {
+          "id": "res-2->us-p2",
+          "source": "res-2",
+          "target": "us-p2",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-2"
+        },
+        {
+          "id": "us-p7->res-3",
+          "source": "us-p7",
+          "target": "res-3",
+          "relationCode": "M",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-3"
+        },
+        {
+          "id": "res-3->us-p6",
+          "source": "res-3",
+          "target": "us-p6",
+          "relationCode": "M",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-3"
+        },
+        {
+          "id": "us-p6->res-4",
+          "source": "us-p6",
+          "target": "res-4",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-4"
+        },
+        {
+          "id": "res-4->us-p8",
+          "source": "res-4",
+          "target": "us-p8",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-4"
+        },
+        {
+          "id": "us-p1->res-5",
+          "source": "us-p1",
+          "target": "res-5",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-5"
+        },
+        {
+          "id": "res-5->us-p5",
+          "source": "res-5",
+          "target": "us-p5",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-5"
+        },
+        {
+          "id": "us-p8->res-6",
+          "source": "us-p8",
+          "target": "res-6",
+          "relationCode": "A",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-6"
+        },
+        {
+          "id": "res-6->us-p7",
+          "source": "res-6",
+          "target": "us-p7",
+          "relationCode": "A",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-6"
+        },
+        {
+          "id": "us-p2->res-7",
+          "source": "us-p2",
+          "target": "res-7",
+          "relationCode": "J",
+          "arrow": false,
+          "dashed": false,
+          "relationId": "res-7"
+        },
+        {
+          "id": "us-p3->res-7",
+          "source": "us-p3",
+          "target": "res-7",
+          "relationCode": "J",
+          "arrow": false,
+          "dashed": false,
+          "relationId": "res-7"
+        },
+        {
+          "id": "res-7->res-8",
+          "source": "res-7",
+          "target": "res-8",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-8"
+        },
+        {
+          "id": "res-8->us-p5",
+          "source": "res-8",
+          "target": "us-p5",
+          "relationCode": "S",
+          "arrow": true,
+          "dashed": false,
+          "relationId": "res-8"
+        }
+      ],
+      "isolatedNodeIds": [],
+      "componentCount": 2,
+      "issues": []
+    }
+  }
+}

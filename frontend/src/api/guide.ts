@@ -10,6 +10,7 @@ import type {
   LabelCreate,
   LabelPatch,
   RelationDefinition,
+  RelationDefinitionUpsert,
   GuideCompareResult,
   GuideCreateRequest,
   GuideVersionCreateRequest,
@@ -73,6 +74,28 @@ export async function listRelationDefinitions(
     params
   )
   return r.items
+}
+
+// G15 新增草稿关系定义（接口归成员C维护）
+export function createRelationDefinition(
+  guideVersionId: string,
+  body: RelationDefinitionUpsert
+): Promise<RelationDefinition> {
+  return post<RelationDefinition>(
+    `/guide-versions/${guideVersionId}/relations`,
+    body
+  )
+}
+
+// G16 局部更新草稿关系定义（接口归成员C维护）
+export function updateRelationDefinition(
+  relationDefinitionId: string,
+  body: RelationDefinitionUpsert
+): Promise<RelationDefinition> {
+  return patch<RelationDefinition>(
+    `/relation-definitions/${relationDefinitionId}`,
+    body
+  )
 }
 
 // G08 更新版本附件（仅 DRAFT）
