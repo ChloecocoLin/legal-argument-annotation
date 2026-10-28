@@ -1,14 +1,10 @@
 package com.argument.common.exception;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 /**
  * 业务错误码。code 字符串与 openapi-ready.yaml 对齐。
  */
-@Getter
-@RequiredArgsConstructor
 public enum ErrorCode {
 
     VALIDATION_ERROR("VALIDATION_ERROR", HttpStatus.BAD_REQUEST),
@@ -17,6 +13,20 @@ public enum ErrorCode {
     NOT_FOUND("NOT_FOUND", HttpStatus.NOT_FOUND),
     CONFLICT("CONFLICT", HttpStatus.CONFLICT),
     LOCKED_RESOURCE("LOCKED_RESOURCE", HttpStatus.LOCKED),
+    IDEMPOTENCY_CONFLICT("IDEMPOTENCY_CONFLICT", HttpStatus.CONFLICT),
+    VERSION_CONFLICT("VERSION_CONFLICT", HttpStatus.CONFLICT),
+    GUIDE_NOT_PUBLISHED("GUIDE_NOT_PUBLISHED", HttpStatus.CONFLICT),
+    SCOPE_NOT_CONFIRMED("SCOPE_NOT_CONFIRMED", HttpStatus.CONFLICT),
+    ROLE_MISMATCH("ROLE_MISMATCH", HttpStatus.CONFLICT),
+    ACTIVE_ASSIGNMENTS("ACTIVE_ASSIGNMENTS", HttpStatus.CONFLICT),
+    INSUFFICIENT_ANNOTATORS("INSUFFICIENT_ANNOTATORS", HttpStatus.CONFLICT),
+    INSUFFICIENT_POOL("INSUFFICIENT_POOL", HttpStatus.CONFLICT),
+    TASK_NOT_READY("TASK_NOT_READY", HttpStatus.CONFLICT),
+    ASSIGNMENT_INCOMPLETE("ASSIGNMENT_INCOMPLETE", HttpStatus.CONFLICT),
+    FINAL_NOT_IN_DATABASE("FINAL_NOT_IN_DATABASE", HttpStatus.CONFLICT),
+    ALREADY_REVIEWED("ALREADY_REVIEWED", HttpStatus.CONFLICT),
+    BLIND_SCOPE_DENIED("BLIND_SCOPE_DENIED", HttpStatus.FORBIDDEN),
+    PENDING_MODEL("PENDING_MODEL", HttpStatus.CONFLICT),
 
     INSUFFICIENT_VERSIONS("INSUFFICIENT_VERSIONS", HttpStatus.BAD_REQUEST),
     LABEL_IN_USE("LABEL_IN_USE", HttpStatus.CONFLICT),
@@ -35,4 +45,17 @@ public enum ErrorCode {
 
     private final String code;
     private final HttpStatus status;
+
+    ErrorCode(String code, HttpStatus status) {
+        this.code = code;
+        this.status = status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
 }

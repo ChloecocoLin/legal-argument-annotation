@@ -1,0 +1,30 @@
+[
+  {
+    "id": "578473fe-5f9d-412a-ae6e-51b36d8319a7",
+    "fileName": "v1.2 中文裁判文书说理部分法律论证结构标注与图示指南（修订版）.docx",
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "sizeBytes": 344342,
+    "sha256": "9d0842f8fb5cd46d1ee121dab3eb9f8d49bd71e792821388ca61ffac5c7e8139",
+    "storageKey": "guides/v1.2/official-guide.docx",
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1
+  },
+  {
+    "id": "826a54dd-c644-4e1d-a460-66b9586b1cb7",
+    "fileName": "余某徐某案.txt",
+    "mimeType": "text/plain",
+    "sizeBytes": 195,
+    "sha256": "0905cc3f16fd346f363963570af18ea5cd3fbe01c3e667bb28f7c1f69cca35e1",
+    "storageKey": "documents/doc-1/original.txt",
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1
+  }
+]

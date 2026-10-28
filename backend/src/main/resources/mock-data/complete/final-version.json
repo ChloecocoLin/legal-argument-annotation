@@ -1,0 +1,166 @@
+{
+  "finalAnnotationVersion": {
+    "id": "7ae1dfb2-7f6a-4351-98cd-953102ff2719",
+    "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+    "sessionId": "aba39933-394e-41e0-aa76-1cf8acc57ba7",
+    "versionNumber": 1,
+    "status": "IN_DATABASE",
+    "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+    "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "elementIds": [
+      "9b1853a9-6490-4be2-9210-baf52241b564",
+      "ecf40f79-4b53-4662-8efd-bb3c9d1332a8"
+    ],
+    "relationIds": [],
+    "graphId": "efb4e906-a58f-4764-981e-d6be7daaa7fa",
+    "provenance": [
+      {
+        "resultKind": "ELEMENT",
+        "resultId": "9b1853a9-6490-4be2-9210-baf52241b564",
+        "sourceVersionIds": [
+          "402d8716-3ea0-46ac-9078-05545fe58071"
+        ],
+        "sourceObjectIds": [
+          "007077eb-0059-41ed-bd82-bf5b90faf40f"
+        ],
+        "decisionId": "252ee1c5-faad-47c0-ade8-b396bfe66dbf",
+        "expertIssueId": "efa7a7c0-43ae-4c38-8371-d9a064e0c49a"
+      },
+      {
+        "resultKind": "ELEMENT",
+        "resultId": "ecf40f79-4b53-4662-8efd-bb3c9d1332a8",
+        "sourceVersionIds": [
+          "402d8716-3ea0-46ac-9078-05545fe58071",
+          "e4b02d3f-f041-48fa-bf91-7736a381eab9"
+        ],
+        "sourceObjectIds": [
+          "408ef925-f0f5-4627-8356-9ae49322b22f",
+          "797b9d34-39bb-4679-8607-e17845dae3cb"
+        ],
+        "decisionId": "c63cdc79-24b5-4faf-81b5-07598a031686",
+        "expertIssueId": null
+      },
+      {
+        "resultKind": "EXCLUDED_RELATION",
+        "resultId": null,
+        "sourceVersionIds": [
+          "402d8716-3ea0-46ac-9078-05545fe58071"
+        ],
+        "sourceObjectIds": [
+          "5a8a91cf-66fb-469f-b41c-b731f1210372"
+        ],
+        "decisionId": "59961eec-3460-4622-aafd-e65a9ea97f0b",
+        "expertIssueId": null
+      }
+    ],
+    "approvedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "approvedAt": "2026-10-10T09:00:00Z",
+    "committedAt": "2026-10-10T10:00:00Z",
+    "createdAt": "2026-10-10T09:00:00Z",
+    "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "updatedAt": "2026-10-10T10:00:00Z",
+    "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "recordVersion": 2
+  },
+  "elements": [
+    {
+      "id": "9b1853a9-6490-4be2-9210-baf52241b564",
+      "ownerType": "FINAL_VERSION",
+      "ownerId": "7ae1dfb2-7f6a-4351-98cd-953102ff2719",
+      "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+      "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+      "startOffset": 5,
+      "endOffset": 20,
+      "text": "依法成立的合同，自成立时生效。",
+      "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+      "labelCode": "GM-L",
+      "isProposition": true,
+      "displayNo": "P1",
+      "sourceElementIds": [
+        "007077eb-0059-41ed-bd82-bf5b90faf40f"
+      ],
+      "createdAt": "2026-10-10T09:00:00Z",
+      "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "updatedAt": "2026-10-10T09:00:00Z",
+      "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "recordVersion": 1
+    },
+    {
+      "id": "ecf40f79-4b53-4662-8efd-bb3c9d1332a8",
+      "ownerType": "FINAL_VERSION",
+      "ownerId": "7ae1dfb2-7f6a-4351-98cd-953102ff2719",
+      "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+      "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+      "startOffset": 20,
+      "endOffset": 39,
+      "text": "当事人应当按照约定全面履行自己的义务。",
+      "labelDefinitionId": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+      "labelCode": "GM-L",
+      "isProposition": true,
+      "displayNo": "P2",
+      "sourceElementIds": [
+        "408ef925-f0f5-4627-8356-9ae49322b22f",
+        "797b9d34-39bb-4679-8607-e17845dae3cb"
+      ],
+      "createdAt": "2026-10-10T09:00:00Z",
+      "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "updatedAt": "2026-10-10T09:00:00Z",
+      "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "recordVersion": 1
+    }
+  ],
+  "relations": [],
+  "graph": {
+    "id": "efb4e906-a58f-4764-981e-d6be7daaa7fa",
+    "ownerType": "FINAL_VERSION",
+    "ownerId": "7ae1dfb2-7f6a-4351-98cd-953102ff2719",
+    "elementIds": [
+      "9b1853a9-6490-4be2-9210-baf52241b564",
+      "ecf40f79-4b53-4662-8efd-bb3c9d1332a8"
+    ],
+    "relationIds": [],
+    "status": "VALID",
+    "createdAt": "2026-10-10T09:00:00Z",
+    "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "updatedAt": "2026-10-10T09:00:00Z",
+    "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "recordVersion": 1
+  },
+  "graphLayouts": [
+    {
+      "id": "07f4a50b-92dd-4d0f-83e6-100c1f7b1cd3",
+      "graphId": "efb4e906-a58f-4764-981e-d6be7daaa7fa",
+      "layoutVersion": 1,
+      "canvasWidth": 800,
+      "canvasHeight": 480,
+      "nodePositions": [
+        {
+          "targetKind": "ELEMENT",
+          "targetId": "9b1853a9-6490-4be2-9210-baf52241b564",
+          "x": 160,
+          "y": 160
+        },
+        {
+          "targetKind": "ELEMENT",
+          "targetId": "ecf40f79-4b53-4662-8efd-bb3c9d1332a8",
+          "x": 520,
+          "y": 160
+        }
+      ],
+      "createdAt": "2026-10-10T09:00:00Z",
+      "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "updatedAt": "2026-10-10T09:00:00Z",
+      "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+      "recordVersion": 1
+    }
+  ],
+  "sourceDecisionIds": [
+    "252ee1c5-faad-47c0-ade8-b396bfe66dbf",
+    "59961eec-3460-4622-aafd-e65a9ea97f0b",
+    "c63cdc79-24b5-4faf-81b5-07598a031686"
+  ],
+  "sourceExpertIssueIds": [
+    "efa7a7c0-43ae-4c38-8371-d9a064e0c49a"
+  ]
+}

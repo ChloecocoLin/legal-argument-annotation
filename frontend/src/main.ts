@@ -9,6 +9,7 @@ import './styles/main.css'
 import './styles/tokens.css'
 import 'element-plus/dist/index.css'
 import './styles/app.css'
+import { useAuthStore } from '@/stores/auth'
 
 const app = createApp(App)
 
@@ -17,6 +18,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 app.use(createPinia())
+useAuthStore()
 app.use(router)
 app.use(ElementPlus, { locale: zhCn })
 app.mount('#app')
