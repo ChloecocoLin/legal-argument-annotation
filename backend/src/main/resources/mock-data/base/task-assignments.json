@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1e49dba9-3c07-4e45-b50d-89289b560f4d",
+    "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+    "userId": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+    "assignmentRole": "ANNOTATOR",
+    "status": "ACTIVE",
+    "assignedAt": "2026-10-10T08:00:00Z",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1,
+    "taskMemberId": "132ebcf3-04b5-4d54-b14b-e77ad4429ad4"
+  },
+  {
+    "id": "23cf6498-c282-45b5-aec6-d0e08b219286",
+    "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+    "userId": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+    "assignmentRole": "ANNOTATOR",
+    "status": "ACTIVE",
+    "assignedAt": "2026-10-10T08:00:00Z",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1,
+    "taskMemberId": "4a316312-9e36-4457-8f47-eeffe6f4329c"
+  },
+  {
+    "id": "a8dc6007-3767-4a6f-971d-663300e2b09c",
+    "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+    "userId": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "assignmentRole": "ARBITER",
+    "status": "ACTIVE",
+    "assignedAt": "2026-10-10T08:00:00Z",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1,
+    "taskMemberId": "9786f2c3-9c32-4079-b1f3-165952dd685f"
+  }
+]

@@ -527,3 +527,7 @@
 .toc a:hover { background: var(--surface-3); color: var(--accent); }
 .toc .lv2 a { padding-left: 22px; color: var(--muted); font-size: 12.5px; }
 .toc .cur a { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+.page { padding: 8px 4px 40px; }
+.page-head h1 { margin: 0 0 6px; font-size: 22px; }
+.page-head .muted { margin: 0; color: var(--muted); }

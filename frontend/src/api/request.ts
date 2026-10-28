@@ -43,7 +43,7 @@ instance.interceptors.request.use(
 
     // POST 默认补充幂等键
     const method = (config.method || '').toLowerCase()
-    if (method === 'post' && !config.headers['Idempotency-Key']) {
+    if (['post', 'put', 'patch'].includes(method) && !config.headers['Idempotency-Key']) {
       config.headers['Idempotency-Key'] = crypto.randomUUID()
     }
     return config

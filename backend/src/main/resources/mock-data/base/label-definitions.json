@@ -1,0 +1,395 @@
+[
+  {
+    "id": "f4d094fc-c85b-4b2f-ae0e-dc3801b8f37b",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "IS",
+    "name": "争议焦点",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 1,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法院概括本案争议的问题，而非任一方的主张或意见。",
+    "recognitionRules": [
+      "须由法院概括争议；当事人主张本身不标 IS。"
+    ],
+    "signalPhrases": [
+      "本案争议焦点为",
+      "关于……"
+    ],
+    "examples": [
+      "本案的争议焦点为：是否构成侵权。"
+    ],
+    "notes": "范围按非命题切割规则处理。"
+  },
+  {
+    "id": "0e2d7f43-caa0-4bc4-adb5-3e2f99b09f37",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "AS",
+    "name": "态度声明",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 2,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法院对相关主张表示采纳或否定的态度。",
+    "recognitionRules": [
+      "只表达态度而未形成可判断的法律评价时用 AS；结合上下文区别 SM。"
+    ],
+    "signalPhrases": [
+      "本院不予采纳",
+      "本院予以认可"
+    ],
+    "examples": [
+      "本院不予采纳。"
+    ],
+    "notes": "同一短语在具体语境下可能构成 SM，不能仅凭词语匹配。"
+  },
+  {
+    "id": "78a23eea-3582-44bd-b26c-1ed7e8dc643b",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "SS",
+    "name": "总结性陈述",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 3,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法院在说理末尾对整体论证所作的总结性陈述。",
+    "recognitionRules": [
+      "识别整体收束功能；不把每个段落结论都归为 SS。"
+    ],
+    "signalPhrases": [
+      "综上",
+      "综上所述"
+    ],
+    "examples": [
+      "综上所述，谢某的再审申请不符合规定。"
+    ],
+    "notes": "依裁判理由实际边界判断是否属于标注范围。"
+  },
+  {
+    "id": "46eaa5ba-d89c-46cc-a15c-3941ae6ede2b",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "JG",
+    "name": "判决依据",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 4,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法院在总结性陈述后列明作出裁判的依据。",
+    "recognitionRules": [
+      "与论证过程中直接使用的 GM-L 区分；关注总结之后的判决依据位置。"
+    ],
+    "signalPhrases": [
+      "依照……规定",
+      "依据……"
+    ],
+    "examples": [
+      "依照《中华人民共和国民法典》第五百零二条规定，"
+    ],
+    "notes": "属非命题要素；不参与论证关系。"
+  },
+  {
+    "id": "3e3c395f-f40b-421a-a862-801c527d4a4d",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "JD",
+    "name": "判决结果",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 5,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法院最终作出的裁判决定。",
+    "recognitionRules": [
+      "确认是最终裁判结果，而非论证过程中的个别规范判断。"
+    ],
+    "signalPhrases": [
+      "判决如下",
+      "裁定如下",
+      "判处"
+    ],
+    "examples": [
+      "裁定如下：驳回再审申请。"
+    ],
+    "notes": "通常位于说理范围之后，按范围规则处理。"
+  },
+  {
+    "id": "5a6d65d3-6ae9-4703-bf65-57086e8774bc",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "Non-O",
+    "name": "其他非论证成分",
+    "category": "NON_PROPOSITION",
+    "baseType": null,
+    "sortOrder": 6,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "不能归入其他非命题类型的非论证成分。",
+    "recognitionRules": [
+      "先排除 IS、AS、SS、JG、JD；只对确在标注范围内的文本使用。"
+    ],
+    "signalPhrases": [
+      "本判决为终审判决"
+    ],
+    "examples": [
+      "本判决为终审判决。"
+    ],
+    "notes": "不可作为命题参与论证关系。"
+  },
+  {
+    "id": "c00bf012-a35e-449b-ad39-b274a114a493",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "SF",
+    "name": "个别事实判断",
+    "category": "PROPOSITION",
+    "baseType": "SF",
+    "sortOrder": 7,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "对本案中个别对象作出的事实判断。",
+    "recognitionRules": [
+      "判断正确性依赖个案事实；不含实体或程序法律评价。"
+    ],
+    "signalPhrases": [
+      "本案中",
+      "经查明"
+    ],
+    "examples": [
+      "原告已依约提供劳务。"
+    ],
+    "notes": "标志性表述仅是提示，不自动决定标签。"
+  },
+  {
+    "id": "a1701db9-f391-4c58-adff-6d3629704058",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GF",
+    "name": "一般事实判断",
+    "category": "PROPOSITION",
+    "baseType": "GF",
+    "sortOrder": 8,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "可在不同个案重复适用、提供经验或背景支撑的一般事实判断，不含法律领域的规范判断。",
+    "recognitionRules": [
+      "须具有一般性；社会常识、经验法则、行业知识或科学规律可归入。"
+    ],
+    "signalPhrases": [
+      "通常",
+      "一般而言"
+    ],
+    "examples": [
+      "网络直播平台通常需要投入较多前期成本。"
+    ],
+    "notes": "不得把一般规范判断误作 GF。"
+  },
+  {
+    "id": "64614bc5-10fd-4b49-9c0e-4844c80bd66d",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "SM",
+    "name": "普通个别规范判断",
+    "category": "PROPOSITION",
+    "baseType": "SM",
+    "sortOrder": 9,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "相关主体对本案作出的具有法律意义的个别评价判断。",
+    "recognitionRules": [
+      "识别实体法构成要件或法效果、程序法与证据评价、合法违法等判断；合同特殊类型用 SM-C。"
+    ],
+    "signalPhrases": [
+      "构成违约",
+      "应当支付",
+      "缺乏事实与法律依据"
+    ],
+    "examples": [
+      "被告应向原告支付该11000元。"
+    ],
+    "notes": "短句如“本院不予支持”需结合上下文与 AS 区分。"
+  },
+  {
+    "id": "701f3e61-336e-4e8c-b63d-59a04460cf0d",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "SM-C",
+    "name": "合同及合同解释",
+    "category": "PROPOSITION",
+    "baseType": "SM",
+    "sortOrder": 10,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "合同条款或其规范性解释形成的特殊个别规范判断。",
+    "recognitionRules": [
+      "规范来源是当事人合同；不误归入 GM 的子类型。"
+    ],
+    "signalPhrases": [
+      "双方在合同中约定",
+      "根据合同约定",
+      "该条款应理解为"
+    ],
+    "examples": [
+      "《电子公交卡服务协议》明确告知用户可申请退卡。"
+    ],
+    "notes": "v1.2 正文将合同及合同解释列在 SM 子类型。"
+  },
+  {
+    "id": "7ac8dc0b-9672-4dbc-b532-0b8755450634",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GM-L",
+    "name": "法律条文",
+    "category": "PROPOSITION",
+    "baseType": "GM",
+    "sortOrder": 11,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "法源中权威性规范性文件内容的直接引用或完全转述。",
+    "recognitionRules": [
+      "包括司法解释作为规范文本；引用或转述若加入理解性改动，改用 GM-I。"
+    ],
+    "signalPhrases": [
+      "依照《××法》第×条规定",
+      "根据法律规定"
+    ],
+    "examples": [
+      "依法成立的合同，自成立时生效。"
+    ],
+    "notes": "法律条文须与规范内容一致，不能凭背景推测来源。"
+  },
+  {
+    "id": "bf69de41-5062-4adc-918a-8cc5039bc792",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GM-I",
+    "name": "法律解释",
+    "category": "PROPOSITION",
+    "baseType": "GM",
+    "sortOrder": 12,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "对法律条文含义、适用范围或条件作出的解释性判断。",
+    "recognitionRules": [
+      "只要加入对法条的理解性改动，即与 GM-L 区分；司法解释文本本身按 GM-L 考查。"
+    ],
+    "signalPhrases": [
+      "应当理解为",
+      "该条规定的本意在于"
+    ],
+    "examples": [
+      "该条规定的本意在于防止买方利用中介房源信息跳单。"
+    ],
+    "notes": "以文书显性解释为准。"
+  },
+  {
+    "id": "01b90bc1-2997-4241-874c-eba9b228ee6f",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GM-U",
+    "name": "习惯与行业惯例",
+    "category": "PROPOSITION",
+    "baseType": "GM",
+    "sortOrder": 13,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "来自社会习惯、交易习惯或行业通行规则的一般规范判断。",
+    "recognitionRules": [
+      "识别规范来源为习惯或行业惯例；不得与纯经验事实 GF 混同。"
+    ],
+    "signalPhrases": [
+      "按照交易习惯",
+      "行业通常做法是"
+    ],
+    "examples": [
+      "按照交易习惯，双方应在交付后结算价款。"
+    ],
+    "notes": "示例为标签提示，不替代指南正文。"
+  },
+  {
+    "id": "f66c1a75-480d-4515-b240-98cf52c28f75",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GM-M",
+    "name": "道德与价值观念",
+    "category": "PROPOSITION",
+    "baseType": "GM",
+    "sortOrder": 14,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "基于道德、价值观念、公序良俗或基本原则的一般规范判断。",
+    "recognitionRules": [
+      "优先识别文本明示的价值或原则依据；勿根据个人评价补充未写明的来源。"
+    ],
+    "signalPhrases": [
+      "违反公序良俗",
+      "有悖公平原则",
+      "诚实信用原则"
+    ],
+    "examples": [
+      "民事主体在民事活动中应当恪守诚信。"
+    ],
+    "notes": "与 GM-L 的直接法条引用按具体表达区分。"
+  },
+  {
+    "id": "f204be9b-ffb7-417d-b964-d38c9c9d6c25",
+    "guideVersionId": "a9055ff9-34b0-4083-9db7-91f82dbe5fc4",
+    "code": "GM-O",
+    "name": "其他规范判断",
+    "category": "PROPOSITION",
+    "baseType": "GM",
+    "sortOrder": 15,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "bca3772c-2ec2-4001-9521-9f825c33a3f2",
+    "recordVersion": 1,
+    "definition": "无法稳定归入其他 GM 子类型的规范判断，包括非法源性质的规范性文件。",
+    "recognitionRules": [
+      "先尝试 GM-L、GM-I、GM-U、GM-M；不能明确归入时才使用。"
+    ],
+    "signalPhrases": [
+      "根据相关政策精神",
+      "依照管理规定"
+    ],
+    "examples": [
+      "根据有关政策规定，相关业务活动不得开展。"
+    ],
+    "notes": "同一规范判断只选一个子类型。"
+  }
+]

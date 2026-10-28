@@ -1,0 +1,72 @@
+[
+  {
+    "id": "189295a2-7eb9-43cc-85d9-341bdd4343e8",
+    "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "userId": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "memberRole": "OWNER",
+    "status": "ACTIVE",
+    "joinedAt": "2026-10-10T08:00:00Z",
+    "deactivatedAt": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1
+  },
+  {
+    "id": "132ebcf3-04b5-4d54-b14b-e77ad4429ad4",
+    "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "userId": "1068a77e-2a72-4f38-ae97-dcb88a45c7b3",
+    "memberRole": "ANNOTATOR",
+    "status": "ACTIVE",
+    "joinedAt": "2026-10-10T08:00:00Z",
+    "deactivatedAt": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1
+  },
+  {
+    "id": "4a316312-9e36-4457-8f47-eeffe6f4329c",
+    "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "userId": "17e46666-aec6-4ed2-8e48-c044014f94a1",
+    "memberRole": "ANNOTATOR",
+    "status": "ACTIVE",
+    "joinedAt": "2026-10-10T08:00:00Z",
+    "deactivatedAt": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1
+  },
+  {
+    "id": "9786f2c3-9c32-4079-b1f3-165952dd685f",
+    "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "userId": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "memberRole": "ARBITER",
+    "status": "ACTIVE",
+    "joinedAt": "2026-10-10T08:00:00Z",
+    "deactivatedAt": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1
+  },
+  {
+    "id": "3dfd0224-1316-429d-8ab0-09ea64be5fca",
+    "taskId": "f102c523-b4ed-4323-81d3-0c564c4141a0",
+    "userId": "4809fe74-569e-4906-a453-423c290b0525",
+    "memberRole": "EXPERT",
+    "status": "ACTIVE",
+    "joinedAt": "2026-10-10T08:00:00Z",
+    "deactivatedAt": null,
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": "9795b546-9838-4ef5-ab05-4ba73d88ea7e",
+    "recordVersion": 1
+  }
+]

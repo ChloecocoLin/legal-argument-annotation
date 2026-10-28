@@ -1,0 +1,142 @@
+[
+  {
+    "id": "76233b76-9e9f-45e0-bb15-458821815a9a",
+    "code": "ADMIN",
+    "name": "系统管理员",
+    "permissionCodes": [
+      "USER_MANAGE",
+      "ROLE_MANAGE",
+      "AUDIT_VIEW",
+      "GUIDE_VIEW",
+      "GUIDE_MANAGE",
+      "GUIDE_REVIEW",
+      "DOCUMENT_VIEW",
+      "DOCUMENT_MANAGE",
+      "TASK_OVERVIEW",
+      "EXPORT_CREATE",
+      "EXPORT_RECORD_VIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "0db02658-691f-4b3d-86db-4c5e069f85e1",
+    "code": "TASK_CREATOR",
+    "name": "任务创建者",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "DOCUMENT_VIEW",
+      "DOCUMENT_SUBMIT",
+      "TASK_OVERVIEW",
+      "TASK_CREATE",
+      "TASK_ASSIGN",
+      "TASK_VIEW",
+      "PILOT_MANAGE",
+      "AUTO_TASK_MANAGE",
+      "EXPORT_CREATE",
+      "EXPORT_RECORD_VIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "2c1969cb-de58-4e3a-be24-298ee128897c",
+    "code": "ANNOTATOR",
+    "name": "标注员",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "ASSIGNED_DOCUMENT_VIEW",
+      "TASK_VIEW",
+      "ANNOTATION_WORK",
+      "ANNOTATION_SUBMIT",
+      "TRAINING_CONFIRM",
+      "AUTO_SUGGESTION_REVIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "950e4a39-5f25-48c4-bf24-9478f3cb9335",
+    "code": "ARBITER",
+    "name": "裁定者",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "ASSIGNED_DOCUMENT_VIEW",
+      "TASK_VIEW",
+      "ADJUDICATION_WORK",
+      "FINAL_REVIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "b36ccbb6-b3c1-4b8e-b5cf-3cdee283a120",
+    "code": "TEACHER",
+    "name": "教师",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "COURSE_DOCUMENT_VIEW",
+      "COURSE_MANAGE",
+      "ASSIGNMENT_MANAGE",
+      "STANDARD_ANSWER_MANAGE",
+      "STUDENT_RESULT_VIEW",
+      "GRADE_EXPORT"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "508550e3-f67f-4c8d-847d-5afbd186a685",
+    "code": "STUDENT",
+    "name": "学生",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "COURSE_DOCUMENT_VIEW",
+      "STUDENT_ANSWER_WORK",
+      "OWN_RESULT_VIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  },
+  {
+    "id": "d9d073f0-da96-442f-826d-a1a689cada11",
+    "code": "EXPERT",
+    "name": "专家",
+    "permissionCodes": [
+      "GUIDE_VIEW",
+      "ASSIGNED_DOCUMENT_VIEW",
+      "EXPERT_REVIEW",
+      "EXPERT_ISSUE_VIEW"
+    ],
+    "status": "ACTIVE",
+    "createdAt": "2026-10-10T08:00:00Z",
+    "createdById": null,
+    "updatedAt": "2026-10-10T08:00:00Z",
+    "updatedById": null,
+    "recordVersion": 1
+  }
+]

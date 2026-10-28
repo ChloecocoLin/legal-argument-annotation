@@ -1,0 +1,33 @@
+[
+  {
+    "id": "8e48abef-998c-4384-892f-bbdbbd9eac7f",
+    "taskDocumentId": "3cbb140f-0274-4871-8248-194271101a14",
+    "documentTextVersionId": "86d2b05b-fa18-4d45-a451-edcaa83d673f",
+    "annotationScopeId": "4c3122b2-90e0-47b4-8e67-0986764897bc",
+    "sourceSubmissionIds": [
+      "bff96e2c-988b-42e2-886e-86e5759343e4",
+      "990b49a3-91d4-4045-96cc-1be76f0b86e6"
+    ],
+    "agreementScore": 1.0,
+    "requiredThreshold": 0.8,
+    "unifiedBoundaries": [
+      {
+        "startOffset": 5,
+        "endOffset": 20
+      },
+      {
+        "startOffset": 20,
+        "endOffset": 39
+      }
+    ],
+    "boundaryHash": "e0defff824760c7c9dbe0f1f9d8cb2c7b4347fbb7d36722f0fa6b00cfc507352",
+    "status": "CONFIRMED",
+    "confirmedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "confirmedAt": "2026-10-10T08:45:00Z",
+    "createdAt": "2026-10-10T08:30:00Z",
+    "createdById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "updatedAt": "2026-10-10T08:45:00Z",
+    "updatedById": "9e76d32b-86e7-4d62-84e1-7f60e7c0b502",
+    "recordVersion": 2
+  }
+]
