@@ -40,8 +40,10 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { createTask, getTaskOptions } from '@/api/memberA'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
+const user = useUserStore()
 const saving = ref(false)
 const form = reactive({
   name: '',
@@ -54,7 +56,18 @@ const form = reactive({
 })
 
 const guides = ref<{ id: string; versionCode: string }[]>([])
-onMounted(async () => { guides.value = (await getTaskOptions()).guides })
+onMounted(async () => {
+  if (!user.roles.some((role) => ['admin', 'creator'].includes(role))) {
+    ElMessage.warning('当前账号不能创建任务，请使用任务创建者登录')
+    router.replace('/tasks')
+    return
+  }
+  try {
+    guides.value = (await getTaskOptions()).guides
+  } catch {
+    ElMessage.error('无法加载已发布指南，请确认后端已启动')
+  }
+})
 
 async function submit() {
   if (!form.name.trim() || !form.guideVersionId) { ElMessage.warning('请填写名称并选择已发布指南'); return }

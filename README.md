@@ -285,33 +285,43 @@ itemId = 058fa5ba-c4a8-457a-96f9-1efd15df8e20
 - [x] M4：专家复核闭环（J03/J12/X01–X05 后端、专家工作台与问题文档前端）
 - [ ] M5：前后端联调与验收
 
-### 成员 A 当前范围（本轮已接入）
+### 成员 A 当前范围（集成后）
 
-READY 已实现：`D01` `D03` `D05`；`T01`–`T12` `T14`；`S01`–`S03`。页面发布按钮走 `T12` 的 `PUBLISH`，**没有第二条 T15 路由**。
+工作请基于 `integration/team-merge`，不要再往旧分支 `feature/member-a-document-task` 加功能。身份走 C 的登录页（开发账号如 `creator.li` / `annotator.chen` / `arbiter.zhao`，口令 `demo`），**不要再用固定 Bearer Token**。
 
-适配/Mock（不当正式契约、不自创冻结表）：`D02/D04/D06/D08` 返回 `PENDING_MODEL`；`D07` 读预置概览；`T13` 仅核 X/N；`S04` 不写入，只读预置已确认关口。本地固定 Bearer Token，不做真实登录。
+READY 已实现：`D01` `D03` `D05`；`T01`–`T12` `T14`；`S01`–`S03`。发布走 `T12` 的 `PUBLISH`，没有第二条 T15 路由。`T13` 由 D 提供完整 X/N，A 不再重复注册。
 
-前端页面：文书总库/详情、创建任务、任务列表/分配/详情、标注工作台原文与边界。标签从 B 的 `G06` 加载，未分类边界不是 Element，不用 Non-O 冒充。
+适配/Mock（不当正式契约、不自创冻结表）：`D02/D04/D06/D07/D08` 都返回 `PENDING_MODEL`，不返回预置成果编号。统一切割关口在 local/test 由 D 试行确认，**不要把 S04 写成冻结 READY**。
 
-M1 当前保留事项：
+前端入口：
 
-- “设为启用”暂缺重新启用旧版本的后端接口。
-- 附件上传接口未完成，新增版本目前只保存元数据。
-- G11 版本对比接口已实现，对比弹窗尚未改为动态数据。
+- `/documents`、`/documents/:id`：文书总库与原文
+- `/tasks`、`/tasks/create`、`/tasks/:id`、`/tasks/:id/assign`：任务与分配
+- `/tasks/:taskId/cases/:caseId/segmentation`：原文选区、独立切割提交与裁定审核（旧 `AnnotateWorkbench` 已停用）
+- 关口确认后进入 `/tasks/:taskId/cases/:caseId/annotate` 做要素/关系（B/C/D 共享工作台）
+
+文书、任务、切割写入同一套持久化记录，不再使用 A 早期内存字典。
+
+A 当前保留事项：
+
+- 附件上传 / 新建文书（D02/D04/D06/D08）模型未冻结，不能当正式入库。
+- 未分类边界不是 Element，不要用 Non-O 冒充。
+- 指南「设为启用」、G11 对比弹窗属 B 的 M1 尾巴，不在 A 本页改契约。
 
 ## Git 协作建议
 
-开发前同步远程分支：
+开发前同步集成分支（当前不要以 `main` 为工作底）：
 
 ```bash
-git switch main
-git pull --rebase origin main
+git fetch origin
+git switch integration/team-merge
+git pull
 ```
 
-建议按功能创建分支，完成验证后再发 Pull Request 合并到 `main`。**不要直接 `git push origin main`**：默认推送会把新提交写进远程 `main`（快进时看起来像覆盖最新默认分支；`--force` 才会改写历史）。成员 A 请推独立分支，例如 `feature/member-a-document-task`。
+建议从 `integration/team-merge` 拉功能分支，完成验证后再发 Pull Request 合回该分支。**不要直接 `git push origin main`。**
 
 ```bash
-git switch -c feature/your-feature
+git switch -c feature/your-feature integration/team-merge
 git add frontend backend README.md
 git commit -m "feat: describe your change"
 git push -u origin feature/your-feature

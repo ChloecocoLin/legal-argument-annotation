@@ -26,6 +26,7 @@ const entries = [
   { path: '/tasks', title: '标注任务', sub: '查看任务、案例及提交进度', roles: ['admin','creator','annotator','arbiter'] },
   { path: '/tasks/create', title: '创建任务', sub: '选择指南、添加文书与分配人员', roles: ['creator'] },
   { path: '/documents', title: '文书总库', sub: '浏览裁判文书与规范化原文', roles: ['admin','creator','annotator','arbiter'] },
+  { path: '/segmentation', title: '独立切割', sub: '在原文上提交命题边界，裁定者审核后确认关口', roles: ['annotator','arbiter'] },
   { path: '/guide', title: '标注指南', sub: '查阅指南版本与标签定义', roles: ['admin','creator','annotator','arbiter','expert','teacher','student'] },
   { path: '/adjudication/conflict', title: '冲突解决', sub: '比较完整版本并裁定命题与关系', roles: ['arbiter'] },
   { path: '/final-review', title: '最终版本审查', sub: '检查最终标注与图验证结果', roles: ['arbiter'] },

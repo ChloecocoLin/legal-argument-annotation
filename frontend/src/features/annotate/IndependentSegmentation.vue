@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 原文选区与边界操作复用 A 4b8cb14 的 AnnotateWorkbench；审核及计算接共享持久化数据。
+// 原文选区与边界操作沿用 A 的 UTF-16 半开区间；审核及计算接共享持久化数据。旧 /dev/a 工作台已移除。
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -70,7 +70,7 @@ function rememberSelection(){
   const start=pre.toString().length,end=start+range.toString().length
   selection.value=end>start?{startOffset:start,endOffset:end}:undefined
 }
-function fromSelection(){if(!selection.value||!view.value)return;const row=selection.value;if(row.startOffset<view.value.scope.startOffset||row.endOffset>view.value.scope.endOffset){ElMessage.warning('选区超出标注范围');return}boundaries.value=[...boundaries.value,{...row}].sort((a,b)=>a.startOffset-b.startOffset)}
+function fromSelection(){if(!selection.value||!view.value){ElMessage.warning('请先在原文中选择一段');return}const row=selection.value;if(row.startOffset<view.value.scope.startOffset||row.endOffset>view.value.scope.endOffset){ElMessage.warning('选区超出标注范围');return}boundaries.value=[...boundaries.value,{...row}].sort((a,b)=>a.startOffset-b.startOffset)}
 function split(index:number){const row=boundaries.value[index];let middle=Math.floor((row.startOffset+row.endOffset)/2);if(middle>0&&/[\uD800-\uDBFF]/.test(text.value[middle-1])&&/[\uDC00-\uDFFF]/.test(text.value[middle]))middle++;if(middle>=row.endOffset)return;boundaries.value.splice(index,1,{startOffset:row.startOffset,endOffset:middle},{startOffset:middle,endOffset:row.endOffset})}
 function merge(index:number){boundaries.value.splice(index,2,{startOffset:boundaries.value[index].startOffset,endOffset:boundaries.value[index+1].endOffset})}
 async function mutate(url:string,body:object,version=0){
@@ -96,19 +96,21 @@ onMounted(()=>load());watch(()=>route.params.caseId,()=>{view.value=undefined;ca
     </template>
     <template v-else-if="view">
       <el-alert v-if="view.checkpoints.length" type="success" :closable="false" :title="`统一切割已确认：一致性 ${(view.checkpoints[0].agreementScore*100).toFixed(2)}%。本轮独立输入只读保留，后续标注须引用此关口。`" style="margin-bottom:16px" />
-      <div v-if="view.assignment&&view.checkpoints.length" class="toolbar"><RouterLink :to="`/tasks/${view.taskDocument.taskId}/cases/${caseId}/annotate`">进入本人标注工作台</RouterLink></div><el-row :gutter="16">
+      <div v-if="view.assignment&&view.checkpoints.length" class="toolbar"><RouterLink :to="`/tasks/${view.taskDocument.taskId}/cases/${caseId}/annotate`"><el-button type="primary">进入本人标注工作台</el-button></RouterLink></div><el-row :gutter="16">
         <el-col :span="14"><el-card><template #header>规范化原文</template>
           <div ref="sourceEl" class="source" @mouseup="rememberSelection">{{ text }}</div>
           <p class="muted">标注范围 [{{ view.scope.startOffset }}, {{ view.scope.endOffset }})</p>
         </el-card></el-col>
         <el-col :span="10"><el-card><template #header>{{ view.canReview?'统一边界候选':'本人独立边界' }}</template>
+          <el-alert v-if="latest?.status==='ACCEPTED' && !canEdit" type="info" :closable="false" :title="view.checkpoints.length ? '统一关口已确认，这次切割已锁定，不能再拖选或退回。' : '这次切割已接受，不能再拖选。已接受的记录不能退回，只有仍是「待审核」时裁定者才能退回。'" style="margin-bottom:12px" />
+          <el-alert v-else-if="latest?.status==='SUBMITTED' && !canEdit" type="info" :closable="false" title="已提交，等待裁定者审核。审核前不能再拖选或重新生成候选。" style="margin-bottom:12px" />
           <div v-if="canEdit" class="toolbar"><el-button size="small" :disabled="pending" @click="suggest">句号 / 分号候选</el-button><el-button size="small" :disabled="pending" @click="fromSelection">添加原文选区</el-button></div>
           <div v-for="(row,index) in boundaries" :key="index" class="boundary"><span>{{ text.slice(row.startOffset,row.endOffset) }}</span><small>[{{ row.startOffset }}, {{ row.endOffset }})</small>
             <div v-if="canEdit"><el-button link :disabled="pending" @click="split(index)">拆分</el-button><el-button link :disabled="index===boundaries.length-1||pending" @click="merge(index)">合并下一条</el-button><el-button link type="danger" :disabled="pending" @click="boundaries.splice(index,1)">移除</el-button></div>
           </div>
           <p :class="rangesValid?'valid':'invalid'">{{ rangesValid?'已连续覆盖完整标注范围':'存在遗漏或重叠，请检查边界' }}</p>
           <el-button v-if="view.assignment" type="primary" :loading="busy" :disabled="!canSubmit||!rangesValid||pending" @click="submit">{{ latest?.status==='RETURNED'?'提交新的切割记录':'提交独立切割' }}</el-button>
-          <p v-if="latest?.status==='SUBMITTED'" class="muted">已提交，等待裁定者审核。</p><p v-if="latest?.status==='ACCEPTED'" class="muted">已接受，等待本案统一关口。</p>
+          <p v-if="latest?.status==='SUBMITTED'" class="muted">已提交，等待裁定者审核。</p><p v-if="latest?.status==='ACCEPTED' && !view.checkpoints.length" class="muted">已接受，等待本案另一名标注员提交，以及裁定者确认统一关口。</p><p v-if="latest?.status==='ACCEPTED' && view.checkpoints.length" class="muted">已接受。统一关口已确认，请从上方进入本人标注工作台。</p>
         </el-card></el-col>
       </el-row>
       <el-card style="margin-top:16px"><template #header>{{ view.canReview?'独立提交与审核轨迹':'本人提交与审核轨迹' }}</template>

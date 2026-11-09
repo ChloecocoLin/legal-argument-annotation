@@ -61,8 +61,17 @@ watch(()=>user.id,()=>{attempt.reset();pending.value=false;view.value=undefined;
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <div class="toolbar"><RouterLink :to="`/tasks/${route.params.taskId}/cases/${route.params.caseId}/segmentation`">查看统一切割</RouterLink><el-button :disabled="busy||pending" @click="load">刷新本人数据</el-button><el-button v-if="pending" :loading="busy" @click="retry">使用原请求重试保存</el-button></div>
     <template v-if="view">
-      <el-alert v-if="!view.draft" type="info" :closable="false" title="统一切割已确认。点击创建后，才会建立属于当前账号的空草稿。" />
-      <el-button v-if="!view.draft" type="primary" :disabled="!view.canCreate||busy||pending" @click="create">创建本人草稿</el-button>
+      <template v-if="!view.draft">
+        <el-alert type="info" :closable="false" title="统一切割已确认。下面两条是只读的统一边界。点「创建本人草稿」之后，才能给每条边界选择要素类型。" />
+        <el-card style="margin-top:16px"><template #header>统一边界</template>
+          <p class="source">{{ view.text.normalizedText }}</p>
+          <div v-for="item in view.segmentationCheckpoint.unifiedBoundaries" :key="item.startOffset" class="boundary">
+            <span>{{ view.text.normalizedText.slice(item.startOffset, item.endOffset) }}</span>
+            <small>[{{ item.startOffset }}, {{ item.endOffset }}) · 未分类</small>
+          </div>
+        </el-card>
+        <el-button type="primary" :disabled="!view.canCreate||busy||pending" @click="create">创建本人草稿</el-button>
+      </template>
       <template v-else>
         <div class="toolbar"><b>{{ view.canWrite?'本人草稿':'本人草稿（只读）' }}</b><span>已分类 {{ rows.length-remaining }} / {{ rows.length }} · 保存修订 {{ view.draft.revision }}</span><el-button :disabled="!view.canWrite||busy||pending" @click="save">保存草稿</el-button></div>
         <el-radio-group v-model="section" :disabled="busy||pending" style="margin-bottom:16px"><el-radio-button value="elements">要素标注</el-radio-button><el-radio-button value="relations">关系标注</el-radio-button><el-radio-button value="graph">论证图示</el-radio-button></el-radio-group>

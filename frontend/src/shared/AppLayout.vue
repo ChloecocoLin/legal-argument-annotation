@@ -19,7 +19,7 @@ const navigation = computed(() => {
     'admin-home':['admin'], 'research-results':['admin','creator','arbiter'],
     'audit-events':['admin','creator','arbiter'], 'guide-management':['admin','creator','annotator','arbiter','teacher','student','expert'],
     'document-library':['admin','creator','annotator','arbiter'], 'task-list':['admin','creator','annotator','arbiter'],
-    'task-create':['creator'], 'task-assign':['creator'], 'segmentation':['annotator','arbiter'],
+    'task-create':['admin','creator'], 'segmentation':['annotator','arbiter'],
     'conflict-resolve':['arbiter'], 'final-review':['arbiter'], 'expert-review':['expert'],
     'expert-issues':['expert'], 'auto-annotate':['creator'],
     'export':['creator','arbiter'], 'export-records':['creator','arbiter']

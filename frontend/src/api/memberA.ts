@@ -97,39 +97,6 @@ export function getProgress(taskId: string) {
   }>(`/tasks/${taskId}/progress`)
 }
 
-export function submitSegmentation(taskDocumentId: string, body: Record<string, unknown>) {
-  return post<{ status: string; attemptNumber: number }>(
-    `/task-documents/${taskDocumentId}/segmentation-submissions`,
-    body
-  )
-}
-
-export function listSegmentations(taskDocumentId: string) {
-  return getPage<{ attemptNumber: number; status: string; reviewedAt: string | null }>(
-    `/task-documents/${taskDocumentId}/segmentation-submissions`
-  )
-}
-
-export function reviewSegmentation(
-  submissionId: string,
-  body: { action: 'ACCEPT' | 'RETURN'; reviewReason: string },
-  recordVersion: number
-) {
-  return post<{ status: string; reviewedAt: string }>(
-    `/segmentation-submissions/${submissionId}/reviews`,
-    body,
-    { headers: { 'If-Match': String(recordVersion) } }
-  )
-}
-
-export function getPresetCheckpoint(taskDocumentId: string) {
-  return get<Record<string, unknown>>(`/task-documents/${taskDocumentId}/segmentation-checkpoints`)
-}
-
-export function getWorkbench(taskId: string) {
-  return get<{ items: Record<string, unknown>[] }>(`/dev/a/workbench`, { taskId })
-}
-
 export function getTaskSetup(taskId: string) {
   return get<{
     task: Record<string, unknown>
@@ -144,10 +111,4 @@ export function getTaskOptions() {
 
 export function listUsers(params: Record<string, unknown>) {
   return getPage<{ id: string; displayName: string }>('/users', params)
-}
-
-export function listLabels(guideVersionId: string) {
-  return get<Array<{ code: string; name: string; category: string }>>(
-    `/guide-versions/${guideVersionId}/labels`
-  )
 }

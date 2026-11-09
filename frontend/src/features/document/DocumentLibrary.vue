@@ -12,6 +12,7 @@
       <el-table-column prop="id" label="文书 ID" min-width="280" />
       <el-table-column prop="courtName" label="法院" min-width="220" />
       <el-table-column prop="causeOfAction" label="案由" min-width="160" />
+      <template #empty>暂无文书。上传接口尚未冻结，请使用预置文书。</template>
     </el-table>
   </div>
 </template>
@@ -19,6 +20,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { listDocuments } from '@/api/memberA'
 
 const router = useRouter()
@@ -31,6 +33,8 @@ async function load() {
   try {
     const page = await listDocuments({ q: q.value || undefined, page: 1, size: 20 })
     items.value = page.items
+  } catch {
+    ElMessage.error('文书列表加载失败，请确认已登录且后端已启动')
   } finally {
     loading.value = false
   }

@@ -51,7 +51,12 @@ const progress = ref<
   { taskDocumentId: string; submittedCount: number; requiredAnnotators: number; status: string }[]
 >([])
 
-const canManage = computed(() => task.value?.ownerUserId === user.id && ['DRAFT', 'ASSIGNING'].includes(task.value?.status || ''))
+const canManage = computed(() => {
+  const t = task.value
+  if (!t || !['DRAFT', 'ASSIGNING'].includes(t.status)) return false
+  if (user.roles.includes('admin')) return true
+  return t.ownerUserId === user.id && user.roles.includes('creator')
+})
 const options = ref<Awaited<ReturnType<typeof getTaskOptions>> | null>(null)
 const scopeId = ref('')
 const adding = ref(false)

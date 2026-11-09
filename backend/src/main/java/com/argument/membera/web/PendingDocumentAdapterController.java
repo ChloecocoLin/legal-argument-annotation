@@ -32,12 +32,7 @@ public class PendingDocumentAdapterController {
 
     @GetMapping("/documents/{documentId}/annotation-overview")
     public ApiResponse<Map<String, Object>> d07(@PathVariable String documentId) {
-        return ApiResponse.ok(
-                Map.of(
-                        "finalVersionId", "7ae1dfb2-7f6a-4351-98cd-953102ff2719",
-                        "graphIds", java.util.List.of("efb4e906-a58f-4764-981e-d6be7daaa7fa"),
-                        "documentId", documentId,
-                        "adapter", "PENDING_MODEL mock"));
+        throw new BusinessException(ErrorCode.PENDING_MODEL, "D07 模型未冻结，文书 " + documentId + " 不能返回标注概览，请使用预置文书/范围");
     }
 
     @PostMapping("/document-text-versions/{textVersionId}/publish")

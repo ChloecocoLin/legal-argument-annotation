@@ -5,7 +5,7 @@
         <h1>任务列表</h1>
         <p class="muted">查看参与的任务、案例提交进度和人员分配。</p>
       </div>
-      <el-button v-if="user.roles.includes('creator')" type="primary" @click="$router.push('/tasks/create')">创建任务</el-button>
+      <el-button v-if="canCreate" type="primary" @click="$router.push('/tasks/create')">创建任务</el-button>
     </div>
     <el-table :data="rows" v-loading="loading">
       <el-table-column prop="name" label="名称" min-width="200" />
@@ -14,16 +14,18 @@
       <el-table-column label="操作" width="220">
         <template #default="{ row }">
           <el-button link type="primary" @click="$router.push(`/tasks/${row.id}`)">详情</el-button>
-          <el-button v-if="user.roles.includes('creator')" link type="primary" @click="$router.push(`/tasks/${row.id}/assign`)">分配</el-button>
+          <el-button v-if="canCreate" link type="primary" @click="$router.push(`/tasks/${row.id}/assign`)">分配</el-button>
           <el-button link type="primary" @click="$router.push(`/tasks/${row.id}/progress`)">版本进度</el-button>
         </template>
       </el-table-column>
+      <template #empty>暂无任务。创建者请先新建任务并分配文书。</template>
     </el-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { statusName } from '@/features/versions/api'
 const user = useUserStore()
@@ -31,6 +33,7 @@ import { getTaskSetup, listTasks } from '@/api/memberA'
 
 const loading = ref(false)
 const rows = ref<{ id: string; status: string; name: string }[]>([])
+const canCreate = computed(() => user.roles.some((role) => ['admin', 'creator'].includes(role)))
 
 onMounted(async () => {
   loading.value = true
@@ -47,6 +50,8 @@ onMounted(async () => {
       })
     )
     rows.value = enriched
+  } catch {
+    ElMessage.error('任务列表加载失败，请确认已登录且后端已启动')
   } finally {
     loading.value = false
   }
