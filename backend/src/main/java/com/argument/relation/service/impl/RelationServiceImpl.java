@@ -217,6 +217,38 @@ public class RelationServiceImpl implements RelationService, RelationLookup {
         return relation.getStatus();
     }
 
+    // ── R05 要素的引用检查（成员A删除要素前调用）────────────────────────
+
+    @Override
+    public List<RelationView> referencesOfElement(
+            String ownerType, String ownerId, String elementId) {
+        if (StringUtils.isBlank(elementId)) {
+            return List.of();
+        }
+        List<Relation> rows = relationMapper.selectList(new LambdaQueryWrapper<Relation>()
+                .eq(Relation::getOwnerType, ownerType)
+                .eq(Relation::getOwnerId, ownerId)
+                .eq(Relation::getStatus, STATUS_ACTIVE));
+        if (rows.isEmpty()) {
+            return List.of();
+        }
+        List<String> relationIds = rows.stream().map(Relation::getId).collect(Collectors.toList());
+        Set<String> referencing = participantMapper.selectList(
+                        new LambdaQueryWrapper<RelationParticipant>()
+                                .in(RelationParticipant::getRelationId, relationIds)
+                                .eq(RelationParticipant::getTargetKind, RelationRules.KIND_ELEMENT)
+                                .eq(RelationParticipant::getTargetId, elementId))
+                .stream()
+                .map(RelationParticipant::getRelationId)
+                .collect(Collectors.toSet());
+        if (referencing.isEmpty()) {
+            return List.of();
+        }
+        return toViews(rows.stream()
+                .filter(relation -> referencing.contains(relation.getId()))
+                .collect(Collectors.toList()));
+    }
+
     // ── RelationLookup：校验器的读取出口 ────────────────────────────────
 
     @Override
