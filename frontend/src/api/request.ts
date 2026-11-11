@@ -83,6 +83,26 @@ function isEnvelope(value: unknown): value is ApiEnvelope<unknown> {
   return value !== null && typeof value === 'object' && 'success' in value
 }
 
+/**
+ * 把后端信封里的 code/message/details 附到被 reject 的对象上。
+ *
+ * 为什么不改变 reject 的形状：LoginView 等既有调用方按 `error.response.data.error`
+ * 取文案，直接换成自定义 Error 会让它们全丢消息；附加字段是**加法**，旧读法照旧，
+ * shared/apiError.ts 再优先读这份规范化后的字段。
+ */
+function attachApiFailure(
+  target: object,
+  status: number | undefined,
+  error: ApiEnvelope<unknown>['error']
+): void {
+  Object.assign(target, {
+    apiStatus: status,
+    apiCode: error?.code,
+    apiMessage: error?.message,
+    apiDetails: error?.details
+  })
+}
+
 // 响应拦截：解包统一信封
 instance.interceptors.response.use(
   (response) => {
@@ -101,11 +121,14 @@ instance.interceptors.response.use(
     }
 
     ElMessage.error(body.error?.message || '请求失败')
-    return Promise.reject(new Error(body.error?.code || 'Business error'))
+    const failure = new Error(body.error?.code || 'Business error')
+    attachApiFailure(failure, response.status, body.error)
+    return Promise.reject(failure)
   },
   (error) => {
     const body = error.response?.data
     if (isEnvelope(body) && !body.success) {
+      attachApiFailure(error, error.response?.status, body.error)
       const code = body.error?.code
       if (code === 'UNAUTHENTICATED' || error.response.status === 401) {
         ElMessage.error('登录已过期，请重新登录')

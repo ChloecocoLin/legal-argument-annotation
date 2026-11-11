@@ -7,6 +7,7 @@ import com.argument.auth.service.AuthService;
 import com.argument.common.exception.BusinessException;
 import com.argument.common.exception.ErrorCode;
 import com.argument.security.AppUserPrincipal;
+import com.argument.security.LoginThrottle;
 import com.argument.security.TokenStore;
 import com.argument.security.entity.AppUser;
 import com.argument.security.mapper.AppUserMapper;
@@ -47,10 +48,20 @@ public class AuthServiceImpl implements AuthService {
     private final AppUserMapper appUserMapper;
     private final PasswordEncoder passwordEncoder;
     private final TokenStore tokenStore;
+    private final LoginThrottle loginThrottle;
 
     @Override
     public LoginResponse login(LoginRequest request) {
         String username = request.username() == null ? "" : request.username().trim();
+
+        // 先看是否在锁定期内：锁定期间连口令都不必验，直接告诉对方多久后再来。
+        long lockedSeconds = loginThrottle.lockedSeconds(username);
+        if (lockedSeconds > 0) {
+            long minutes = (lockedSeconds + 59) / 60;
+            throw new BusinessException(ErrorCode.LOCKED_RESOURCE,
+                    "登录尝试次数过多，请 " + minutes + " 分钟后再试");
+        }
+
         AppUser user = findActiveUserByUsername(username);
 
         // 账号不存在时也走一次编码器，让两条路径的工作量一致。种子用的是 {noop}，这一步省不了多少；
@@ -59,9 +70,11 @@ public class AuthServiceImpl implements AuthService {
         String hash = user == null ? "{noop}__placeholder__" : user.getPasswordHash();
         boolean matched = hash != null && passwordEncoder.matches(request.password(), hash);
         if (user == null || !matched) {
+            loginThrottle.recordFailure(username);
             log.info("登录失败：loginName={}（口令不匹配或账号不存在）", username);
             throw new BusinessException(ErrorCode.UNAUTHENTICATED, CREDENTIAL_ERROR);
         }
+        loginThrottle.recordSuccess(username);
         if (!STATUS_ACTIVE.equals(user.getStatus())) {
             // 能走到这里说明口令是对的，所以这句提示不会泄漏账号是否存在
             throw new BusinessException(ErrorCode.UNAUTHENTICATED, "账号已停用，请联系管理员");

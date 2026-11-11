@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from './Icon.vue'
 import Toasts from './Toasts.vue'
 import { NAV } from './nav.config'
 import { toast } from './toast'
+import { helpFor } from './pageHelp'
+import { canEnter } from './roleAccess'
 import { useUserStore } from '@/stores/user'
 import { ROLE_LABEL } from '@/types/auth'
 
@@ -27,6 +29,7 @@ const roleText = computed(() =>
 )
 
 async function signOut() {
+  closeMenus()
   await user.logout()
   toast('已退出登录')
   // 不带 redirect：退出是主动行为，用户要的是回到登录页，不是回来接着看刚才那一页。
@@ -34,37 +37,32 @@ async function signOut() {
 }
 
 /**
- * 导航按角色过滤。**只过滤填了 roles 的项**，其余原样显示——
- * B/D 的模块还没声明各自的角色矩阵，凭空猜一个只会把他们的入口藏掉。
- * 一个分组里的项全被滤掉时，整个分组也不显示（免得留一个孤零零的标题）。
+ * 换账号。角色是账号的属性，前端没有「切换角色」这回事：
+ * 唯一诚实的做法是退出当前会话，回到登录页用另一个账号登录。
+ */
+async function switchAccount() {
+  closeMenus()
+  await user.logout()
+  toast('已退出，请使用另一个账号登录')
+  await router.replace({ name: 'login' })
+}
+
+/**
+ * 导航按角色过滤。角色只读**路由的 meta.roles**（router/index.ts），不在这里另写一份。
+ * 未声明 roles 的路由对所有登录用户可见；一个分组里的项全被滤掉时，整个分组也不显示。
  */
 const navGroups = computed(() =>
   NAV.map((g) => ({
     ...g,
-    items: g.items.filter((it) => !it.roles || it.roles.some((r) => user.roles.includes(r)))
+    items: g.items.filter(
+      (it) => !it.path || canEnter(user.roles, router.resolve(it.path).meta.roles)
+    )
   })).filter((g) => g.items.length > 0)
 )
 
-const titleMap: Record<string, string> = {
-  '/': '系统总览',
-  '/guide': '指南管理',
-  // 成员C的标注工作台（关系标注与论证图），与 B 的 /adjudication/annotate 相互独立
-  '/annotation/workbench': '标注工作台',
-  // 成员C的图示审查页（分工.md §四.6）
-  '/annotation/graph-audit': '图示审查',
-  // 成员C的教学练习页（分工.md §四-7）
-  '/teaching/exercises': '关系练习',
-  '/adjudication/conflict': '冲突解决',
-  // 成员C的关系裁定页（冲突解决第二阶段）
-  '/adjudication/relation': '关系裁定',
-  '/adjudication/annotate': '标注工作台',
-  '/expert': '专家工作台',
-  '/expert/issues': '疑难问题说明文档'
-}
-const here = computed(() => {
-  if (route.path.startsWith('/guide/')) return '版本详情'
-  return titleMap[route.path] || '系统总览'
-})
+const here = computed(() => (route.meta.title as string) || '系统总览')
+
+const helpLines = computed(() => helpFor(route.name))
 
 function isActive(path?: string): boolean {
   if (!path) return false
@@ -79,6 +77,36 @@ function notReady(label: string) {
 function openMobileNav() {
   document.body.classList.toggle('nav-open')
 }
+
+// ── 顶栏浮层（帮助 / 通知 / 账号）──────────────────────────────────
+type TopMenu = 'help' | 'bell' | 'account'
+const openMenu = ref<TopMenu | null>(null)
+
+function toggleMenu(name: TopMenu) {
+  openMenu.value = openMenu.value === name ? null : name
+}
+
+function closeMenus() {
+  openMenu.value = null
+}
+
+function onDocumentClick() {
+  closeMenus()
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') closeMenus()
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
@@ -133,22 +161,79 @@ function openMobileNav() {
           <span class="here">{{ here }}</span>
         </div>
         <span style="flex: 1"></span>
-        <div class="topbar-search">
-          <Icon name="search" />
-          <input type="search" placeholder="检索文书 / 任务 / 案号" aria-label="全局检索" />
+
+        <!-- 帮助：显示当前页面的 3–5 行说明，文案在 shared/pageHelp.ts -->
+        <div class="topbar-menu">
+          <button
+            class="btn btn-icon btn-ghost"
+            title="帮助"
+            :aria-expanded="openMenu === 'help'"
+            @click.stop="toggleMenu('help')"
+          >
+            <Icon name="help" />
+          </button>
+          <div v-if="openMenu === 'help'" class="topbar-pop help-pop" @click.stop>
+            <div class="pop-title">{{ here }}</div>
+            <ul class="pop-help">
+              <li v-for="line in helpLines" :key="line">{{ line }}</li>
+            </ul>
+          </div>
         </div>
-        <!-- 角色下拉保留但**不可切换**：角色是账号的属性，由后端按令牌判定。
-             做成可切换等于把 RBAC 变成摆设（前端选了也没用，后端不认）。 -->
-        <div class="role-switch" :title="`当前角色：${roleText}（由账号决定，不可切换）`">
-          <Icon name="user" />
-          <span class="muted t-xs">角色</span>
-          <select aria-label="当前角色" disabled>
-            <option>{{ roleText }}</option>
-          </select>
+
+        <!-- 通知：没有数据时如实显示「暂无通知」，不弹「模块未接入」的错误 -->
+        <div class="topbar-menu">
+          <button
+            class="btn btn-icon btn-ghost"
+            title="通知"
+            :aria-expanded="openMenu === 'bell'"
+            @click.stop="toggleMenu('bell')"
+          >
+            <Icon name="bell" />
+          </button>
+          <div v-if="openMenu === 'bell'" class="topbar-pop bell-pop" @click.stop>
+            <div class="pop-title">通知</div>
+            <div class="pop-empty">暂无通知</div>
+            <p class="t-xs muted" style="margin-top: 8px">
+              任务提醒、裁定退回与专家复核结果会出现在这里。
+            </p>
+          </div>
         </div>
-        <button class="btn btn-icon btn-ghost" title="帮助" @click="notReady('帮助')"><Icon name="help" /></button>
-        <button class="btn btn-icon btn-ghost" title="通知" @click="notReady('通知')"><Icon name="bell" /></button>
-        <span class="avatar" :title="`${displayName} · ${roleText}`">{{ initials }}</span>
+
+        <!-- 账号菜单：角色由账号决定，不做「切换角色」，只提供退出后换账号 -->
+        <div class="topbar-menu">
+          <button
+            class="account-btn"
+            :title="`${displayName} · ${roleText}`"
+            :aria-expanded="openMenu === 'account'"
+            @click.stop="toggleMenu('account')"
+          >
+            <span class="avatar">{{ initials }}</span>
+            <span class="account-name">
+              <b>{{ displayName }}</b>
+              <small>{{ roleText }}</small>
+            </span>
+            <Icon name="chev" cls="account-chev" />
+          </button>
+          <div v-if="openMenu === 'account'" class="topbar-pop account-pop" @click.stop>
+            <div class="pop-account-head">
+              <span class="avatar">{{ initials }}</span>
+              <span>
+                <b>{{ displayName }}</b>
+                <small>{{ user.username || '—' }}</small>
+              </span>
+            </div>
+            <p class="t-xs muted" style="margin: 6px 0 10px">
+              当前角色：{{ roleText }}。角色由账号决定，不能在页面上切换。
+            </p>
+            <button class="pop-item" @click="switchAccount">
+              <Icon name="logout" />
+              <span>
+                <b>退出后换账号</b>
+                <small>回到登录页，用另一个账号登录</small>
+              </span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <main class="content">

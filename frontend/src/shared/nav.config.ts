@@ -1,23 +1,14 @@
 // 侧边导航。path 为空表示该模块由其他成员负责、当前未接入。
-// 固定以 admin 角色视角展示（M1）。
-import type { UserRole } from '@/types/auth'
-
+//
+// **不再在这里写 roles。** 角色声明只有一处：路由的 meta.roles（router/index.ts）。
+// AppLayout 用 router.resolve(path).meta.roles 过滤，路由守卫也用同一份；
+// 从前这里复制一份「允许角色」，改路由时忘了改这里，就会出现「侧栏看得见、点进去被弹回」
+// 或者反过来「路由放行了、侧栏却藏了」。
 export interface NavItem {
   id: string
   label: string
   icon: string
   path?: string
-  /**
-   * 允许看到这一项的角色。**不填 = 所有登录用户都看得到。**
-   *
-   * 只给 C 的页面填了（分工.md §六的 RBAC 矩阵）。这纯粹是**界面便利**：
-   * 后端才是权限的判定方，这里只是不让「学生点进关系裁定 → 弹一句没有权限」这种
-   * 演示事故把真正的功能演示冲掉。没填的项保持原样，B/D 各自的矩阵由他们自己补。
-   *
-   * ⚠️ 它和后端控制器上的 `@PreAuthorize` 是**两份声明**，改一处必须想着另一处。
-   * 只改这里 = 藏了入口但接口还开着（安全上无害，因为拦在后端）；只改后端 = 点了会报错。
-   */
-  roles?: UserRole[]
 }
 export interface NavGroup {
   group: string
@@ -48,29 +39,14 @@ export const NAV: NavGroup[] = [
   {
     group: '标注与裁定',
     items: [
-      {
-        id: 'annotation-workbench',
-        label: '标注工作台',
-        icon: 'edit',
-        path: '/annotation/workbench',
-        // R02–R04 写关系限 admin/annotator（见 SecurityConfig 的矩阵）
-        roles: ['admin', 'annotator']
-      },
-      {
-        id: 'graph-audit',
-        label: '图示审查',
-        icon: 'checkc',
-        path: '/annotation/graph-audit',
-        // GR02 审查是裁定员的活，所以比关系写多一个 arbiter
-        roles: ['admin', 'annotator', 'arbiter']
-      },
+      { id: 'annotation-workbench', label: '标注工作台', icon: 'edit', path: '/annotation/workbench' },
+      { id: 'graph-audit', label: '图示审查', icon: 'checkc', path: '/annotation/graph-audit' },
       { id: 'conflict-resolve', label: '冲突解决', icon: 'merge', path: '/adjudication/conflict' },
       {
         id: 'relation-adjudication',
         label: '关系裁定',
         icon: 'merge',
-        path: '/adjudication/relation',
-        roles: ['admin', 'arbiter']
+        path: '/adjudication/relation'
       },
       { id: 'final-review', label: '最终版本审查', icon: 'checkc' }
     ]
@@ -80,15 +56,7 @@ export const NAV: NavGroup[] = [
     // 五类练习（S 专项 / J-M 区分 / A-I 区分 / 嵌套 / 学生图与标准图比较）共用一个页面，
     // 因此这里只有一项；未来若拆成多页再按类型展开。
     group: '教学与练习',
-    items: [
-      {
-        id: 'teaching-exercises',
-        label: '关系练习',
-        icon: 'list',
-        path: '/teaching/exercises',
-        roles: ['admin', 'student', 'teacher']
-      }
-    ]
+    items: [{ id: 'teaching-exercises', label: '关系练习', icon: 'list', path: '/teaching/exercises' }]
   },
   {
     group: '专家复核',
