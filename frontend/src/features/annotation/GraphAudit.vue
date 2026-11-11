@@ -12,9 +12,10 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import ArgumentGraph from './ArgumentGraph.vue'
 import GraphExportButtons from './GraphExportButtons.vue'
+import ForbiddenNotice from '@/shared/ForbiddenNotice.vue'
 import Icon from '@/shared/Icon.vue'
 import { toast } from '@/shared/toast'
-import { errorMessageOf } from '@/shared/apiError'
+import { errorMessageOf, isForbidden } from '@/shared/apiError'
 import { componentsOf } from '@/shared/graphGeometry'
 import { REL_ANNOTATION_ORDER, REL_META } from '@/shared/relationMeta'
 import {
@@ -81,6 +82,8 @@ interface DimensionRow {
 
 const ownerKey = ref(OWNERS[0].key)
 const loading = ref(false)
+/** 403 时显示后端原文的权限空状态。 */
+const forbidden = ref<string | null>(null)
 const graph = ref<GraphView | null>(null)
 const validation = ref<GraphValidateResult | null>(null)
 const activeCategory = ref<string>('ALL')
@@ -182,6 +185,17 @@ const dimensionRows = computed<DimensionRow[]>(() =>
 const errorCount = computed(() => findings.value.filter((item) => item.level === 'ERROR').length)
 const warnCount = computed(() => findings.value.filter((item) => item.level === 'WARNING').length)
 
+/**
+ * 审查结论以 GR02 为准（草稿）；定稿没有 GR02，才退回 GR01 的 status。
+ * GR01 的 status 是「上次构图时」的结论，GR02 才是「现在这组命题与关系」的结论，
+ * 两者混用会出现「校验刚判不通过，徽标还写着 VALID」。
+ */
+const auditStatus = computed(() => validation.value?.status ?? graph.value?.status ?? null)
+const auditStatusText = computed(() => {
+  if (!auditStatus.value) return '—'
+  return auditStatus.value === 'VALID' ? '校验通过' : '未通过'
+})
+
 const visibleFindings = computed<AuditFinding[]>(() =>
   activeCategory.value === 'ALL'
     ? findings.value
@@ -280,6 +294,7 @@ function refit(): void {
 
 async function load(): Promise<void> {
   loading.value = true
+  forbidden.value = null
   try {
     const current = owner.value
     const view = await getGraph(current.ownerType, current.ownerId)
@@ -298,7 +313,8 @@ async function load(): Promise<void> {
   } catch (error) {
     graph.value = null
     validation.value = null
-    toast(errorMessageOf(error), 'err')
+    if (isForbidden(error)) forbidden.value = errorMessageOf(error)
+    else toast(errorMessageOf(error), 'err')
   } finally {
     loading.value = false
   }
@@ -312,7 +328,8 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="wb audit">
+  <ForbiddenNotice v-if="forbidden && !graph" :message="forbidden" @retry="load" />
+  <div v-else class="wb audit">
     <!-- ── 左：审查类别清单 ─────────────────────────────────────── -->
     <section class="wb-col wb-left">
       <div class="wb-col-head">
@@ -339,8 +356,8 @@ onMounted(load)
           <p class="t-xs muted" style="margin-top: 6px">{{ owner.note }}</p>
           <p class="t-xs muted">
             图示状态
-            <b :style="{ color: graph?.status === 'VALID' ? 'var(--success)' : 'var(--danger)' }">
-              {{ graph?.status ?? '—' }}
+            <b :style="{ color: auditStatus === 'VALID' ? 'var(--success)' : 'var(--danger)' }">
+              {{ auditStatusText }}
             </b>
             · 布局 v{{ graph?.layoutVersion ?? 0 }}
             · {{ nodes.length }} 图元 / {{ edges.length }} 连线
@@ -413,8 +430,8 @@ onMounted(load)
         <span v-if="activeDimension" class="badge" :class="DECISION_BADGE[activeDimension.decision]">
           {{ DECISION_LABELS[activeDimension.decision] }}
         </span>
-        <span class="badge" :class="graph?.status === 'VALID' ? 'success' : 'danger'">
-          {{ graph?.status ?? '—' }}
+        <span class="badge" :class="auditStatus === 'VALID' ? 'success' : 'danger'">
+          {{ auditStatusText }}
         </span>
       </div>
 

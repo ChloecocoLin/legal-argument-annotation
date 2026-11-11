@@ -141,7 +141,11 @@ export function buildRenderNodes(
   const renderEdges = buildRenderEdges(edges)
   // 后端保存过的布局（GraphLayout）完整覆盖时优先使用；否则整图自动布局，
   // 避免出现“一半用旧坐标、一半用新排布”的错位。
-  if (applyPositions(rendered, positions) < rendered.length) {
+  //
+  // 只「完整」还不够：旧版本/种子可能把某个孤立命题存在离主图很远的位置，
+  // 完整套用后就是一片空白画布边角挂着一个 P1。间距不合理时同样整图重排。
+  const placed = applyPositions(rendered, positions)
+  if (placed < rendered.length || !layoutIsSane(rendered)) {
     autoLayout(rendered, renderEdges)
   }
   return rendered
@@ -150,6 +154,9 @@ export function buildRenderNodes(
 /**
  * 套用后端保存的坐标。返回成功套用的节点数，调用方据此判断布局是否完整。
  * 改变坐标不更改关系、也不产生新的标注版本（契约）。
+ *
+ * 套用后把整体平移回 MARGIN 起点的坐标系：保存时画布原点可能不同，
+ * 但屏幕上只需要相对位置，平移不改变任何关系。
  */
 export function applyPositions(
   nodes: RenderNode[],
@@ -167,7 +174,42 @@ export function applyPositions(
       placed += 1
     }
   })
+  if (placed > 0) {
+    const bounds = graphBounds(nodes)
+    const dx = MARGIN - bounds.minX
+    const dy = MARGIN - bounds.minY
+    if (dx !== 0 || dy !== 0) {
+      nodes.forEach((node) => {
+        node.x += dx
+        node.y += dy
+      })
+    }
+  }
   return placed
+}
+
+/**
+ * 保存的坐标是否「像一张排过的图」。
+ *
+ * 判据只看两件事，都是有意的保守判断：
+ *   1. 所有节点是否都堆在同一点（旧数据里的 0,0）；
+ *   2. 相邻节点之间是否出现超过三列/三行的空档。
+ * 两者都不涉及业务语义，只因「这样的布局肉眼不可用」，重排不会丢信息。
+ */
+export function layoutIsSane(nodes: RenderNode[]): boolean {
+  if (nodes.length <= 1) return true
+  const cells = new Set(nodes.map((n) => `${Math.round(n.x)},${Math.round(n.y)}`))
+  if (cells.size < 2) return false
+
+  const xs = nodes.map((n) => n.x).sort((a, b) => a - b)
+  const ys = nodes.map((n) => n.y).sort((a, b) => a - b)
+  for (let i = 1; i < xs.length; i += 1) {
+    if (xs[i] - xs[i - 1] > COL_W * 3) return false
+  }
+  for (let i = 1; i < ys.length; i += 1) {
+    if (ys[i] - ys[i - 1] > ROW_H * 3) return false
+  }
+  return true
 }
 
 /** 逻辑边 → 绘图边（箭头/虚线由后端在 GraphEdge 上给出）。 */
@@ -188,16 +230,39 @@ const GROUP_GAP = 80
 const MARGIN = 60
 
 /**
- * 自动布局（只在后端尚无布局时使用）。
- * 按连通分量分组，组内从入度为 0 的节点做分层 BFS：层 → 列，层内按展示编号排序成行。
+ * 自动布局（只在后端尚无布局、或保存的布局不可用时使用）。
+ *
+ * 两条规则：
+ *   1. **孤立命题先放左上**（没有参与任何关系的节点），最多 4 列排成网格——
+ *      只有一个 P1 的图不会出现在画布右半边，也不会被主图挤到看不见的角落；
+ *   2. 有连线的部分按连通分量分组，组内从入度为 0 的节点做分层 BFS：
+ *      层 → 列，层内按展示编号排序成行；分量之间从左到右依次排开。
  */
 export function autoLayout(nodes: RenderNode[], edges: RenderEdge[]): void {
   if (nodes.length === 0) return
   const index = new Map<string, RenderNode>()
   nodes.forEach((n) => index.set(n.id, n))
 
+  // 参与过任何一条边的节点才算「有结构」；其余都按孤立命题处理。
+  const touched = new Set<string>()
+  edges.forEach((e) => {
+    touched.add(e.a)
+    touched.add(e.b)
+  })
+  const isolated = nodes.filter((n) => !touched.has(n.id))
+  const connected = nodes.filter((n) => touched.has(n.id))
+
+  const ISO_COLS = 4
+  isolated.forEach((node, i) => {
+    node.x = MARGIN + (i % ISO_COLS) * COL_W
+    node.y = MARGIN + Math.floor(i / ISO_COLS) * ROW_H
+  })
+  const offsetY = isolated.length
+    ? MARGIN + Math.ceil(isolated.length / ISO_COLS) * ROW_H + GROUP_GAP
+    : MARGIN
+
   let offsetX = MARGIN
-  componentsOf(nodes, edges).forEach((group) => {
+  componentsOf(connected, edges).forEach((group) => {
     const inGroup = new Set(group)
     const next = new Map<string, string[]>()
     const indegree = new Map<string, number>()
@@ -253,7 +318,7 @@ export function autoLayout(nodes: RenderNode[], edges: RenderEdge[]): void {
     const height = maxRows * ROW_H
     columnKeys.forEach((d) => {
       const list = levels.get(d) as string[]
-      const top = MARGIN + (height - list.length * ROW_H) / 2
+      const top = offsetY + (height - list.length * ROW_H) / 2
       list.forEach((id, row) => {
         const node = index.get(id) as RenderNode
         node.x = offsetX + d * COL_W
