@@ -5,7 +5,6 @@
       <p class="muted">查看任务配置和案例提交进度。</p>
     </div>
     <el-descriptions :column="2" border v-if="task">
-      <el-descriptions-item label="任务 ID">{{ task.id }}</el-descriptions-item>
       <el-descriptions-item label="状态">{{ statusName(task.status) }}</el-descriptions-item>
       <el-descriptions-item label="创建者">{{ ownerName || task.ownerUserId }}</el-descriptions-item>
       <el-descriptions-item label="每案 N">{{ task.defaultRequiredAnnotators }}</el-descriptions-item>
@@ -20,11 +19,11 @@
     </el-card>
     <h3 style="margin-top: 20px">案例进度（正式提交 X/N）</h3>
     <el-table :data="progress">
-      <el-table-column prop="taskDocumentId" label="案例" />
+      <el-table-column label="案例" min-width="160"><template #default="{ row }">案例 {{ row.taskDocumentId.slice(0, 8) }}</template></el-table-column>
       <el-table-column prop="submittedCount" label="已收到 X" width="120" />
       <el-table-column prop="requiredAnnotators" label="需要 N" width="120" />
       <el-table-column label="状态" width="160"><template #default="{ row }">{{ statusName(row.status) }}</template></el-table-column>
-      <el-table-column v-if="user.roles.some(role=>['annotator','arbiter'].includes(role))" label="操作" width="220"><template #default="{ row }"><el-button link type="primary" @click="$router.push(`/tasks/${taskId}/cases/${row.taskDocumentId}/segmentation`)">独立切割</el-button><el-button v-if="user.roles.includes('annotator')" link type="primary" @click="$router.push(`/tasks/${taskId}/cases/${row.taskDocumentId}/annotate`)">本人标注工作台</el-button></template></el-table-column>
+      <el-table-column v-if="user.roles.some(role=>['annotator','arbiter'].includes(role))" label="操作" width="240" fixed="right"><template #default="{ row }"><el-button link type="primary" @click="$router.push(`/tasks/${taskId}/cases/${row.taskDocumentId}/segmentation`)">独立切割</el-button><el-button v-if="user.roles.includes('annotator')" link type="primary" @click="$router.push(`/tasks/${taskId}/cases/${row.taskDocumentId}/annotate`)">本人标注工作台</el-button></template></el-table-column>
     </el-table>
     <div style="margin-top: 16px">
       <el-button v-if="canManage" @click="$router.push(`/tasks/${taskId}/assign`)">去分配</el-button>

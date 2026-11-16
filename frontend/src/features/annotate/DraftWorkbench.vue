@@ -31,7 +31,7 @@ function saveLayout(){if(!view.value?.graph)return;const nodePositions=(graphRef
 const rows=computed(()=>view.value?.segmentationCheckpoint.unifiedBoundaries.map(b=>({...b,element:view.value?.elements.find(e=>e.startOffset===b.startOffset&&e.endOffset===b.endOffset)}))||[])
 const row=computed(()=>rows.value[selected.value]),remaining=computed(()=>rows.value.filter(r=>!r.element).length)
 function select(index:number){if(pending.value||busy.value)return;selected.value=index;label.value=rows.value[index]?.element?.labelCode||null}
-async function load(){loading.value=true;error.value='';view.value=undefined;try{view.value=await get<Workspace>(`/integration/cases/${route.params.caseId}/annotation-workspace`);selected.value=Math.min(selected.value,Math.max(rows.value.length-1,0));label.value=row.value?.element?.labelCode||null;resetRelation()}catch(e){error.value=errorMessage(e)}finally{loading.value=false}}
+async function load(keepView=false){loading.value=true;if(!keepView){error.value='';view.value=undefined}try{view.value=await get<Workspace>(`/integration/cases/${route.params.caseId}/annotation-workspace`);selected.value=Math.min(selected.value,Math.max(rows.value.length-1,0));label.value=row.value?.element?.labelCode||null;resetRelation()}catch(e){error.value=errorMessage(e)}finally{loading.value=false}}
 async function execute(command:Command,version=0){
   if(busy.value)return;busy.value=true;error.value=''
   const saved=attempt.get(JSON.parse(JSON.stringify({...command,actorId:user.id})),version);pending.value=true
@@ -42,7 +42,18 @@ async function execute(command:Command,version=0){
     else if(c.method==='PATCH')await patch(c.url,c.body,config)
     else await del(c.url,{...config,data:c.body})
     attempt.reset();pending.value=false;await load();ElMessage.success('已保存本人草稿')
-  }catch(e){error.value=errorMessage(e);if(errorCode(e)){attempt.reset();pending.value=false}}
+  }catch(e){
+    const code=errorCode(e)
+    if(code==='VERSION_CONFLICT'){
+      attempt.reset();pending.value=false
+      await load(true)
+      error.value='另一处刚刚保存过，请看最新内容后再保存'
+    }else{
+      error.value=errorMessage(e)
+      if(code==='GRAPH_REFERENCES_ELEMENT')section.value='graph'
+      if(code){attempt.reset();pending.value=false}
+    }
+  }
   finally{busy.value=false}
 }
 function retry(){const saved=attempt.pending();if(saved)execute({method:'POST',url:'',body:{}})}
@@ -87,7 +98,7 @@ watch(()=>user.id,()=>{attempt.reset();pending.value=false;view.value=undefined;
         <el-row v-if="section==='relations'" :gutter="20"><el-col :span="12"><el-card><template #header>关系清单</template><p v-if="!view.relations?.length">尚无关系，请核对是否存在论证联系。</p><div v-for="r in view.relations" :key="r.id" class="boundary"><b>{{ expression(r) }}</b><div><el-button :disabled="!view.canWrite||busy||pending" @click="editRelation(r)">编辑参与项</el-button><el-button :disabled="!view.canWrite||busy||pending" type="danger" @click="deleteRelation(r)">删除关系</el-button></div></div></el-card></el-col><el-col :span="12"><el-card><template #header>{{ editing?'修改关系参与项':'新建关系' }}</template><el-select v-model="code" :disabled="!!editing||busy||pending" @change="resetRelation"><el-option v-for="c in (['S','J','M','A','I'] as const)" :key="c" :value="c" :label="({S:'支持 S',J:'组合 J',M:'匹配 M',A:'反对 A',I:'同一 I'})[c]" /></el-select><div v-for="(_,index) in targets" :key="index" class="toolbar"><b>{{ directed?(index===0?'来源':'目标'):`成员 ${index+1}` }}</b><el-select v-model="targets[index]" filterable :disabled="busy||pending" placeholder="选择本人命题或关系整体" style="width:75%"><el-option v-for="option in options" :key="option.value" :value="option.value" :label="option.label" /></el-select><el-button v-if="!directed&&targets.length>2" :disabled="busy||pending" @click="targets.splice(index,1)">移除</el-button></div><el-button v-if="!directed" :disabled="busy||pending" @click="targets.push('')">增加成员</el-button><div class="toolbar"><el-button type="primary" :disabled="!view.canWrite||targets.some(t=>!t)||busy||pending" @click="saveRelation">保存关系</el-button><el-button :disabled="busy||pending" @click="resetRelation">新建另一关系</el-button></div><p class="muted">只记录直接关系；嵌套保留完整结构。服务端检查参与矩阵、方向、来源和循环，不自动补齐传递支持。</p></el-card></el-col></el-row>
         <el-card v-if="section==='graph'"><template #header>完整论证图 · {{ view.graph?.status==='VALID'?'校验通过': '待校验' }}</template><ArgumentGraph ref="graphRef" :nodes="view.nodes||[]" :edges="view.edges||[]" :positions="view.layout?.nodePositions||[]" :editable="view.canWrite&&!busy&&!pending" /><div class="toolbar"><el-button type="primary" :disabled="!view.canWrite||busy||pending" @click="validateGraph">校验完整草稿</el-button><el-button :disabled="!view.canWrite||!view.graph||busy||pending" @click="saveLayout">保存图布局</el-button><el-button :disabled="!view.canWrite||!view.graph||busy||pending" @click="resetGraph">保留旧图并重新编辑</el-button></div><p v-for="(issue,index) in view.issues" :key="index" class="muted">{{ issue.message }}</p><p class="muted">显示所有命题、关系结构和孤立命题。拖动只改变布局，提交时会再次校验内容。</p></el-card>
         <el-alert style="margin-top:20px" type="info" :closable="false" :title="remaining?`还有 ${remaining} 条统一边界未分类。`:view.graph?.status==='VALID'?'完整图已通过校验，请人工核对后进入提交确认。':'分类已保存，请继续检查关系并校验完整图。'" />
-        <div class="toolbar"><RouterLink v-if="!busy&&!pending" :to="`/annotations/${view.draft.id}/submit`">进入提交确认</RouterLink><RouterLink :to="`/tasks/${route.params.taskId}/cases/${route.params.caseId}/versions`">查看本人正式版本</RouterLink></div>
+        <div class="toolbar"><RouterLink v-if="!busy&&!pending" :to="`/annotations/${view.draft.id}/submit`"><el-button type="primary">进入提交确认</el-button></RouterLink><RouterLink :to="`/tasks/${route.params.taskId}/cases/${route.params.caseId}/versions`">查看本人正式版本</RouterLink></div>
       </template>
     </template>
   </div>

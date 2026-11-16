@@ -82,5 +82,13 @@ class IndependentSegmentationIntegrationTest {
         String id=submit(chen,chenAssignment);var body=mapper.createObjectNode().put("action","ACCEPT").put("reviewReason","检查边界");var stale=send("/api/v1/segmentation-submissions/"+id+"/reviews",arbiter,VersionJson.uuid(),body,2,409);assertThat(stale.path("error").path("details").get(0).path("currentRecordVersion").asInt()).isEqualTo(1);assertThat(data.read("segmentationSubmission",id).path("status").asText()).isEqualTo("SUBMITTED");
         send("/api/v1/segmentation-submissions/"+id+"/reviews",chen,VersionJson.uuid(),body,1,403);
     }
+    @Test void submitRejectsNonAnnotatorsAndUnknownAssignmentWithoutCreatingRecords()throws Exception{
+        String path="/api/v1/task-documents/"+caseId+"/segmentation-submissions";
+        String student=login("student.zhou");
+        assertThat(send(path,student,VersionJson.uuid(),input(chenAssignment),null,403).path("error").path("code").asText()).isEqualTo("BLIND_SCOPE_DENIED");
+        assertThat(send(path,arbiter,VersionJson.uuid(),input(chenAssignment),null,403).path("error").path("code").asText()).isEqualTo("BLIND_SCOPE_DENIED");
+        assertThat(send(path,chen,VersionJson.uuid(),input("00000000-0000-4000-8000-000000000000"),null,404).path("error").path("code").asText()).isEqualTo("NOT_FOUND");
+        assertThat(data.find("segmentationSubmission","taskDocumentId",caseId)).isEmpty();
+    }
 
 }

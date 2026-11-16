@@ -54,6 +54,8 @@ public class DocumentService {
             }
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("id", doc.get("id"));
+            item.put("title", doc.get("title"));
+            item.put("caseNumber", doc.get("caseNumber"));
             item.put("courtName", doc.get("courtName"));
             item.put("causeOfAction", doc.get("causeOfAction"));
             items.add(item);
@@ -78,6 +80,10 @@ public class DocumentService {
         }
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", doc.get("id"));
+        data.put("title", doc.get("title"));
+        data.put("caseNumber", doc.get("caseNumber"));
+        data.put("courtName", doc.get("courtName"));
+        data.put("causeOfAction", doc.get("causeOfAction"));
         data.put("originalFileId", doc.get("originalFileId"));
         data.put("textVersionIds", versionIds);
         return data;

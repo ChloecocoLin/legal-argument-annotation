@@ -7,36 +7,43 @@
       </div>
       <el-button v-if="canCreate" type="primary" @click="$router.push('/tasks/create')">创建任务</el-button>
     </div>
+    <el-alert v-if="loadError" :title="loadError" type="error" :closable="false" style="margin-bottom: 16px" />
     <el-table :data="rows" v-loading="loading">
-      <el-table-column prop="name" label="名称" min-width="200" />
+      <el-table-column prop="name" label="名称" min-width="220" />
       <el-table-column label="状态" width="140"><template #default="{ row }">{{ statusName(row.status) }}</template></el-table-column>
-      <el-table-column prop="id" label="任务编号" min-width="280" />
-      <el-table-column label="操作" width="220">
+      <el-table-column label="操作" width="240" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="$router.push(`/tasks/${row.id}`)">详情</el-button>
           <el-button v-if="canCreate" link type="primary" @click="$router.push(`/tasks/${row.id}/assign`)">分配</el-button>
           <el-button link type="primary" @click="$router.push(`/tasks/${row.id}/progress`)">版本进度</el-button>
         </template>
       </el-table-column>
-      <template #empty>暂无任务。创建者请先新建任务并分配文书。</template>
+      <template #empty>{{ emptyText }}</template>
     </el-table>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { statusName } from '@/features/versions/api'
-const user = useUserStore()
+import { errorMessage, statusName } from '@/features/versions/api'
 import { getTaskSetup, listTasks } from '@/api/memberA'
 
+const user = useUserStore()
 const loading = ref(false)
+const loadError = ref('')
 const rows = ref<{ id: string; status: string; name: string }[]>([])
 const canCreate = computed(() => user.roles.some((role) => ['admin', 'creator'].includes(role)))
+const emptyText = computed(() => {
+  if (loadError.value) return loadError.value
+  if (user.roles.includes('student')) return '你还没有被分配任务'
+  if (user.roles.some((role) => ['teacher', 'expert'].includes(role))) return '当前角色无权访问标注任务'
+  return '暂无任务。创建者请先新建任务并分配文书。'
+})
 
 onMounted(async () => {
   loading.value = true
+  loadError.value = ''
   try {
     const page = await listTasks({ page: 1, size: 50 })
     const enriched = await Promise.all(
@@ -50,8 +57,8 @@ onMounted(async () => {
       })
     )
     rows.value = enriched
-  } catch {
-    ElMessage.error('任务列表加载失败，请确认已登录且后端已启动')
+  } catch (e) {
+    loadError.value = errorMessage(e)
   } finally {
     loading.value = false
   }

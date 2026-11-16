@@ -8,11 +8,25 @@ export interface PageMetaItems<T> {
 }
 
 export function listDocuments(params: Record<string, unknown>) {
-  return getPage<{ id: string; courtName: string; causeOfAction: string }>('/documents', params)
+  return getPage<{
+    id: string
+    title?: string
+    caseNumber?: string
+    courtName: string
+    causeOfAction: string
+  }>('/documents', params)
 }
 
 export function getDocument(documentId: string) {
-  return get<{ id: string; originalFileId: string; textVersionIds: string[] }>(`/documents/${documentId}`)
+  return get<{
+    id: string
+    title?: string
+    caseNumber?: string
+    courtName?: string
+    causeOfAction?: string
+    originalFileId: string
+    textVersionIds: string[]
+  }>(`/documents/${documentId}`)
 }
 
 export function getTextVersion(textVersionId: string) {

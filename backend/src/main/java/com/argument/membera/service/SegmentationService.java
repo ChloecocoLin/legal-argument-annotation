@@ -47,7 +47,13 @@ public class SegmentationService {
 
     @Transactional
     public ObjectNode submit(Actor actor,String caseId,String key,ObjectNode body){
-        var doc=locked(caseId);var assignment=ownAssignment(actor,caseId,body.path("assignmentId").asText());String op="S01:"+caseId;
+        VersionJson.uuid(caseId);
+        data.read("taskDocument",caseId);
+        require(actor.permission("ANNOTATION_WORK")&&access.hasAssignment(actor,caseId,"ANNOTATOR"),ErrorCode.BLIND_SCOPE_DENIED,"不能提交切割");
+        String assignmentId=body.path("assignmentId").asText();
+        VersionJson.uuid(assignmentId);
+        require(!data.find("assignment","id",assignmentId).isEmpty(),ErrorCode.NOT_FOUND,"分配不存在");
+        var doc=locked(caseId);var assignment=ownAssignment(actor,caseId,assignmentId);String op="S01:"+caseId;
         var previous=replay(actor,op,key,body);if(previous!=null)return previous;working(doc);
         require(trials.getIfAvailable()==null||trials.getIfAvailable().list("SUBMISSION",caseId).isEmpty(),ErrorCode.CONFLICT,"该案例已有旧试行输入，不能混用两种提交来源");
         var history=data.find("segmentationSubmission","assignmentId",assignment.path("id").asText());
