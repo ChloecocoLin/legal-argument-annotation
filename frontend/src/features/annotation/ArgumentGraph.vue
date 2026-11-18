@@ -3,12 +3,13 @@
 //   S 实心圆 ● 有向、A 空心圆 ○ 有向、J/M 带“+”圆（J 无向、M 有向）、I 用矩形框内“/”不分圆节点。
 // 几何与交互移植原型 assets/graph.js（拖动 / 滚轮缩放 / 平移 / fit），
 // 样式全部复用 app.css §11 的 .g-*，不新造类名、不加依赖（不使用 AntV X6）。
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { GraphEdge, GraphNode, GraphNodePosition } from '@/types/graph'
 import {
   PROP_H,
   PROP_W,
   REL_R,
+  autoLayout,
   buildRenderEdges,
   buildRenderNodes,
   edgeEndpoints,
@@ -61,6 +62,15 @@ const scale = ref(1)
 const tx = ref(FIT_PAD)
 const ty = ref(FIT_PAD)
 const panning = ref(false)
+
+/**
+ * 是否仍由「自动取景」控制视口。
+ *
+ * 用户一旦缩放/平移/拖过节点，就不再因为容器尺寸变化而把他的视角重置回中央；
+ * 点「适应窗口」重新置为 true。否则窗口一抖，刚对好的位置就跳走。
+ */
+const autoFit = ref(true)
+let resizeObserver: ResizeObserver | null = null
 
 const dragMode = ref<'pan' | 'node' | null>(null)
 const dragNodeId = ref<string | null>(null)
@@ -127,6 +137,7 @@ function clampScale(value: number): number {
 }
 
 function fit(): void {
+  autoFit.value = true
   const host = hostEl.value
   if (!host || rendered.value.length === 0) return
   const width = host.clientWidth
@@ -152,15 +163,29 @@ function zoomBy(factor: number): void {
 function zoomAt(px: number, py: number, factor: number): void {
   const next = clampScale(scale.value * factor)
   if (next === scale.value) return
+  autoFit.value = false
   tx.value = px - (px - tx.value) * (next / scale.value)
   ty.value = py - (py - ty.value) * (next / scale.value)
   scale.value = next
 }
 
 function reset(): void {
+  autoFit.value = false
   scale.value = 1
   tx.value = FIT_PAD
   ty.value = FIT_PAD
+}
+
+/** 当前图示内容的包围盒（含图元尺寸）。工作台据此计算保存时的画布大小。 */
+function contentBounds() {
+  return graphBounds(rendered.value)
+}
+
+/** 丢掉当前坐标，按「孤立命题左上、其余分层」重新排一遍。 */
+function autoLayoutNow(): void {
+  autoLayout(rendered.value, renderedEdges.value)
+  autoFit.value = true
+  nextTick(fit)
 }
 
 function onWheel(event: WheelEvent): void {
@@ -194,6 +219,7 @@ function onPointerMove(event: PointerEvent): void {
   const dy = event.clientY - lastPoint.value.y
   if (dx === 0 && dy === 0) return
   moved.value = true
+  autoFit.value = false
   lastPoint.value = { x: event.clientX, y: event.clientY }
   if (dragMode.value === 'pan') {
     tx.value += dx
@@ -314,9 +340,31 @@ watch(
 
 onMounted(() => {
   nextTick(fit)
+  // 容器尺寸变化（侧栏折叠、窗口缩放、切到另一栏）时重新取景；
+  // 用户手动调过视角后就不再抢他的镜头，直到点「适应窗口」为止。
+  if (typeof ResizeObserver !== 'undefined' && hostEl.value) {
+    resizeObserver = new ResizeObserver(() => {
+      if (autoFit.value) fit()
+    })
+    resizeObserver.observe(hostEl.value)
+  }
 })
 
-defineExpose({ fit, zoomBy, reset, exportSvg, exportPng, currentPositions })
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+})
+
+defineExpose({
+  fit,
+  zoomBy,
+  reset,
+  contentBounds,
+  autoLayoutNow,
+  exportSvg,
+  exportPng,
+  currentPositions
+})
 </script>
 
 <template>

@@ -329,4 +329,16 @@ public class ArgumentGraphServiceImpl implements ArgumentGraphService {
         return nextVersion;
     }
 
+    @Override
+    @Transactional
+    public void resetLayouts(String graphId) {
+        ArgumentGraph graph = graphMapper.selectById(graphId);
+        if (graph == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "论证图不存在：" + graphId);
+        }
+        // @TableLogic 生效：逻辑删除，保留行以便追溯；GR01 的 loadLayout 不再取到它们。
+        layoutMapper.delete(new LambdaQueryWrapper<GraphLayout>()
+                .eq(GraphLayout::getGraphId, graphId));
+    }
+
 }

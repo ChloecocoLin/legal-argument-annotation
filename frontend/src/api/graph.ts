@@ -1,6 +1,6 @@
 // 论证图接口函数（GR01–GR03，接口归成员C维护）。契约见 openapi-ready.yaml。
 // 注意：拦截器已解包统一信封，调用方**不要**再写 .data。
-import { get, post } from './request'
+import { del, get, post } from './request'
 import type {
   GraphView,
   GraphValidateRequest,
@@ -38,4 +38,10 @@ export function saveGraphLayout(
   body: LayoutCreateRequest
 ): Promise<LayoutCreateResult> {
   return post<LayoutCreateResult>(`/graphs/${graphId}/layouts`, body)
+}
+
+// 清除该图已保存的全部布局版本，GR01 随后回退为自动布局。
+// 只删坐标，不删命题/关系——图由当前数据推导，节点不会因为清布局而消失。
+export function resetGraphLayout(graphId: string): Promise<void> {
+  return del<void>(`/graphs/${graphId}/layouts`)
 }

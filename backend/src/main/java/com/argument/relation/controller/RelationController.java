@@ -7,6 +7,7 @@ import com.argument.relation.service.RelationService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,6 +42,26 @@ public class RelationController {
         data.put("items", result.getRecords());
         return ApiResponse.ok(data,
                 new PageMeta(result.getCurrent(), result.getSize(), result.getTotal()));
+    }
+
+    /**
+     * R05 查询要素被哪些有效关系引用。供成员A删除要素前判断，避免删出「关系指向空气」。
+     *
+     * <p>不查论证图：图是 GR01 从当前命题与关系推导的，未提交/已重排的图都不是阻断来源。
+     * 返回 {@code {items:[RelationView], total}}；A 的删除接口在 total>0 时应抛
+     * {@code RELATION_REFERENCES_ELEMENT} 并把关系表达式带进 message。
+     */
+    @GetMapping("/relations/references")
+    public ApiResponse<Map<String, Object>> referencesOfElement(
+            @RequestParam String ownerType,
+            @RequestParam String ownerId,
+            @RequestParam String elementId) {
+        List<RelationView> items =
+                relationService.referencesOfElement(ownerType, ownerId, elementId);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("items", items);
+        data.put("total", items.size());
+        return ApiResponse.ok(data);
     }
 
     // R02 建立关系

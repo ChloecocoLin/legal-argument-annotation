@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from './Icon.vue'
 import Toasts from './Toasts.vue'
 import { NAV } from './nav.config'
 import { toast } from './toast'
+import { helpFor } from './pageHelp'
 import { useUserStore } from '@/stores/user'
+import { ROLE_LABEL } from '@/types/auth'
 
 const route = useRoute(), router = useRouter()
 const user = useUserStore()
-const userName = computed(() => user.name || '未登录')
-const avatarText = computed(() => user.name ? user.name.slice(0, 2) : '—')
-const roleName = computed(() => ({ admin: '管理员', creator: '任务创建者', annotator: '标注员', arbiter: '裁定者', expert: '专家', teacher: '教师', student: '学生' }[user.roles[0] || ''] || '未登录'))
+const userName = computed(() => user.name || user.username || '未登录')
+const avatarText = computed(() => {
+  const n = user.name || user.username
+  if (!n) return '—'
+  return n.slice(0, 2)
+})
+const displayName = computed(() => user.name || user.username || '未登录')
+const initials = avatarText
+const roleText = computed(() =>
+  user.roles.length ? user.roles.map((r) => ROLE_LABEL[r] || r).join(' / ') : '未分配角色'
+)
 
 const navigation = computed(() => {
   const allowed: Record<string, string[]> = {
@@ -27,40 +37,22 @@ const navigation = computed(() => {
   return NAV.map(group => ({ ...group, items: group.items.filter(item => !allowed[item.id] || user.roles.some(role => allowed[item.id].includes(role))) })).filter(group => group.items.length)
 })
 
-const titleMap: Record<string, string> = {
- '/teaching':'教学工作台','/assignment-create':'创建教学作业','/teaching-standard':'标准标注样例','/student-results':'学生结果总览','/student-compare':'作答比对与反馈',
-  '/': '系统总览',
-  '/admin-home': '管理工作台',
-  '/audit': '入库与审计记录',
-  '/segmentation': '独立切割与统一关口',
-  '/results': '已入库成果',
-  '/auto-annotate': '自动标注',
-  '/export': '导出中心',
-  '/export-records': '导出记录',
-  '/guide': '指南管理',
-  '/adjudication/conflict': '冲突解决',
-  '/adjudication/annotate': '裁定者自定义标注',
-  '/expert': '专家工作台',
-  '/expert/issues': '疑难问题说明文档'
-}
-const here = computed(() => {
-  if (route.path.startsWith('/student-annotate')) return '学生标注练习'
-  if (route.path.startsWith('/final-review')) return '最终版本审查'
-  if (route.path.startsWith('/annotations/')) return '提交标注'
-  if (route.path.startsWith('/versions/')) return '完整标注版本'
-  if (route.path.startsWith('/documents/')) return '文书详情'
-  if (route.path === '/documents') return '文书总库'
-  if (route.path === '/tasks/create') return '创建任务'
-  if (route.path.endsWith('/assign')) return '任务分配'
-  if (route.path.startsWith('/tasks/')&&route.path.endsWith('/annotate')) return '本人标注工作台'
-  if (route.path.endsWith('/segmentation')) return '独立切割与统一关口'
-  if (route.path.startsWith('/tasks/')) return route.path.endsWith('/versions') ? '标注版本' : '任务详情'
-  if (route.path === '/tasks') return '任务列表'
-  if (route.path.startsWith('/guide/')) return '版本详情'
-  return titleMap[route.path] || '系统总览'
-})
+const here = computed(() => (route.meta.title as string) || '系统总览')
+const helpLines = computed(() => helpFor(route.name))
 
-async function logout() { await user.logout(); await router.replace('/login') }
+async function signOut() {
+  closeMenus()
+  await user.logout()
+  toast('已退出登录')
+  await router.replace({ path: '/login' })
+}
+
+async function switchAccount() {
+  closeMenus()
+  await user.logout()
+  toast('已退出，请使用另一个账号登录')
+  await router.replace({ path: '/login' })
+}
 
 function isActive(path?: string): boolean {
   if (!path) return false
@@ -77,6 +69,35 @@ function notReady(label: string) {
 function openMobileNav() {
   document.body.classList.toggle('nav-open')
 }
+
+type TopMenu = 'help' | 'bell' | 'account'
+const openMenu = ref<TopMenu | null>(null)
+
+function toggleMenu(name: TopMenu) {
+  openMenu.value = openMenu.value === name ? null : name
+}
+
+function closeMenus() {
+  openMenu.value = null
+}
+
+function onDocumentClick() {
+  closeMenus()
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') closeMenus()
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
@@ -114,7 +135,7 @@ function openMobileNav() {
         <span class="avatar">{{ avatarText }}</span>
         <span>
           <b style="color: #fff; font-size: 12.5px">{{ userName }}</b><br />
-          <span>{{ roleName }}</span>
+          <span>{{ roleText }}</span>
         </span>
       </div>
     </aside>
@@ -128,21 +149,82 @@ function openMobileNav() {
           <span class="here">{{ here }}</span>
         </div>
         <span style="flex: 1"></span>
-        <div class="topbar-search">
-          <Icon name="search" />
-          <input type="search" placeholder="检索文书 / 任务 / 案号" aria-label="全局检索" />
+
+        <div class="topbar-menu">
+          <button
+            class="btn btn-icon btn-ghost"
+            title="帮助"
+            :aria-expanded="openMenu === 'help'"
+            @click.stop="toggleMenu('help')"
+          >
+            <Icon name="help" />
+          </button>
+          <div v-if="openMenu === 'help'" class="topbar-pop help-pop" @click.stop>
+            <div class="pop-title">{{ here }}</div>
+            <ul class="pop-help">
+              <li v-for="line in helpLines" :key="line">{{ line }}</li>
+            </ul>
+          </div>
         </div>
-        <div class="role-switch">
-          <Icon name="user" />
-          <span class="muted t-xs">角色</span>
-          <select aria-label="切换角色" disabled>
-            <option>{{ roleName }}</option>
-          </select>
+
+        <div class="topbar-menu">
+          <button
+            class="btn btn-icon btn-ghost"
+            title="通知"
+            :aria-expanded="openMenu === 'bell'"
+            @click.stop="toggleMenu('bell')"
+          >
+            <Icon name="bell" />
+          </button>
+          <div v-if="openMenu === 'bell'" class="topbar-pop bell-pop" @click.stop>
+            <div class="pop-title">通知</div>
+            <div class="pop-empty">暂无通知</div>
+            <p class="t-xs muted" style="margin-top: 8px">
+              任务提醒、裁定退回与专家复核结果会出现在这里。
+            </p>
+          </div>
         </div>
-        <button class="btn btn-icon btn-ghost" title="帮助" @click="notReady('帮助')"><Icon name="help" /></button>
-        <button class="btn btn-icon btn-ghost" title="通知" @click="notReady('通知')"><Icon name="bell" /></button>
-        <button class="btn btn-sm btn-ghost" @click="logout">退出登录</button>
-        <span class="avatar" :title="userName">{{ avatarText }}</span>
+
+        <div class="topbar-menu">
+          <button
+            class="account-btn"
+            :title="`${displayName} · ${roleText}`"
+            :aria-expanded="openMenu === 'account'"
+            @click.stop="toggleMenu('account')"
+          >
+            <span class="avatar">{{ initials }}</span>
+            <span class="account-name">
+              <b>{{ displayName }}</b>
+              <small>{{ roleText }}</small>
+            </span>
+            <Icon name="chev" cls="account-chev" />
+          </button>
+          <div v-if="openMenu === 'account'" class="topbar-pop account-pop" @click.stop>
+            <div class="pop-account-head">
+              <span class="avatar">{{ initials }}</span>
+              <span>
+                <b>{{ displayName }}</b>
+                <small>{{ user.username || '—' }}</small>
+              </span>
+            </div>
+            <p class="t-xs muted" style="margin: 6px 0 10px">
+              当前角色：{{ roleText }}。角色由账号决定，不能在页面上切换。
+            </p>
+            <button class="pop-item" @click="switchAccount">
+              <Icon name="logout" />
+              <span>
+                <b>退出后换账号</b>
+                <small>回到登录页，用另一个账号登录</small>
+              </span>
+            </button>
+            <button class="pop-item" @click="signOut">
+              <Icon name="logout" />
+              <span>
+                <b>退出登录</b>
+              </span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <main class="content">

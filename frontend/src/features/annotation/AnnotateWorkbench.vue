@@ -9,9 +9,10 @@ import ArgumentGraph from './ArgumentGraph.vue'
 import GraphExportButtons from './GraphExportButtons.vue'
 import BaseModal from '@/shared/BaseModal.vue'
 import Chip from '@/shared/Chip.vue'
+import ForbiddenNotice from '@/shared/ForbiddenNotice.vue'
 import Icon from '@/shared/Icon.vue'
 import { toast } from '@/shared/toast'
-import { errorMessageOf } from '@/shared/apiError'
+import { errorMessageOf, isForbidden } from '@/shared/apiError'
 import { componentsOf } from '@/shared/graphGeometry'
 import { typeGroup } from '@/shared/elementMeta'
 import { REL_ANNOTATION_ORDER, REL_META } from '@/shared/relationMeta'
@@ -30,20 +31,35 @@ import {
   listRelations,
   replaceParticipants
 } from '@/api/relation'
-import { getGraph, saveGraphLayout, validateGraph } from '@/api/graph'
+import {
+  getGraph,
+  resetGraphLayout,
+  saveGraphLayout,
+  validateGraph
+} from '@/api/graph'
 import type { RelationType } from '@/types/common'
 import type {
   MockProposition,
   Relation,
+  RelationIssue,
   RelationParticipant
 } from '@/types/relation'
-import type { GraphNode, GraphValidateResult, GraphView } from '@/types/graph'
+import type {
+  GraphNode,
+  GraphNodePosition,
+  GraphValidateResult,
+  GraphView
+} from '@/types/graph'
 
 /** 【临时】模拟标注草稿（data.sql 种子）。正式接入后由「我的标注任务」带 ?draft=xxx 进入。 */
 const DEMO_DRAFT_ID = 'md-1'
 /** 标注阶段关系归属草稿；裁定阶段为 ARBITER_CUSTOM，定稿为 FINAL_VERSION。 */
 const OWNER_TYPE = 'DRAFT'
-const LAYOUT_CANVAS = { canvasWidth: 1200, canvasHeight: 800 }
+/**
+ * 保存布局时的画布留白。画布尺寸不再写死 1200×800：单命题的图也只存实际大小，
+ * 否则取景时按固定画布缩放，那个 P1 会被缩到角落里。
+ */
+const CANVAS_PAD = 80
 const TAB_LABELS = ['一', '二', '三', '四', '五', '六', '七', '八']
 
 // 候选行：命题或已有关系，既要能画界面，也要能喂给关系矩阵判断
@@ -59,6 +75,8 @@ const draftId = computed(() => (route.query.draft as string) || DEMO_DRAFT_ID)
 
 const loading = ref(false)
 const saving = ref(false)
+/** 403 时保留后端原文；有值时整页换成「无权限」空状态，而不是空三栏。 */
+const forbidden = ref<string | null>(null)
 const propositions = ref<MockProposition[]>([])
 const relations = ref<Relation[]>([])
 const graph = ref<GraphView | null>(null)
@@ -68,6 +86,14 @@ const graphRef = ref<InstanceType<typeof ArgumentGraph> | null>(null)
 const activeNodeId = ref<string | null>(null)
 const activePropositionId = ref<string | null>(null)
 const tabIndex = ref(0)
+/**
+ * 尚未保存的坐标（拖动、重新布局产生）。
+ *
+ * 后端保存的 layout 只在 GR03 之后才更新；如果直接拿 graph.positions 当唯一来源，
+ * 切一次「图示一/图示二」就会重建、把刚拖好的位置又按旧布局摆回去。
+ */
+const draftPositions = ref<GraphNodePosition[] | null>(null)
+const resetLayoutOpen = ref(false)
 
 const editor = reactive({
   relationId: null as string | null,
@@ -89,6 +115,7 @@ onMounted(loadAll)
 
 async function loadAll(): Promise<void> {
   loading.value = true
+  forbidden.value = null
   try {
     const [elementList, relationPage, graphView] = await Promise.all([
       listMockPropositions(draftId.value),
@@ -100,7 +127,9 @@ async function loadAll(): Promise<void> {
     graph.value = graphView
     await runValidation()
   } catch (error) {
-    toast(errorMessageOf(error), 'err')
+    // 拦截器已按后端原文弹过提示；这里是页内兜底：403 显示权限说明，其它错误也保留原话。
+    if (isForbidden(error)) forbidden.value = errorMessageOf(error)
+    else toast(errorMessageOf(error), 'err')
   } finally {
     loading.value = false
   }
@@ -133,6 +162,41 @@ async function runValidation(): Promise<void> {
     validation.value = null
     toast(errorMessageOf(error), 'err')
   }
+}
+
+// ── 校验结论（放在图上方，先于细节看）──────────────────────────────────
+// 之前只有第六节里一行 `{{ validation?.status }}`，校验完仍是「待校验」的错觉；
+// 这里把「这稿到底过没过、差几条」做成图上方的一条常驻横幅。
+const issues = computed(() => validation.value?.issues ?? [])
+const errorIssues = computed(() => issues.value.filter((i) => i.level === 'ERROR'))
+const warnIssues = computed(() => issues.value.filter((i) => i.level === 'WARNING'))
+const passed = computed(
+  () => validation.value?.status === 'VALID' && errorIssues.value.length === 0
+)
+const validationTone = computed<'idle' | 'ok' | 'bad'>(() => {
+  if (!validation.value) return 'idle'
+  return passed.value ? 'ok' : 'bad'
+})
+const validationTitle = computed(() => {
+  if (!validation.value) return '尚未校验'
+  if (passed.value) return '校验通过，图可以保存和提交'
+  const counts: string[] = []
+  if (errorIssues.value.length) counts.push(`${errorIssues.value.length} 条错误`)
+  if (warnIssues.value.length) counts.push(`${warnIssues.value.length} 条提醒`)
+  return `还有 ${counts.length ? counts.join('、') : '结构问题'}，图还不能通过`
+})
+const validationDetail = computed(() => {
+  const view = validation.value
+  if (!view) return '点「重新校验」提交当前全部命题与关系。'
+  const stats = `${view.componentCount} 个独立论证图 · ${view.isolatedNodeIds.length} 个孤立命题`
+  if (passed.value) return stats
+  const first = errorIssues.value[0] ?? warnIssues.value[0]
+  return first ? `${first.message}（${stats}）` : stats
+})
+
+/** 点问题行时尽量在图上选中对应关系节点，让「哪一条」看得见。 */
+function focusIssue(issue: RelationIssue): void {
+  if (issue.relationId) activeNodeId.value = issue.relationId
 }
 
 // ── 左栏：裁判理由原文（模拟命题）──────────────────────────────────────
@@ -452,6 +516,27 @@ function resetView(): void {
   graphRef.value?.reset()
 }
 
+/** 传给 ArgumentGraph 的坐标：未保存的优先，其次是后端保存的布局。 */
+const savedPositions = computed(() => draftPositions.value ?? graph.value?.positions ?? [])
+
+function onPositionsChange(positions: GraphNodePosition[]): void {
+  draftPositions.value = positions
+}
+
+/**
+ * 重新布局。只改屏幕坐标，不改关系；要按「保存布局」才落到 GR03。
+ * 如果当前停在某个子图，先切回「全部」，否则只会重排当前子图的节点。
+ */
+async function relayout(): Promise<void> {
+  if (tabIndex.value !== 0) {
+    tabIndex.value = 0
+    await nextTick()
+  }
+  graphRef.value?.autoLayoutNow()
+  draftPositions.value = graphRef.value?.currentPositions() ?? null
+  toast('已按自动布局重排；点「保存布局」留存')
+}
+
 /** GR03：保存布局。切到「全部」再取坐标，避免只存下当前图示的子集。 */
 async function saveLayout(): Promise<void> {
   const view = graph.value
@@ -462,13 +547,49 @@ async function saveLayout(): Promise<void> {
   }
   const nodePositions = graphRef.value?.currentPositions() ?? []
   if (nodePositions.length === 0) return
+  // 画布尺寸按内容包围盒算，不再固定 1200×800；
+  // 否则单命题的图在默认画布里只占一个角，导出的 PNG 也大半是空白。
+  const bounds = graphRef.value?.contentBounds()
+  const canvasWidth = bounds
+    ? Math.max(640, Math.round(bounds.maxX - bounds.minX + CANVAS_PAD * 2))
+    : 800
+  const canvasHeight = bounds
+    ? Math.max(480, Math.round(bounds.maxY - bounds.minY + CANVAS_PAD * 2))
+    : 600
   saving.value = true
   try {
     const result = await saveGraphLayout(view.graphId, {
-      ...LAYOUT_CANVAS,
+      canvasWidth,
+      canvasHeight,
       nodePositions
     })
+    draftPositions.value = null
     toast(`布局已保存（版本 ${result.layoutVersion}）`)
+    await refresh()
+  } catch (error) {
+    toast(errorMessageOf(error), 'err')
+  } finally {
+    saving.value = false
+  }
+}
+
+/**
+ * 清除已保存布局。注意：清的是「坐标」，不是图里的节点。
+ *
+ * 图是从当前命题与关系**推导**出来的（GR01 每次都按现状重建），
+ * 命题只要还属于这份草稿，节点就一定还在——「重置图示后节点还在」不是 bug。
+ * 要让某个节点消失，下一步只有一个：在「五、已标注关系」里删掉相关关系
+ * （命题本身归成员A的要素管理，本页不删命题）。
+ */
+async function confirmResetLayout(): Promise<void> {
+  const view = graph.value
+  if (!view) return
+  saving.value = true
+  try {
+    await resetGraphLayout(view.graphId)
+    draftPositions.value = null
+    resetLayoutOpen.value = false
+    toast('已清除保存的布局，图示按自动布局重新排列')
     await refresh()
   } catch (error) {
     toast(errorMessageOf(error), 'err')
@@ -479,7 +600,9 @@ async function saveLayout(): Promise<void> {
 </script>
 
 <template>
-  <div class="wb">
+  <!-- 403：整页换成权限说明，后端文案原样显示 -->
+  <ForbiddenNotice v-if="forbidden && !graph" :message="forbidden" @retry="loadAll" />
+  <div v-else class="wb">
     <!-- ── 左：裁判理由原文 ─────────────────────────────────────── -->
     <section class="wb-col wb-left">
       <div class="wb-col-head">
@@ -517,6 +640,23 @@ async function saveLayout(): Promise<void> {
         <span style="flex: 1"></span>
         <span class="t-xs muted">{{ relations.length }} 条</span>
       </div>
+
+      <!-- 校验结论常驻：通过/不通过一眼可见，不必翻到第六节去找状态 -->
+      <div class="wb-banner" :class="`is-${validationTone}`">
+        <Icon
+          :name="validationTone === 'ok' ? 'checkc' : validationTone === 'bad' ? 'alert' : 'info'"
+          cls="banner-ico"
+        />
+        <div class="wb-banner-text">
+          <b>{{ validationTitle }}</b>
+          <span>{{ validationDetail }}</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" :disabled="loading" @click="runValidation">
+          <Icon name="refresh" />
+          重新校验
+        </button>
+      </div>
+
       <div class="wb-col-body">
         <!-- 关系类型 -->
         <div class="op-sec">
@@ -693,24 +833,29 @@ async function saveLayout(): Promise<void> {
           <h4>六、嵌套与完整性检查</h4>
           <p class="t-xs muted">
             图示状态：
-            <b :style="{ color: validation?.status === 'VALID' ? 'var(--success)' : 'var(--danger)' }">
-              {{ validation?.status ?? '—' }}
+            <b :style="{ color: passed ? 'var(--success)' : 'var(--danger)' }">
+              {{ validation ? (passed ? '通过' : '未通过') : '尚未校验' }}
             </b>
             · 独立论证图 {{ validation?.componentCount ?? graph?.componentCount ?? 0 }} 个
-            · 孤立命题 {{ validation?.isolatedNodeIds?.length ?? 0 }} 个
+            · 孤立命题 {{ validation?.isolatedNodeIds.length ?? 0 }} 个
           </p>
-          <div v-if="validation?.issues?.length" style="margin-top: 8px">
+          <div v-if="issues.length" style="margin-top: 8px">
             <p
-              v-for="(issue, index) in validation.issues"
+              v-for="(issue, index) in issues"
               :key="`${issue.code}-${index}`"
               class="t-xs"
-              :style="{ color: issue.level === 'ERROR' ? 'var(--danger)' : 'var(--warn)' }"
+              :style="{
+                color: issue.level === 'ERROR' ? 'var(--danger)' : 'var(--warn)',
+                cursor: issue.relationId ? 'pointer' : 'default'
+              }"
+              @click="focusIssue(issue)"
             >
               <Icon :name="issue.level === 'ERROR' ? 'alert' : 'info'" />
               {{ issue.message }}
+              <span v-if="issue.relationId" class="muted">（点击定位）</span>
             </p>
           </div>
-          <p v-else class="t-xs muted" style="margin-top: 8px">
+          <p v-else-if="passed" class="t-xs muted" style="margin-top: 8px">
             未发现错误方向、非法嵌套、J/M 混用与孤立命题问题。
           </p>
           <div v-if="pendingHints.length" style="margin-top: 8px">
@@ -739,9 +884,14 @@ async function saveLayout(): Promise<void> {
           </button>
         </div>
         <span style="flex: 1"></span>
-        <span class="t-xs muted">
-          布局 v{{ graph?.layoutVersion ?? 0 }} · {{ graph?.status ?? '—' }}
+        <!-- 校验状态与布局版本分开显示：两件事，别混成一个「·」 -->
+        <span
+          class="t-xs"
+          :style="{ color: validationTone === 'ok' ? 'var(--success)' : validationTone === 'bad' ? 'var(--danger)' : 'var(--muted)' }"
+        >
+          {{ validationTone === 'ok' ? '校验通过' : validationTone === 'bad' ? `未通过 ${errorIssues.length}` : '待校验' }}
         </span>
+        <span class="t-xs muted">布局 v{{ graph?.layoutVersion ?? 0 }}</span>
         <button class="btn btn-icon btn-ghost" title="适应窗口" @click="refit">
           <Icon name="fit" />
         </button>
@@ -754,6 +904,20 @@ async function saveLayout(): Promise<void> {
         <button class="btn btn-icon btn-ghost" title="回到原点" @click="resetView">
           <Icon name="undo" />
         </button>
+        <button
+          class="btn btn-icon btn-ghost"
+          title="重新布局（孤立命题放左上，其余按层排列）"
+          @click="relayout"
+        >
+          <Icon name="layers" />
+        </button>
+        <button
+          class="btn btn-icon btn-ghost"
+          title="清除已保存的布局"
+          @click="resetLayoutOpen = true"
+        >
+          <Icon name="refresh" />
+        </button>
         <GraphExportButtons :target="graphRef" :name="`标注工作台-${draftId}`" />
         <button class="btn btn-secondary btn-sm" :disabled="saving" @click="saveLayout">
           <Icon name="save" />
@@ -765,10 +929,12 @@ async function saveLayout(): Promise<void> {
         style="flex: 1 1 auto; min-height: 0"
         :nodes="visibleNodes"
         :edges="visibleEdges"
-        :positions="graph?.positions ?? []"
+        :positions="savedPositions"
         :active-id="activeNodeId"
+        :editable="tabIndex === 0"
         @update:active-id="activeNodeId = $event"
         @node-click="onGraphNodeClick"
+        @positions-change="onPositionsChange"
       />
       <div class="graph-legend">
         <span v-for="item in legendItems" :key="item.code" class="lg">
@@ -800,6 +966,27 @@ async function saveLayout(): Promise<void> {
     <template #footer>
       <button class="btn btn-secondary" @click="deleteState.open = false">取消</button>
       <button class="btn btn-danger" @click="confirmDelete">确认删除</button>
+    </template>
+  </BaseModal>
+
+  <BaseModal
+    v-model:open="resetLayoutOpen"
+    title="清除已保存的布局"
+    sub="只清除坐标，不删除命题与关系"
+  >
+    <p class="t-sm" style="line-height: 1.7">
+      清除后图示会按自动布局重新排列（孤立命题在左上，有关系的部分按层展开）。
+      命题仍属于本图，所以节点不会消失——图示是从当前命题与关系推导出来的。
+    </p>
+    <p class="t-sm" style="line-height: 1.7; margin-top: 8px">
+      如果想让某个节点从图上消失，下一步只有一个：在「五、已标注关系」里删除与它相关的关系；
+      命题本身由成员A的要素管理维护，本页不删除命题。
+    </p>
+    <template #footer>
+      <button class="btn btn-secondary" @click="resetLayoutOpen = false">取消</button>
+      <button class="btn btn-danger" :disabled="saving" @click="confirmResetLayout">
+        确认清除
+      </button>
     </template>
   </BaseModal>
 </template>

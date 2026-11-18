@@ -10,10 +10,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Component;
 
 /**
- * C 的不透明会话令牌：SecureRandom 32 字节，8 小时有效，登出即时撤销。
+ * 登录令牌的内存存储。归成员 C（分工.md §六）。
+ *
+ * <p>不透明令牌 + 服务端会话：SecureRandom 32 字节后 Base64URL 编码，8 小时有效，登出即时撤销。
  * 会话目前仅存进程内；服务重启后需重新登录，持久化账号和业务数据不受影响。
  * 主体权限由 UnifiedVersionIdentity 每次从共享用户/角色重新读取。
- * 后续多实例部署需替换为共享令牌存储，不改变 issue/resolve/revoke 协议。
+ *
+ * <p>多实例部署时把 {@link #sessions} 换成共享存储即可，对外接口
+ * （{@link #issue} / {@link #resolve} / {@link #revoke}）不用变。
  */
 @Component
 public class TokenStore {

@@ -4,6 +4,7 @@ import com.argument.common.response.ApiResponse;
 import com.argument.graph.dto.*;
 import com.argument.graph.service.ArgumentGraphService;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +51,13 @@ public class ArgumentGraphController {
             @PathVariable String graphId,
             @Valid @RequestBody LayoutCreateRequest request) {
         return ApiResponse.ok(new LayoutCreateResult(graphService.saveLayout(graphId, request)));
+    }
+
+    // GR03 清除已保存布局（只删坐标，不删节点）；GR01 回退自动布局
+    @DeleteMapping("/graphs/{graphId}/layouts")
+    @PreAuthorize("hasAnyRole('admin','annotator','arbiter')")
+    public ApiResponse<Map<String, Integer>> resetLayouts(@PathVariable String graphId) {
+        graphService.resetLayouts(graphId);
+        return ApiResponse.ok(Map.of("layoutVersion", 0));
     }
 }
