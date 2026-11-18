@@ -27,17 +27,19 @@ public class AuditTrialService {
         return actor.role("ARBITER") && actor.permission("FINAL_REVIEW") && access.hasAssignment(actor,e.path("taskDocumentId").asText(),"ARBITER");
     }
     public ObjectNode list(Actor actor,Map<String,String> filters,int page,int size) {
-        role(actor);require(Set.of("objectType","objectId","actorId","from","to","page","size").containsAll(filters.keySet()),ErrorCode.VALIDATION_ERROR,"不支持的审计查询字段");
+        role(actor);require(Set.of("objectType","objectId","actorId","actorName","taskName","from","to","page","size").containsAll(filters.keySet()),ErrorCode.VALIDATION_ERROR,"不支持的审计查询字段");
         for(String field:List.of("objectId","actorId"))if(filters.containsKey(field))VersionJson.uuid(filters.get(field));
         if(filters.containsKey("objectType"))require(Set.of("FinalAnnotationVersion","Task","TaskDocument","AdjudicationSession").contains(filters.get("objectType")),ErrorCode.VALIDATION_ERROR,"不支持的审计对象类型");
         Instant from=time(filters.get("from")),to=time(filters.get("to"));require(from==null || to==null || !from.isAfter(to),ErrorCode.VALIDATION_ERROR,"开始时间不能晚于结束时间");
-        var rows=store.events().stream().filter(e->visible(actor,e))
+        var rows=store.events(filters).stream().filter(e->visible(actor,e))
                 .filter(e->!filters.containsKey("objectType") || filters.get("objectType").equals(e.path("objectType").asText()))
                 .filter(e->!filters.containsKey("objectId") || filters.get("objectId").equals(e.path("objectId").asText()))
                 .filter(e->!filters.containsKey("actorId") || filters.get("actorId").equals(e.path("actorUserId").asText()))
+                .filter(e->matches("user",e.path("actorUserId").asText(),"displayName",filters.get("actorName")))
+                .filter(e->matches("task",e.path("taskId").asText(),"name",filters.get("taskName")))
                 .filter(e->from==null || !Instant.parse(e.path("occurredAt").asText()).isBefore(from))
                 .filter(e->to==null || !Instant.parse(e.path("occurredAt").asText()).isAfter(to)).toList();
-        var result=mapper.createObjectNode().put("total",rows.size());var items=result.putArray("items");rows.stream().skip((long)(page-1)*size).limit(size).forEach(items::add);return result;
+        var result=mapper.createObjectNode().put("total",rows.size());var items=result.putArray("items");rows.stream().skip((long)(page-1)*size).limit(size).forEach(e->{var row=e.deepCopy();row.put("actorName",label("user",e.path("actorUserId").asText(),"displayName"));row.put("taskName",label("task",e.path("taskId").asText(),"name"));items.add(row);});return result;
     }
     public ObjectNode provenance(Actor actor,String type,String id) {
         require("FinalAnnotationVersion".equals(type),ErrorCode.VALIDATION_ERROR,"本批来源查询仅支持最终版本；其他对象待团队确认");
@@ -51,6 +53,10 @@ public class AuditTrialService {
         var workspace=finals.workspace(actor,id);var result=mapper.createObjectNode().put("total",workspace.path("history").size());var items=result.putArray("items");int i=0;
         for(var h:workspace.path("history")){if(i++<(long)(page-1)*size || items.size()>=size)continue;items.addObject().set("recordVersion",h.path("after").path("recordVersion"));((ObjectNode)items.get(items.size()-1)).set("at",h.path("createdAt"));}return result;
     }
+    private String label(String kind,String id,String field) {
+        try{return data.read(kind,id).path(field).asText();}catch(BusinessException ex){if(ex.getErrorCode()==ErrorCode.NOT_FOUND)return "";throw ex;}
+    }
+    private boolean matches(String kind,String id,String field,String query) {return query==null || label(kind,id,field).toLowerCase(Locale.ROOT).contains(query.trim().toLowerCase(Locale.ROOT));}
     private Instant time(String value) {
         if(value==null)return null;
         try {require(value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"),ErrorCode.VALIDATION_ERROR,"查询时间必须为 UTC 秒精度格式");return Instant.parse(value);}

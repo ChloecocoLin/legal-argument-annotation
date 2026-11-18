@@ -25,8 +25,7 @@ public class LocalAnnotationDependencies implements AnnotationDependencies {
         return VersionJson.parse(mapper,rows.get(0));
     }
     public List<ObjectNode> find(String kind,String field,String value) {
-        return jdbc.queryForList("SELECT payload_json FROM workflow_records WHERE object_kind=? ORDER BY object_id",String.class,kind)
-            .stream().map(s->VersionJson.parse(mapper,s)).filter(n->field==null || n.path(field).asText().equals(value)).toList();
+        return com.argument.integration.WorkflowRecordQuery.find(jdbc,mapper,kind,field,value);
     }
     public void replace(String kind,ObjectNode record) {
         if(jdbc.update("UPDATE workflow_records SET payload_json=? WHERE object_kind=? AND object_id=?",record.toString(),kind,record.path("id").asText())!=1)

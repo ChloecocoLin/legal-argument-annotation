@@ -32,7 +32,13 @@ public class TaskService {
     public DocumentService.Result list(String q, String status, String taskType, int page, int size) {
         DevUser user = AuthContext.requireAnyRole("ADMIN", "TASK_CREATOR", "ANNOTATOR", "ARBITER");
         List<Map<String, Object>> items = new ArrayList<>();
-        for (Map<String, Object> task : store.tasks.values()) {
+        Set<String> visibleIds=new HashSet<>();
+        if(!user.hasRole("ADMIN")){
+            store.find(store.tasks,"ownerUserId",user.userId()).forEach(t->visibleIds.add(Records.str(t,"id")));
+            store.find(store.taskMembers,"userId",user.userId()).stream().filter(m->"ACTIVE".equals(Records.str(m,"status"))).forEach(m->visibleIds.add(Records.str(m,"taskId")));
+        }
+        var candidates=user.hasRole("ADMIN")?store.tasks.values():visibleIds.stream().map(store.tasks::get).filter(java.util.Objects::nonNull).toList();
+        for (Map<String, Object> task : candidates) {
             if (!access.isTaskMember(user, Records.str(task, "id"))
                     && !user.userId().equals(Records.str(task, "ownerUserId"))
                     && !user.hasRole("ADMIN")) {
@@ -159,7 +165,7 @@ public class TaskService {
             throw new BusinessException(ErrorCode.SCOPE_NOT_CONFIRMED, "标注范围尚未确认");
         }
         boolean dup =
-                store.taskDocuments.values().stream()
+                store.find(store.taskDocuments,"taskId",taskId).stream()
                         .anyMatch(
                                 row ->
                                         taskId.equals(Records.str(row, "taskId"))
@@ -280,7 +286,7 @@ public class TaskService {
         Map<String, Object> task = access.requireTask(taskId);
         access.requireCreator(user, task);
         List<Map<String, Object>> docs = new ArrayList<>();
-        for (Map<String, Object> td : store.taskDocuments.values()) {
+        for (Map<String, Object> td : store.find(store.taskDocuments,"taskId",taskId)) {
             if (!taskId.equals(Records.str(td, "taskId"))) {
                 continue;
             }
@@ -352,7 +358,7 @@ public class TaskService {
                         .filter(m -> "ACTIVE".equals(Records.str(m, "status")))
                         .toList();
         List<Map<String, Object>> docs =
-                store.taskDocuments.values().stream()
+                store.find(store.taskDocuments,"taskId",taskId).stream()
                         .filter(d -> taskId.equals(Records.str(d, "taskId")))
                         .toList();
         int need =
@@ -389,7 +395,7 @@ public class TaskService {
                 throw new BusinessException(ErrorCode.TASK_NOT_READY, "只有草稿可以发布");
             }
             boolean hasDoc =
-                    store.taskDocuments.values().stream().anyMatch(d -> taskId.equals(Records.str(d, "taskId")));
+                    store.find(store.taskDocuments,"taskId",taskId).stream().anyMatch(d -> taskId.equals(Records.str(d, "taskId")));
             if (!hasDoc) {
                 throw new BusinessException(ErrorCode.TASK_NOT_READY, "发布前至少绑定一篇文书");
             }
@@ -399,7 +405,7 @@ public class TaskService {
                 throw new BusinessException(ErrorCode.TASK_NOT_READY, "当前状态不能启动");
             }
             List<Map<String, Object>> docs =
-                    store.taskDocuments.values().stream()
+                    store.find(store.taskDocuments,"taskId",taskId).stream()
                             .filter(d -> taskId.equals(Records.str(d, "taskId")))
                             .toList();
             if (docs.isEmpty()) {
@@ -423,12 +429,12 @@ public class TaskService {
             throw new BusinessException(ErrorCode.FORBIDDEN, "无权查看进度");
         }
         List<Map<String, Object>> items = new ArrayList<>();
-        for (Map<String, Object> td : store.taskDocuments.values()) {
+        for (Map<String, Object> td : store.find(store.taskDocuments,"taskId",taskId)) {
             if (!taskId.equals(Records.str(td, "taskId"))) {
                 continue;
             }
             long submitted =
-                    store.submissions.values().stream()
+                    store.find(store.submissions,"taskDocumentId",Records.str(td,"id")).stream()
                             .filter(s -> Records.str(td, "id").equals(Records.str(s, "taskDocumentId")))
                             .filter(s -> List.of("SUBMITTED", "ACCEPTED").contains(Records.str(s, "status")))
                             .map(s -> Records.str(s, "createdById"))
@@ -436,7 +442,7 @@ public class TaskService {
                             .count();
             if (user.hasRole("ANNOTATOR") && !user.hasAnyRole("ADMIN", "TASK_CREATOR", "ARBITER")) {
                 submitted =
-                        store.submissions.values().stream()
+                        store.find(store.submissions,"taskDocumentId",Records.str(td,"id")).stream()
                                 .filter(s -> Records.str(td, "id").equals(Records.str(s, "taskDocumentId")))
                                 .filter(s -> user.userId().equals(Records.str(s, "createdById")))
                                 .filter(s -> List.of("SUBMITTED", "ACCEPTED").contains(Records.str(s, "status")))
@@ -505,9 +511,9 @@ public class TaskService {
             if(user.hasAnyRole("ADMIN","TASK_CREATOR","ARBITER")||user.userId().equals(Records.str(member,"userId")))members.add(item);
         }
         List<Map<String, Object>> documents = new ArrayList<>();
-        for (Map<String, Object> td : store.taskDocuments.values()) {
+        for (Map<String, Object> td : store.find(store.taskDocuments,"taskId",taskId)) {
             if (taskId.equals(Records.str(td, "taskId"))) {
-                if(user.hasAnyRole("ADMIN","TASK_CREATOR")||store.assignments.values().stream().anyMatch(a->Records.str(td,"id").equals(Records.str(a,"taskDocumentId"))&&user.userId().equals(Records.str(a,"userId"))&&"ACTIVE".equals(Records.str(a,"status"))))documents.add(Records.copy(td));
+                if(user.hasAnyRole("ADMIN","TASK_CREATOR")||store.find(store.assignments,"taskDocumentId",Records.str(td,"id")).stream().anyMatch(a->Records.str(td,"id").equals(Records.str(a,"taskDocumentId"))&&user.userId().equals(Records.str(a,"userId"))&&"ACTIVE".equals(Records.str(a,"status"))))documents.add(Records.copy(td));
             }
         }
         Map<String, Object> data = new LinkedHashMap<>();

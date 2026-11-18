@@ -19,5 +19,10 @@ public class CommitTrialRepository {
     public void commitment(String caseId,String finalId,String auditId,ObjectNode evidence) {
         jdbc.update("INSERT INTO trial_final_commitments(task_document_id,final_version_id,audit_event_id,evidence_json) VALUES (?,?,?,?)",caseId,finalId,auditId,evidence.toString());
     }
+    public List<ObjectNode> events(java.util.Map<String,String> filters) {
+        String sql="SELECT payload_json FROM trial_audit_events WHERE 1=1";var args=new java.util.ArrayList<Object>();
+        for(String[] f:new String[][]{{"objectId","object_id","="},{"from","occurred_at",">="},{"to","occurred_at","<="}})if(filters.containsKey(f[0])){sql+=" AND "+f[1]+f[2]+"?";args.add(filters.get(f[0]));}
+        return jdbc.queryForList(sql+" ORDER BY occurred_at DESC,id",String.class,args.toArray()).stream().map(s->VersionJson.parse(mapper,s)).toList();
+    }
     public List<ObjectNode> events() {return jdbc.queryForList("SELECT payload_json FROM trial_audit_events ORDER BY occurred_at DESC,id",String.class).stream().map(s->VersionJson.parse(mapper,s)).toList();}
 }

@@ -23,7 +23,7 @@ onBeforeRouteLeave(()=>!blocked.value&&!dirty.value)
 onMounted(load)
 </script>
 <template><section class="page"><div class="page-head"><h1>学生标注练习</h1><router-link class="btn" to="/teaching">教学工作台</router-link></div>
-<p class="notice">教学试行：每次提交独立保留。标准答案与关系专项评分在提交且到达开放时间后显示；总分暂不汇总。</p>
+<p class="notice">每次提交独立保留。标准答案与关系专项评分在提交且到达开放时间后显示。</p>
 <p v-if="message||error" role="alert">{{message||error}}</p><button v-if="pending&&!busy" class="btn" @click="act('',{})">重试未确认的操作</button>
 <fieldset :disabled="blocked||dirty"><label>选择作业 <select v-model="selected" @change="load"><option value="">请选择</option><option v-for="a in assignments" :key="a.id" :value="a.id">{{a.name}}</option></select></label></fieldset>
 <template v-if="context"><p>截止：{{context.assignment.dueAt}} · 答案开放：{{context.assignment.answerOpensAt}} · 最多 {{context.assignment.maxAttempts}} 次</p><article class="card" style="white-space:pre-wrap">{{context.material.scopeText}}</article>

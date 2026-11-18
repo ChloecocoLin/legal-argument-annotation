@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest @AutoConfigureMockMvc @ActiveProfiles("test")
 class CommitAuditTrialWorkflowTest {
@@ -110,6 +111,18 @@ class CommitAuditTrialWorkflowTest {
         var v=approved();String key=VersionJson.uuid();commit(v,key);for(String token:List.of("dev-admin-wang","dev-creator-li","dev-annotator-chen","dev-expert-qian"))postAs(token,v,VersionJson.uuid(),4,confirm(),403);
         var assignment=data.find("assignment","taskDocumentId",CASE).stream().filter(a->"ARBITER".equals(a.path("assignmentRole").asText())).findFirst().orElseThrow();assignment.put("status","DISABLED");data.replace("assignment",assignment);postAs("dev-arbiter-zhao",v,key,3,confirm(),403);
         assertThat(count("trial_audit_events")).isEqualTo(1);
+    }
+    @Test void auditNamesAndDateFiltersKeepAuthorizationAndImmutableEvents() throws Exception {
+        var v=approved();commit(v,VersionJson.uuid());var stored=audit.events().get(0).deepCopy();
+        String person=data.read("user",stored.path("actorUserId").asText()).path("displayName").asText();
+        String task=data.read("task",TASK).path("name").asText();
+        var response=mapper.readTree(mvc.perform(get("/api/v1/audit-events").header("Authorization","Bearer dev-admin-wang").param("actorName",person).param("taskName",task).param("from","2020-01-01T00:00:00Z").param("to","2099-01-01T00:00:00Z")).andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        assertThat(response.path("data").path("items").size()).isEqualTo(1);
+        assertThat(response.path("data").path("items").get(0).path("actorName").asText()).isEqualTo(person);
+        assertThat(response.path("data").path("items").get(0).path("taskName").asText()).isEqualTo(task);
+        assertThat(getAs("dev-admin-wang","/api/v1/audit-events?taskName=DOES_NOT_EXIST",200).path("meta").path("total").asInt()).isZero();
+        assertThat(getAs("dev-admin-wang","/api/v1/audit-events?from=2099-01-01T00:00:00Z",200).path("meta").path("total").asInt()).isZero();
+        assertThat(audit.events()).containsExactly(stored);
     }
     @Test void auditQueriesRespectScopeAndDoNotGrantContentAccess() throws Exception {
         var v=approved();commit(v,VersionJson.uuid());String id=v.path("id").asText();var admin=getAs("dev-admin-wang","/api/v1/audit-events?objectId="+id+"&size=1",200);assertThat(admin.path("meta").path("total").asInt()).isEqualTo(1);assertThat(admin.path("data").path("items").size()).isEqualTo(1);assertThat(getAs("dev-creator-li","/api/v1/audit-events",200).path("data").path("total").asInt()).isEqualTo(1);

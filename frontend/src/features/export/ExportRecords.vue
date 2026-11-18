@@ -42,9 +42,9 @@ onMounted(async () => { await load(); if(typeof route.query.id === 'string') awa
 onUnmounted(() => { disposed = true; clearTimeout(timer) })
 </script>
 <template>
-  <LocalSession description="D 分支试行：查询真实导出记录，申请短时凭证并下载文件" />
+  <LocalSession description="查询导出记录并下载文件" />
   <div class="page-head between"><div><div class="eyebrow">EXPORT RECORDS</div><h1 class="t-h1">导出记录</h1><p class="t-sm muted">每份文件保留固定来源版本、摘要与下载记录。</p></div><router-link to="/export" class="btn btn-primary">＋ 新建导出</router-link></div>
-  <div class="note warn boundary">文件与下载模型待团队评审。本地试行已接通；PNG / SVG 已接入服务端试行渲染，正式渲染模型待团队评审。</div>
+  <div class="note warn boundary">选择已完成的记录下载文件；尚未生成文件时，请先前往导出中心。</div>
   <div v-if="error" class="note danger" role="alert">{{ error }} <button class="btn btn-sm" @click="load">刷新</button></div>
   <section class="card"><div class="card-head between"><select class="select" aria-label="导出状态" v-model="status" @change="page=1;load()"><option value="">全部状态</option><option v-for="(label,value) in names" :key="value" :value="value">{{ label }}</option></select><button class="btn btn-secondary" @click="load" :disabled="loading">{{ loading ? '读取中…' : '刷新' }}</button></div>
   <div class="tbl-wrap"><table class="tbl"><thead><tr><th>编号</th><th>最终版数</th><th>格式</th><th>时间</th><th>大小</th><th>状态</th><th>操作</th></tr></thead><tbody><tr v-for="row in items" :key="row.id"><td class="mono">{{ row.id.slice(0,8) }}</td><td>{{ row.finalVersionIds.length }}</td><td>{{ row.format }}</td><td>{{ formatTime(row.requestedAt) }}</td><td>{{ row.file ? (row.file.sizeBytes/1024).toFixed(1)+' KB' : '—' }}</td><td>{{ names[row.status] || row.status }}</td><td><button class="btn btn-sm" @click="show(row.id)">详情</button> <button class="btn btn-sm btn-primary" :disabled="row.status !== 'COMPLETED' || busy || attempt.pending() && downloadAttemptId !== row.id" @click="download(row)">{{ attempt.pending() && downloadAttemptId === row.id ? '重试下载' : '下载' }}</button></td></tr><tr v-if="!items.length"><td colspan="7" class="empty muted">{{ loading ? '正在读取记录…' : '当前范围内没有导出记录' }}</td></tr></tbody></table></div>

@@ -25,7 +25,7 @@ public class AccessService {
         if (user.hasAnyRole("ADMIN", "TASK_CREATOR")) {
             return identity.actor(user.userId()).permission("DOCUMENT_VIEW");
         }
-        return store.assignments.values().stream()
+        return store.find(store.assignments,"userId",user.userId()).stream()
                 .filter(row -> user.userId().equals(Records.str(row, "userId")))
                 .filter(row -> "ACTIVE".equals(Records.str(row, "status")))
                 .filter(row -> versions.hasAssignment(identity.actor(user.userId()),Records.str(row,"taskDocumentId"),Records.str(row,"assignmentRole")))
@@ -37,7 +37,7 @@ public class AccessService {
         if (user.hasRole("ADMIN")) {
             return true;
         }
-        return store.taskMembers.values().stream()
+        return store.find(store.taskMembers,"taskId",taskId).stream()
                 .anyMatch(
                         row ->
                                 taskId.equals(Records.str(row, "taskId"))

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowStore {
  public final Map<String,Map<String,Object>> users,roles,documents,textVersions,scopes,tasks,taskDocuments,taskMembers,assignments,submissions,checkpoints,finalVersions;
+ public List<Map<String,Object>> find(Map<String,Map<String,Object>> records,String field,String value){
+  if(records instanceof PersistentRecordMap persistent)return persistent.find(field,value);
+  return records.values().stream().filter(r->value.equals(String.valueOf(r.get(field)))).toList();
+ }
  public WorkflowStore(JdbcTemplate jdbc,ObjectMapper mapper,FinalReviewRepository finals){
   users=new PersistentRecordMap(jdbc,mapper,"user");roles=new PersistentRecordMap(jdbc,mapper,"role");documents=new PersistentRecordMap(jdbc,mapper,"document");textVersions=new PersistentRecordMap(jdbc,mapper,"text");scopes=new PersistentRecordMap(jdbc,mapper,"scope");tasks=new PersistentRecordMap(jdbc,mapper,"task");taskDocuments=new PersistentRecordMap(jdbc,mapper,"taskDocument");taskMembers=new PersistentRecordMap(jdbc,mapper,"member");assignments=new PersistentRecordMap(jdbc,mapper,"assignment");submissions=new PersistentRecordMap(jdbc,mapper,"segmentationSubmission");checkpoints=new PersistentRecordMap(jdbc,mapper,"checkpoint");
   finalVersions=new AbstractMap<>(){

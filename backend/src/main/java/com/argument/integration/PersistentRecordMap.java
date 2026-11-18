@@ -30,8 +30,15 @@ public final class PersistentRecordMap extends AbstractMap<String, Map<String,Ob
     @Override public Map<String,Object> remove(Object key){writable();var old=get(key);jdbc.update("DELETE FROM workflow_records WHERE object_kind=? AND object_id=?",kind,key);return old;}
     @Override public Set<Entry<String,Map<String,Object>>> entrySet(){
         var result=new LinkedHashSet<Entry<String,Map<String,Object>>>();
-        for(String id:jdbc.queryForList("SELECT object_id FROM workflow_records WHERE object_kind=? ORDER BY object_id",String.class,kind))result.add(new SimpleImmutableEntry<>(id,get(id)));
+        jdbc.query("SELECT object_id,payload_json FROM workflow_records WHERE object_kind=? ORDER BY object_id",rs->{
+            String id=rs.getString(1);var values=mapper.convertValue(VersionJson.parse(mapper,rs.getString(2)),new TypeReference<Map<String,Object>>(){});
+            result.add(new SimpleImmutableEntry<>(id,new RecordView(id,values)));
+        },kind);
         return Collections.unmodifiableSet(result);
+    }
+    public List<Map<String,Object>> find(String field,String value){
+        return WorkflowRecordQuery.find(jdbc,mapper,kind,field,value).stream()
+            .map(n->(Map<String,Object>)new RecordView(n.path("id").asText(),mapper.convertValue(n,new TypeReference<Map<String,Object>>(){}))).toList();
     }
     private void writable(){if(!TransactionSynchronizationManager.isActualTransactionActive()||TransactionSynchronizationManager.isCurrentTransactionReadOnly())throw new IllegalStateException("Workflow writes require a shared transaction");}
     private final class RecordView extends AbstractMap<String,Object> {
